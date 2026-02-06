@@ -1,20 +1,21 @@
 :root {
-  --primary: #a5ad97;
-  --primary-light: #c1c8b5;
-  --primary-dark: #8a9279;
-  --accent: #e8b86d;
-  --bg: #0d1117;
-  --bg-secondary: #161b22;
-  --bg-tertiary: #21262d;
+  /* Cyberpunk Theme */
+  --primary: #00FFFF;
+  --primary-light: #33FFFF;
+  --primary-dark: #00CCCC;
+  --accent: #EC4899;
+  --bg: #000000;
+  --bg-secondary: #0a0a0a;
+  --bg-tertiary: #141414;
   --card-bg: #1c2128;
-  --text: #e6edf3;
-  --text-secondary: #8b949e;
-  --text-muted: #6e7681;
-  --border: #30363d;
-  --success: #238636;
-  --warning: #f0883e;
-  --danger: #da3633;
-  --info: #58a6ff;
+  --text: #ffffff;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border: #1e293b;
+  --success: #00FF00;
+  --warning: #FFFF00;
+  --danger: #FF0066;
+  --info: #00FFFF;
 }
 
 * {
@@ -64,10 +65,10 @@ body {
 .logo-text {
   font-size: 24px;
   font-weight: 700;
-  letter-spacing: 2px;
-  background: linear-gradient(135deg, var(--accent), #f4d03f);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  letter-spacing: 3px;
+  color: var(--primary);
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  font-family: 'Courier New', monospace;
 }
 
 .main-nav {
@@ -76,24 +77,27 @@ body {
 }
 
 .nav-btn {
-  background: transparent;
+  background: var(--card-bg);
   border: none;
   color: var(--text-secondary);
   padding: 8px 16px;
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
 .nav-btn:hover {
-  color: var(--text);
-  background: var(--bg-tertiary);
+  color: var(--primary);
+  text-shadow: 0 0 10px var(--primary);
 }
 
 .nav-btn.active {
+  background: var(--bg);
   color: var(--accent);
-  background: rgba(232, 184, 109, 0.1);
+  border-bottom: 2px solid var(--accent);
+  box-shadow: 0 0 15px rgba(236, 72, 153, 0.3);
 }
 
 .header-actions {
@@ -160,7 +164,7 @@ body {
 
 /* Buttons */
 .btn-primary {
-  background: var(--primary);
+  background: var(--accent);
   color: white;
   border: none;
   padding: 10px 20px;
@@ -168,11 +172,12 @@ body {
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .btn-primary:hover {
-  background: var(--primary-light);
+  background: var(--accent);
+  box-shadow: 0 0 15px rgba(236, 72, 153, 0.5);
 }
 
 .btn-secondary {
@@ -295,7 +300,7 @@ body {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  background: linear-gradient(90deg, #00FFFF, #EC4899);
   border-radius: 4px;
   transition: width 0.5s ease;
 }
@@ -1206,9 +1211,10 @@ body {
 }
 
 .counsel-session-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
   border-color: var(--primary);
+  transition: all 0.3s ease;
 }
 
 .session-header {
@@ -1533,9 +1539,10 @@ body {
 }
 
 .learning-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
   border-color: var(--primary);
+  transition: all 0.3s ease;
 }
 
 .learning-card-header {
@@ -1703,7 +1710,7 @@ body {
 
 .progress-fill {
   height: 100%;
-  background: var(--primary);
+  background: linear-gradient(90deg, #00FFFF, #EC4899);
   border-radius: 3px;
   transition: width 0.3s ease;
 }
