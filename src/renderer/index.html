@@ -126,7 +126,10 @@
               <button class="goal-filter-btn" data-filter="finance">Finance</button>
               <button class="goal-filter-btn" data-filter="personal">Personal</button>
             </div>
-            <button class="btn-secondary" id="showArchivedBtn">📦 Show Archived</button>
+            <div class="goals-toggles">
+              <button class="btn-secondary" id="showCompletedBtn">✓ Show Completed</button>
+              <button class="btn-secondary" id="showArchivedBtn">📦 Show Archived</button>
+            </div>
           </div>
         </div>
 
@@ -165,6 +168,32 @@
               <div class="loading">Loading goals...</div>
             </div>
             <button class="add-goal-btn" data-timeframe="long">+ Add Goal</button>
+          </div>
+        </div>
+
+        <!-- COMPLETED SECTION (collapsible) -->
+        <div class="goals-section-collapsible" id="completedSection" style="display: none;">
+          <div class="goals-section-header">
+            <h3>✓ Completed Goals</h3>
+            <span class="goals-section-count" id="completedCount">0</span>
+          </div>
+          <div class="goals-section-content">
+            <div class="goals-list" id="goalsCompleted">
+              <div class="empty-state">No completed goals</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ARCHIVED SECTION (collapsible) -->
+        <div class="goals-section-collapsible" id="archivedSection" style="display: none;">
+          <div class="goals-section-header">
+            <h3>📦 Archived Goals</h3>
+            <span class="goals-section-count" id="archivedCount">0</span>
+          </div>
+          <div class="goals-section-content">
+            <div class="goals-list" id="goalsArchived">
+              <div class="empty-state">No archived goals</div>
+            </div>
           </div>
         </div>
       </section>
@@ -305,8 +334,8 @@
 
             <!-- Step 7: Description -->
             <div class="goal-step" data-step="7">
-              <h3>How will you measure success?</h3>
-              <textarea id="newGoalDescription" rows="5" placeholder="Describe how you'll know you've achieved this goal..." class="goal-textarea"></textarea>
+              <h3>Description</h3>
+              <textarea id="newGoalDescription" rows="5" placeholder="Describe your goal in detail..." class="goal-textarea"></textarea>
             </div>
 
             <!-- Step 8: Link Habits -->

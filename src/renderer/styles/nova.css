@@ -1935,6 +1935,11 @@ body {
   gap: 8px;
 }
 
+.goals-toggles {
+  display: flex;
+  gap: 8px;
+}
+
 .goal-filter-btn {
   background: var(--card-bg);
   border: 1px solid var(--border);
@@ -2163,6 +2168,58 @@ body {
   background: var(--card-bg);
   border-color: var(--primary);
   color: var(--primary);
+}
+
+/* Collapsible Sections (Completed/Archived) */
+.goals-section-collapsible {
+  margin-top: 24px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.goals-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.goals-section-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.goals-section-count {
+  background: var(--primary);
+  color: var(--bg);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.goals-section-content {
+  padding: 16px;
+}
+
+.goals-section-content .goals-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.goals-section-content .empty-state {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 40px 20px;
+  font-size: 14px;
 }
 
 /* =========================================

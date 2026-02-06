@@ -74,12 +74,33 @@ const Nova = {
       });
     });
 
+    const showCompletedBtn = document.getElementById('showCompletedBtn');
+    if (showCompletedBtn) {
+      showCompletedBtn.addEventListener('click', () => {
+        this.showCompleted = !this.showCompleted;
+        showCompletedBtn.textContent = this.showCompleted ? '✓ Hide Completed' : '✓ Show Completed';
+        const completedSection = document.getElementById('completedSection');
+        if (completedSection) {
+          completedSection.style.display = this.showCompleted ? 'block' : 'none';
+        }
+        if (this.showCompleted) {
+          this.loadGoals();
+        }
+      });
+    }
+
     const showArchivedBtn = document.getElementById('showArchivedBtn');
     if (showArchivedBtn) {
       showArchivedBtn.addEventListener('click', () => {
         this.showArchived = !this.showArchived;
         showArchivedBtn.textContent = this.showArchived ? '📦 Hide Archived' : '📦 Show Archived';
-        this.loadGoals();
+        const archivedSection = document.getElementById('archivedSection');
+        if (archivedSection) {
+          archivedSection.style.display = this.showArchived ? 'block' : 'none';
+        }
+        if (this.showArchived) {
+          this.loadGoals();
+        }
       });
     }
 
@@ -308,6 +329,7 @@ const Nova = {
   // New Goals System
   currentGoalFilter: 'all',
   showArchived: false,
+  showCompleted: false,
   createGoalStep: 1,
   currentGoalData: {},
 
@@ -317,21 +339,35 @@ const Nova = {
       if (this.currentGoalFilter !== 'all') {
         params.append('tag', this.currentGoalFilter);
       }
-      if (!this.showArchived) {
-        params.append('archived', 'false');
-      }
 
       const data = await this.apiGet(`/goals?${params.toString()}`);
-      const goals = data.goals || [];
+      const allGoals = data.goals || [];
 
-      // Organize goals by timeframe
-      const shortTerm = goals.filter(g => g.timeframe === 'short');
-      const midTerm = goals.filter(g => g.timeframe === 'mid');
-      const longTerm = goals.filter(g => g.timeframe === 'long');
+      // Separate goals by status
+      const activeGoals = allGoals.filter(g => !g.archived && g.status !== 'completed');
+      const completedGoals = allGoals.filter(g => g.status === 'completed' && !g.archived);
+      const archivedGoals = allGoals.filter(g => g.archived);
+
+      // Organize active goals by timeframe
+      const shortTerm = activeGoals.filter(g => g.timeframe === 'short');
+      const midTerm = activeGoals.filter(g => g.timeframe === 'mid');
+      const longTerm = activeGoals.filter(g => g.timeframe === 'long');
 
       this.renderGoalsList('goalsShortTerm', shortTerm);
       this.renderGoalsList('goalsMidTerm', midTerm);
       this.renderGoalsList('goalsLongTerm', longTerm);
+
+      // Render completed section
+      if (this.showCompleted) {
+        this.renderGoalsList('goalsCompleted', completedGoals);
+      }
+      document.getElementById('completedCount').textContent = completedGoals.length;
+
+      // Render archived section
+      if (this.showArchived) {
+        this.renderGoalsList('goalsArchived', archivedGoals);
+      }
+      document.getElementById('archivedCount').textContent = archivedGoals.length;
 
       this.setupGoalsDragAndDrop();
     } catch (err) {
