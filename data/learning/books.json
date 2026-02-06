@@ -1,0 +1,74 @@
+[
+  {
+    "id": "book-001",
+    "title": "$100M Offers",
+    "author": "Alex Hormozi",
+    "status": "completed",
+    "progress": 100,
+    "startedDate": "2026-01-05",
+    "completedDate": "2026-01-18",
+    "rating": 5,
+    "summary": "Framework for creating irresistible offers by stacking value, reducing risk, and positioning uniquely. Core idea: Make your offer so good people feel stupid saying no.",
+    "keyInsights": [
+      "Grand Slam Offer = High value + Low friction + Low risk",
+      "Price objections = value communication problems",
+      "Stack value: bonuses, guarantees, scarcity, urgency",
+      "Charge premium prices for premium transformation"
+    ],
+    "implementation": "Applied to Studio Shade Co pricing. Rebuilt offer with: 30-day guarantee, free design consultation, 10-year warranty. Increased close rate from 18% to 34%.",
+    "quotes": [
+      "The goal is not to beat your competitors' price, but to make it irrelevant.",
+      "People buy on emotion and justify with logic."
+    ],
+    "linkedGoalId": null,
+    "linkedProjectId": null,
+    "lastReadDate": "2026-01-18",
+    "createdAt": "2026-01-05T08:00:00Z",
+    "updatedAt": "2026-01-18T22:30:00Z"
+  },
+  {
+    "id": "book-002",
+    "title": "The Lean Startup",
+    "author": "Eric Ries",
+    "status": "reading",
+    "progress": 60,
+    "startedDate": "2026-01-20",
+    "completedDate": null,
+    "rating": null,
+    "summary": "Build-Measure-Learn feedback loop. Validated learning through rapid experimentation. MVP concept.",
+    "keyInsights": [
+      "Build MVPs to test assumptions quickly",
+      "Pivot or persevere based on data, not gut",
+      "Vanity metrics vs actionable metrics",
+      "Small batches = faster iteration"
+    ],
+    "implementation": "Started running weekly experiments for Studio Shade Co. Last week: tested SMS follow-ups (28% response rate vs 12% email).",
+    "quotes": [
+      "The only way to win is to learn faster than anyone else."
+    ],
+    "linkedGoalId": null,
+    "linkedProjectId": null,
+    "lastReadDate": "2026-02-05",
+    "createdAt": "2026-01-20T10:00:00Z",
+    "updatedAt": "2026-02-05T18:45:00Z"
+  },
+  {
+    "id": "book-003",
+    "title": "Traction",
+    "author": "Gabriel Weinberg & Justin Mares",
+    "status": "to_read",
+    "progress": 0,
+    "startedDate": null,
+    "completedDate": null,
+    "rating": null,
+    "summary": "",
+    "keyInsights": [],
+    "implementation": "",
+    "quotes": [],
+    "linkedGoalId": null,
+    "linkedProjectId": null,
+    "lastReadDate": null,
+    "createdAt": "2026-01-28T14:00:00Z",
+    "updatedAt": "2026-01-28T14:00:00Z"
+  }
+]

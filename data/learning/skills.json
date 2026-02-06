@@ -1,0 +1,81 @@
+[
+  {
+    "id": "skill-001",
+    "name": "Cold Calling",
+    "category": "Sales",
+    "level": "intermediate",
+    "targetLevel": "advanced",
+    "startedDate": "2025-10-01",
+    "hoursInvested": 45,
+    "evidence": "150+ calls made. Current close rate: 18% (started at 4%). Landed 3 $50K+ contracts.",
+    "resources": [
+      "Fanatical Prospecting (Jeb Blount)",
+      "Weekly practice with Sarah (sales coach)",
+      "Gong.io call recordings"
+    ],
+    "practiceLog": [
+      {
+        "date": "2026-02-03",
+        "hours": 2,
+        "notes": "Practiced objection handling. Recorded 12 calls."
+      },
+      {
+        "date": "2026-01-27",
+        "hours": 3,
+        "notes": "Role-play session with Sarah. Worked on tonality."
+      }
+    ],
+    "milestones": [
+      {
+        "title": "First successful cold call",
+        "date": "2025-10-15",
+        "description": "Booked meeting with commercial property owner"
+      },
+      {
+        "title": "Hit 15% close rate",
+        "date": "2025-12-20",
+        "description": "Crossed sustainable profitability threshold"
+      }
+    ],
+    "linkedGoalId": null,
+    "createdAt": "2025-10-01T10:00:00Z",
+    "updatedAt": "2026-02-03T18:00:00Z"
+  },
+  {
+    "id": "skill-002",
+    "name": "SQL & Database Design",
+    "category": "Technical",
+    "level": "beginner",
+    "targetLevel": "intermediate",
+    "startedDate": "2026-01-15",
+    "hoursInvested": 12,
+    "evidence": "Built NOVA Chat app with SQLite. Can write basic queries, design schemas, handle migrations.",
+    "resources": [
+      "SQL for Data Science (Coursera)",
+      "SQLite documentation",
+      "Built nova-chat app (hands-on)"
+    ],
+    "practiceLog": [
+      {
+        "date": "2026-02-01",
+        "hours": 3,
+        "notes": "Built Learning System tables with foreign keys"
+      },
+      {
+        "date": "2026-01-25",
+        "hours": 2,
+        "notes": "Learned JOINs and subqueries"
+      }
+    ],
+    "milestones": [
+      {
+        "title": "First working database",
+        "date": "2026-01-18",
+        "description": "Built user authentication system with SQLite"
+      }
+    ],
+    "linkedGoalId": null,
+    "createdAt": "2026-01-15T09:00:00Z",
+    "updatedAt": "2026-02-01T22:00:00Z"
+  }
+]

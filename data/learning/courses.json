@@ -1,0 +1,61 @@
+[
+  {
+    "id": "course-001",
+    "title": "Building a Second Brain",
+    "platform": "Cohort Course",
+    "instructor": "Tiago Forte",
+    "status": "completed",
+    "progress": 100,
+    "startedDate": "2025-11-01",
+    "completedDate": "2025-12-15",
+    "rating": 5,
+    "totalHours": 20,
+    "hoursCompleted": 20,
+    "modules": [
+      "PARA Method (Projects, Areas, Resources, Archives)",
+      "Progressive Summarization",
+      "Capture, Organize, Distill, Express (CODE)",
+      "Intermediate Packets"
+    ],
+    "skillsGained": [
+      "Knowledge management",
+      "Note-taking systems",
+      "Information architecture"
+    ],
+    "application": "Built NOVA Dashboard as my Second Brain. Using PARA to organize all my business knowledge. Studio Shade Co SOPs now documented in Memory tab.",
+    "certificateUrl": null,
+    "linkedGoalId": null,
+    "linkedProjectId": null,
+    "createdAt": "2025-11-01T09:00:00Z",
+    "updatedAt": "2025-12-15T16:30:00Z"
+  },
+  {
+    "id": "course-002",
+    "title": "Advanced Facebook Ads",
+    "platform": "Udemy",
+    "instructor": "Ben Heath",
+    "status": "in_progress",
+    "progress": 45,
+    "startedDate": "2026-01-10",
+    "completedDate": null,
+    "rating": null,
+    "totalHours": 12,
+    "hoursCompleted": 5.5,
+    "modules": [
+      "Campaign structure optimization",
+      "Creative testing framework",
+      "Scaling strategies"
+    ],
+    "skillsGained": [
+      "Meta Ads Manager",
+      "A/B testing",
+      "Conversion tracking"
+    ],
+    "application": "Running tests for Studio Shade Co. Current ROAS: 4.2x (up from 2.8x).",
+    "certificateUrl": null,
+    "linkedGoalId": null,
+    "linkedProjectId": null,
+    "createdAt": "2026-01-10T11:00:00Z",
+    "updatedAt": "2026-02-04T20:15:00Z"
+  }
+]

@@ -1,0 +1,53 @@
+[
+  {
+    "id": "insight-001",
+    "mentorName": "Mike (Construction Mentor)",
+    "date": "2026-01-22",
+    "context": "Discussing how to scale Studio Shade Co beyond $100K MRR",
+    "quote": "You're not in the window shade business. You're in the trust business. Shades are just the proof.",
+    "insight": "Reframed my entire approach. Stopped competing on price, started selling certainty. Homeowners don't want shades - they want to trust the person touching their $2M home.",
+    "applicationPlan": "1. Rebuild sales script around trust signals. 2. Add more testimonials to site. 3. Offer 'meet the installer' calls. 4. Create 'insurance + bonding' one-pager.",
+    "applied": true,
+    "applicationDate": "2026-01-25",
+    "applicationResult": "Close rate jumped from 22% to 34% in 2 weeks. Customers stopped price shopping.",
+    "gratitudeExpressed": true,
+    "linkedGoalId": null,
+    "linkedProjectId": null,
+    "createdAt": "2026-01-22T15:30:00Z",
+    "updatedAt": "2026-02-05T11:00:00Z"
+  },
+  {
+    "id": "insight-002",
+    "mentorName": "Sarah (Sales Coach)",
+    "date": "2026-02-01",
+    "context": "Weekly cold calling practice session",
+    "quote": "The objection isn't the objection. It's a test to see if you believe in what you're selling.",
+    "insight": "When prospects say 'too expensive,' they're really asking 'why should I trust you?' My job is to stay confident and reframe, not defend the price.",
+    "applicationPlan": "Practice 'feel-felt-found' framework. When they say expensive: 'I understand how you feel. Others felt the same way. Here's what they found...'",
+    "applied": true,
+    "applicationDate": "2026-02-02",
+    "applicationResult": "Closed 2 deals this week using this exact framework. Confidence is contagious.",
+    "gratitudeExpressed": false,
+    "linkedGoalId": null,
+    "linkedProjectId": null,
+    "createdAt": "2026-02-01T10:00:00Z",
+    "updatedAt": "2026-02-03T19:00:00Z"
+  },
+  {
+    "id": "insight-003",
+    "mentorName": "David (SaaS Founder)",
+    "date": "2026-01-10",
+    "context": "Coffee chat about building NOVA Dashboard",
+    "quote": "Build for yourself first. If it solves your problem, it'll solve someone else's.",
+    "insight": "Stop worrying about 'is this marketable?' Just build what I need. NOVA Dashboard started as my personal tool - now others are asking for access.",
+    "applicationPlan": "Finish building NOVA for myself. Document everything. If it works, maybe turn it into a product later. No pressure.",
+    "applied": true,
+    "applicationDate": "2026-01-12",
+    "applicationResult": "Stopped overthinking. Built 8 tabs in 2 weeks. Feeling energized instead of anxious.",
+    "gratitudeExpressed": true,
+    "linkedGoalId": null,
+    "linkedProjectId": null,
+    "createdAt": "2026-01-10T16:45:00Z",
+    "updatedAt": "2026-01-28T12:00:00Z"
+  }
+]
