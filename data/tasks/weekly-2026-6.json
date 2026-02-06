@@ -1,0 +1,24 @@
+{
+  "year": "2026",
+  "week": "6",
+  "tasks": [
+    {
+      "id": "task-001",
+      "title": "Review Nova Dashboard",
+      "completed": true,
+      "day": "Thursday"
+    },
+    {
+      "id": "task-002",
+      "title": "Call Francis",
+      "completed": false,
+      "day": "Friday"
+    },
+    {
+      "id": "task-003",
+      "title": "Decide on TX investment",
+      "completed": false,
+      "day": "Friday"
+    }
+  ]
+}

@@ -72,6 +72,20 @@ const Nova = {
     document.getElementById('addMistakeBtn').addEventListener('click', () => this.showAddMistakeModal());
     document.getElementById('addWeeklyGoalBtn').addEventListener('click', () => this.showAddWeeklyGoalModal());
 
+    // Quick action buttons
+    document.getElementById('quickTaskBtn').addEventListener('click', () => {
+      this.switchTab('tasks');
+      this.showAddTaskModal();
+    });
+    document.getElementById('quickHabitBtn').addEventListener('click', () => {
+      this.switchTab('habits');
+      this.showAddHabitModal();
+    });
+    document.getElementById('quickCounselBtn').addEventListener('click', () => {
+      this.switchTab('counsel');
+      this.showAddCounselModal();
+    });
+
     // Network filter
     document.querySelectorAll('.contacts-filter .filter-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -124,7 +138,7 @@ const Nova = {
   async loadDashboard() {
     const today = new Date().toISOString().split('T')[0];
     const goals = await this.apiGet(`/goals/daily/${today}`);
-    document.getElementById('dailyGoalsPreview').innerHTML = goals.goals?.length 
+    document.getElementById('dailyGoalsPreview').innerHTML = goals.goals?.length
       ? goals.goals.map(g => `
         <div class="goal-item">
           <div class="goal-checkbox ${g.completed ? 'checked' : ''}">${g.completed ? '✓' : ''}</div>
@@ -132,16 +146,55 @@ const Nova = {
         </div>
       `).join('')
       : '<p style="color: var(--text-muted);">No goals set for today</p>';
-    
-    // Load week stats
-    const year = new Date().getFullYear();
-    const week = this.getWeekNumber(new Date());
-    const tasks = await this.apiGet(`/tasks/${year}/${week}`);
-    document.getElementById('tasksCompleted').textContent = tasks.completed || 0;
-    document.getElementById('tasksTotal').textContent = tasks.total || 0;
-    const progress = tasks.total ? (tasks.completed / tasks.total * 100) : 0;
+
+    // Load dashboard stats
+    const stats = await this.apiGet('/dashboard/stats');
+    document.getElementById('tasksCompleted').textContent = stats.tasksDone || 0;
+    document.getElementById('tasksTotal').textContent = stats.tasksTotal || 0;
+    document.getElementById('habitStreak').textContent = stats.streakDays || 0;
+    const progress = stats.tasksTotal ? (stats.tasksDone / stats.tasksTotal * 100) : 0;
     document.getElementById('weekProgress').style.width = `${progress}%`;
-    
+
+    // Load urgent items
+    const urgent = await this.apiGet('/dashboard/urgent');
+    document.getElementById('urgentCount').textContent = urgent.count || 0;
+    document.getElementById('urgentList').innerHTML = urgent.items?.length
+      ? urgent.items.map(item => `
+        <div class="urgent-item" onclick="nova.switchTab('${item.link.substring(1)}')">
+          <span class="urgent-type ${item.type}">${item.type === 'task' ? '📋' : item.type === 'network' ? '👤' : '⚖️'}</span>
+          <span class="urgent-title">${item.title}</span>
+        </div>
+      `).join('')
+      : '<p style="color: var(--text-muted); font-size: 13px;">All caught up!</p>';
+
+    // Load skills progress
+    const skillsData = await this.apiGet('/dashboard/skills-progress');
+    document.getElementById('skillsList').innerHTML = skillsData.skills?.length
+      ? skillsData.skills.map(skill => `
+        <div class="skill-item">
+          <span class="skill-name">${skill.name}</span>
+          <span class="skill-hours">${skill.hoursThisWeek}h this week</span>
+        </div>
+      `).join('')
+      : '<p style="color: var(--text-muted); font-size: 13px;">No skills logged this week</p>';
+
+    // Load suggestions
+    const suggestionsData = await this.apiGet('/dashboard/suggestions');
+    document.getElementById('suggestionsList').innerHTML = suggestionsData.suggestions?.length
+      ? suggestionsData.suggestions.slice(0, 3).map(sugg => `
+        <div class="suggestion-item">
+          <div class="suggestion-header">
+            <span class="suggestion-category ${sugg.priority}">${sugg.category}</span>
+          </div>
+          <p class="suggestion-text">${sugg.text}</p>
+          <div class="suggestion-actions">
+            <button class="suggestion-btn" onclick="nova.dismissSuggestion('${sugg.id}')">Dismiss</button>
+            <button class="suggestion-btn primary" onclick="nova.markSuggestionDone('${sugg.id}')">Done</button>
+          </div>
+        </div>
+      `).join('')
+      : '<p style="color: var(--text-muted); font-size: 13px;">No suggestions</p>';
+
     // Load projects preview
     const projects = await this.apiGet('/projects/');
     const activeProjects = projects.slice(0, 3);
@@ -156,25 +209,39 @@ const Nova = {
         </div>
       `).join('')
       : '<p style="color: var(--text-muted);">No active projects</p>';
-    
-    // Load memory preview
-    const memories = await this.apiGet('/memory/timeline?limit=3');
-    document.getElementById('memoryPreview').innerHTML = memories.length
-      ? memories.map(m => `
-        <div class="memory-entry" style="padding: 10px 0;">
-          <div class="memory-meta">
-            <span class="memory-type">${m.type || 'note'}</span>
-            <span>${new Date(m.timestamp).toLocaleDateString()}</span>
-          </div>
-          <div class="memory-content" style="font-size: 14px;">${m.content?.substring(0, 80)}...</div>
-        </div>
-      `).join('')
-      : '<p style="color: var(--text-muted);">No recent memories</p>';
-    
-    // Load habit streak
-    const habits = await this.apiGet('/habits/');
-    const maxStreak = habits.reduce((max, h) => Math.max(max, h.currentStreak || 0), 0);
-    document.getElementById('habitStreak').textContent = maxStreak;
+
+    // Load sync status
+    this.updateSyncStatus();
+  },
+
+  async updateSyncStatus() {
+    try {
+      const syncData = await this.apiGet('/dashboard/sync-status');
+      const syncEl = document.getElementById('syncStatus');
+
+      if (syncData.status === 'synced') {
+        syncEl.className = 'sync-status synced';
+        syncEl.innerHTML = `<span class="sync-icon">✓</span><span class="sync-text">${syncData.timeAgo}</span>`;
+      } else if (syncData.status === 'pending') {
+        syncEl.className = 'sync-status pending';
+        syncEl.innerHTML = `<span class="sync-icon">⟳</span><span class="sync-text">Sync pending</span>`;
+      } else {
+        syncEl.className = 'sync-status';
+        syncEl.innerHTML = `<span class="sync-icon">⟳</span><span class="sync-text">N/A</span>`;
+      }
+    } catch (err) {
+      console.error('Failed to load sync status:', err);
+    }
+  },
+
+  dismissSuggestion(id) {
+    // TODO: Implement dismiss logic
+    console.log('Dismiss suggestion:', id);
+  },
+
+  markSuggestionDone(id) {
+    // TODO: Implement done logic
+    console.log('Mark suggestion done:', id);
   },
   
   // Goals

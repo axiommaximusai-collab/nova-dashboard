@@ -309,6 +309,206 @@ body {
   transition: width 0.5s ease;
 }
 
+/* Quick Actions */
+.quick-actions {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.quick-action-btn {
+  flex: 1;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  color: var(--primary);
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.quick-action-btn:hover {
+  background: var(--primary);
+  color: var(--bg);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.2);
+}
+
+/* Sync Status */
+.sync-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: var(--card-bg);
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-right: 12px;
+}
+
+.sync-status .sync-icon {
+  font-size: 14px;
+}
+
+.sync-status.synced {
+  color: #10b981;
+}
+
+.sync-status.synced .sync-icon {
+  color: #10b981;
+}
+
+.sync-status.pending {
+  color: #f59e0b;
+}
+
+.sync-status.pending .sync-icon {
+  color: #f59e0b;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Urgent Widget */
+.badge {
+  display: inline-block;
+  background: var(--accent);
+  color: var(--bg);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-left: 8px;
+}
+
+.urgent-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 6px;
+  background: var(--bg-tertiary);
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.urgent-item:hover {
+  background: var(--card-bg);
+  transform: translateX(4px);
+}
+
+.urgent-type {
+  font-size: 16px;
+}
+
+.urgent-title {
+  font-size: 13px;
+  flex: 1;
+}
+
+/* Skills Widget */
+.skill-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.skill-item:last-child {
+  border-bottom: none;
+}
+
+.skill-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.skill-hours {
+  font-size: 12px;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* Suggestions Widget */
+.suggestion-item {
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.suggestion-header {
+  margin-bottom: 8px;
+}
+
+.suggestion-category {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.suggestion-category.high {
+  background: rgba(190, 24, 93, 0.2);
+  color: var(--accent);
+}
+
+.suggestion-category.medium {
+  background: rgba(14, 165, 233, 0.2);
+  color: var(--primary);
+}
+
+.suggestion-text {
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 10px;
+  color: var(--text);
+}
+
+.suggestion-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.suggestion-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.suggestion-btn:hover {
+  background: var(--card-bg);
+  color: var(--text);
+}
+
+.suggestion-btn.primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--bg);
+}
+
+.suggestion-btn.primary:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
 /* Goals Tab */
 .view-toggle {
   display: flex;

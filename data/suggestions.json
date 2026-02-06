@@ -1,0 +1,20 @@
+[
+  {
+    "id": "sugg-001",
+    "category": "Process",
+    "text": "Automate weekly task reminders via cron",
+    "priority": "high"
+  },
+  {
+    "id": "sugg-002",
+    "category": "Investment",
+    "text": "Review real estate market trends for Q2",
+    "priority": "medium"
+  },
+  {
+    "id": "sugg-003",
+    "category": "Workflow",
+    "text": "Create SOP for new client onboarding",
+    "priority": "medium"
+  }
+]

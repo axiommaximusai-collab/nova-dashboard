@@ -26,6 +26,10 @@
         <button class="nav-btn" data-tab="learning">Learning</button>
       </nav>
       <div class="header-actions">
+        <div class="sync-status" id="syncStatus">
+          <span class="sync-icon">⟳</span>
+          <span class="sync-text">Loading...</span>
+        </div>
         <button class="btn-icon" id="searchBtn">🔍</button>
         <button class="btn-icon" id="notifBtn">🔔</button>
         <div class="user-avatar">N</div>
@@ -39,6 +43,14 @@
           <div class="dash-card welcome">
             <h2>Good <span id="timeGreeting">Day</span>, Nick</h2>
             <p class="date" id="currentDate">Loading...</p>
+
+            <!-- Quick Action Buttons -->
+            <div class="quick-actions">
+              <button class="quick-action-btn" id="quickTaskBtn">+ New Task</button>
+              <button class="quick-action-btn" id="quickHabitBtn">+ Log Habit</button>
+              <button class="quick-action-btn" id="quickCounselBtn">+ Counsel</button>
+            </div>
+
             <div class="daily-focus">
               <h3>Today's Focus</h3>
               <div id="dailyGoalsPreview">
@@ -46,7 +58,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="dash-card stats">
             <h3>Week at a Glance</h3>
             <div class="stat-row">
@@ -67,18 +79,35 @@
               <div class="progress-fill" id="weekProgress" style="width: 0%"></div>
             </div>
           </div>
-          
+
+          <!-- Urgent/Attention Widget -->
+          <div class="dash-card urgent-items">
+            <h3>🔴 Urgent <span id="urgentCount" class="badge">0</span></h3>
+            <div id="urgentList">
+              <div class="loading">Loading...</div>
+            </div>
+          </div>
+
+          <!-- Skills Building Widget -->
+          <div class="dash-card skills-progress">
+            <h3>⚡ Skills Building</h3>
+            <div id="skillsList">
+              <div class="loading">Loading...</div>
+            </div>
+          </div>
+
+          <!-- Suggestions Widget -->
+          <div class="dash-card suggestions">
+            <h3>💡 Axiom Suggests</h3>
+            <div id="suggestionsList">
+              <div class="loading">Loading...</div>
+            </div>
+          </div>
+
           <div class="dash-card active-projects">
             <h3>Active Projects</h3>
             <div id="projectsPreview">
               <div class="loading">Loading projects...</div>
-            </div>
-          </div>
-          
-          <div class="dash-card recent-memory">
-            <h3>Recent Memory</h3>
-            <div id="memoryPreview">
-              <div class="loading">Loading memories...</div>
             </div>
           </div>
         </div>
