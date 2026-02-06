@@ -8,7 +8,8 @@ const SERVICE_HOOKS = {
   workflowsService: ['createWorkflow', 'updateWorkflow', 'deleteWorkflow', 'runWorkflow'],
   memoryService: ['createEntry', 'updateEntry', 'deleteEntry'],
   projectsService: ['createProject', 'updateProject', 'deleteProject'],
-  networkService: ['createContact', 'updateContact', 'deleteContact', 'logInteraction']
+  networkService: ['createContact', 'updateContact', 'deleteContact', 'logInteraction'],
+  counselService: ['createSession', 'updateSession', 'deleteSession', 'addAgentResponse', 'addSynthesis', 'recordDecision']
 };
 
 // Function to apply hooks to a service

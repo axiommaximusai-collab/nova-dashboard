@@ -22,6 +22,7 @@
         <button class="nav-btn" data-tab="habits">Habits</button>
         <button class="nav-btn" data-tab="memory">Memory</button>
         <button class="nav-btn" data-tab="network">Network</button>
+        <button class="nav-btn" data-tab="counsel">Counsel</button>
       </nav>
       <div class="header-actions">
         <button class="btn-icon" id="searchBtn">🔍</button>
@@ -238,6 +239,33 @@
               <button class="filter-btn" data-filter="deal_source">Deal Sources</button>
             </div>
             <div id="contactsGrid" class="contacts-grid"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- COUNSEL TAB -->
+      <section class="tab-panel" id="counsel">
+        <div class="tab-header">
+          <h2>AI Counsel - Multi-Agent Advisory</h2>
+          <button class="btn-primary" id="newCounselBtn">+ New Session</button>
+        </div>
+
+        <div class="counsel-layout">
+          <!-- Sessions Filter -->
+          <div class="counsel-filters">
+            <button class="filter-btn active" data-filter="all">All Sessions</button>
+            <button class="filter-btn" data-filter="pending">Pending</button>
+            <button class="filter-btn" data-filter="in-progress">In Progress</button>
+            <button class="filter-btn" data-filter="completed">Completed</button>
+          </div>
+
+          <!-- Sessions List -->
+          <div id="counselSessionsList" class="counsel-sessions-list"></div>
+
+          <!-- Session Detail View (hidden by default) -->
+          <div id="counselSessionDetail" class="counsel-session-detail" style="display: none;">
+            <button class="btn-secondary" id="backToSessions">← Back to Sessions</button>
+            <div id="sessionDetailContent"></div>
           </div>
         </div>
       </section>
