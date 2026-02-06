@@ -62,12 +62,17 @@ body {
   color: var(--accent);
 }
 
+.logo-img {
+  height: 40px;
+  width: auto;
+  margin-right: 10px;
+}
+
 .logo-text {
   font-size: 24px;
-  font-weight: 700;
-  letter-spacing: 4px;
+  font-weight: bold;
+  letter-spacing: 2px;
   color: #0ea5e9;
-  text-shadow: 0 0 5px rgba(14, 165, 233, 0.3);
   font-family: 'Courier New', monospace;
 }
 
