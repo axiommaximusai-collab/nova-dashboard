@@ -3,6 +3,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
+// Import routes
 const goalsRoutes = require('./routes/goals');
 const tasksRoutes = require('./routes/tasks');
 const habitsRoutes = require('./routes/habits');
@@ -10,6 +11,10 @@ const workflowsRoutes = require('./routes/workflows');
 const memoryRoutes = require('./routes/memory');
 const projectsRoutes = require('./routes/projects');
 const networkRoutes = require('./routes/network');
+const gitSyncRoutes = require('./routes/gitSync');
+
+// Import git sync and initialize hooks
+const { initializeServiceHooks } = require('./services/gitSyncHooks');
 
 const app = express();
 const PORT = process.env.PORT || 3333;
@@ -27,10 +32,17 @@ app.use('/api/workflows', workflowsRoutes);
 app.use('/api/memory', memoryRoutes);
 app.use('/api/projects', projectsRoutes);
 app.use('/api/network', networkRoutes);
+app.use('/api/git-sync', gitSyncRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Git sync status endpoint
+app.get('/api/sync-status', (req, res) => {
+  const { gitSync } = require('./services/gitSync');
+  res.json(gitSync.getStatus());
 });
 
 // Main dashboard
@@ -46,6 +58,8 @@ app.listen(PORT, () => {
 ║   Studio Shade Co.                                    ║
 ║                                                        ║
 ║   Running at: http://localhost:${PORT}                    ║
+║                                                        ║
+║   🔄 Git Sync: Active (5-min debounce)                ║
 ║                                                        ║
 ╚════════════════════════════════════════════════════════╝
   `);
