@@ -13,6 +13,7 @@ const projectsRoutes = require('./routes/projects');
 const networkRoutes = require('./routes/network');
 const gitSyncRoutes = require('./routes/gitSync');
 const counselRoutes = require('./routes/counsel');
+const learningRoutes = require('./routes/learning');
 
 // Import git sync and initialize hooks
 const { initializeServiceHooks } = require('./services/gitSyncHooks');
@@ -35,6 +36,7 @@ app.use('/api/projects', projectsRoutes);
 app.use('/api/network', networkRoutes);
 app.use('/api/git-sync', gitSyncRoutes);
 app.use('/api/counsel', counselRoutes);
+app.use('/api/learning', learningRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

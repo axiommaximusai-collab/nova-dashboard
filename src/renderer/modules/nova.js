@@ -17,6 +17,7 @@ const Nova = {
     this.loadMemory();
     this.loadNetwork();
     this.loadCounsel();
+    this.loadLearning();
   },
   
   setupNavigation() {
@@ -64,6 +65,23 @@ const Nova = {
     document.getElementById('rolloverBtn').addEventListener('click', () => this.rolloverTasks());
     document.getElementById('newContactBtn').addEventListener('click', () => this.showAddContactModal());
     document.getElementById('newCounselBtn').addEventListener('click', () => this.showAddCounselModal());
+    document.getElementById('addBookBtn').addEventListener('click', () => this.showAddBookModal());
+    document.getElementById('addCourseBtn').addEventListener('click', () => this.showAddCourseModal());
+    document.getElementById('addSkillBtn').addEventListener('click', () => this.showAddSkillModal());
+    document.getElementById('addInsightBtn').addEventListener('click', () => this.showAddInsightModal());
+    document.getElementById('addMistakeBtn').addEventListener('click', () => this.showAddMistakeModal());
+    document.getElementById('addWeeklyGoalBtn').addEventListener('click', () => this.showAddWeeklyGoalModal());
+
+    // Learning subtabs
+    document.querySelectorAll('.learning-subtabs .subtab-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.learning-subtabs .subtab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.learning-subtab').forEach(s => s.classList.remove('active'));
+        e.target.classList.add('active');
+        const subtab = e.target.dataset.subtab;
+        document.getElementById(`subtab-${subtab}`).classList.add('active');
+      });
+    });
 
     // Network filter
     document.querySelectorAll('.contacts-filter .filter-btn').forEach(btn => {
@@ -1087,6 +1105,200 @@ const Nova = {
     });
 
     modal.style.display = 'flex';
+  },
+
+  // ========== LEARNING SYSTEM ==========
+
+  currentLearningSubtab: 'books',
+
+  async loadLearning() {
+    await this.loadBooks();
+    await this.loadCourses();
+    await this.loadSkills();
+    await this.loadInsights();
+    await this.loadMistakes();
+    await this.loadWeeklyGoals();
+  },
+
+  async loadBooks() {
+    const books = await this.apiGet('/learning/books');
+    this.displayBooks(books);
+  },
+
+  displayBooks(books) {
+    const list = document.getElementById('booksList');
+    if (!books || books.length === 0) {
+      list.innerHTML = '<p style="color: var(--text-muted); padding: 40px; text-align: center;">No books yet. Click "+ Add Book" to start tracking your reading.</p>';
+      return;
+    }
+
+    list.innerHTML = books.map(book => `
+      <div class="learning-card">
+        <div class="learning-card-header">
+          <h3>${book.title}</h3>
+          <span class="status-badge status-${book.status}">${book.status.replace('_', ' ')}</span>
+        </div>
+        ${book.author ? `<div class="learning-author">by ${book.author}</div>` : ''}
+        ${book.progress > 0 ? `<div class="progress-bar"><div class="progress-fill" style="width: ${book.progress}%"></div></div>` : ''}
+        ${book.rating ? `<div class="learning-rating">${'⭐'.repeat(book.rating)}</div>` : ''}
+        ${book.summary ? `<p class="learning-summary">${book.summary.substring(0, 150)}...</p>` : ''}
+        ${book.keyInsights && book.keyInsights.length > 0 ? `<div class="learning-insights">${book.keyInsights.length} key insights</div>` : ''}
+      </div>
+    `).join('');
+  },
+
+  async loadCourses() {
+    const courses = await this.apiGet('/learning/courses');
+    this.displayCourses(courses);
+  },
+
+  displayCourses(courses) {
+    const list = document.getElementById('coursesList');
+    if (!courses || courses.length === 0) {
+      list.innerHTML = '<p style="color: var(--text-muted); padding: 40px; text-align: center;">No courses yet. Click "+ Add Course" to track your learning.</p>';
+      return;
+    }
+
+    list.innerHTML = courses.map(course => `
+      <div class="learning-card">
+        <div class="learning-card-header">
+          <h3>${course.title}</h3>
+          <span class="status-badge status-${course.status}">${course.status.replace('_', ' ')}</span>
+        </div>
+        ${course.instructor ? `<div class="learning-author">by ${course.instructor}</div>` : ''}
+        ${course.platform ? `<div class="learning-platform">${course.platform}</div>` : ''}
+        ${course.progress > 0 ? `<div class="progress-bar"><div class="progress-fill" style="width: ${course.progress}%"></div></div>` : ''}
+        ${course.totalHours ? `<div class="learning-meta">${course.hoursCompleted || 0}/${course.totalHours} hours</div>` : ''}
+        ${course.skillsGained && course.skillsGained.length > 0 ? `<div class="learning-skills">${course.skillsGained.slice(0, 3).join(', ')}</div>` : ''}
+      </div>
+    `).join('');
+  },
+
+  async loadSkills() {
+    const skills = await this.apiGet('/learning/skills');
+    this.displaySkills(skills);
+  },
+
+  displaySkills(skills) {
+    const list = document.getElementById('skillsList');
+    if (!skills || skills.length === 0) {
+      list.innerHTML = '<p style="color: var(--text-muted); padding: 40px; text-align: center;">No skills yet. Click "+ Add Skill" to track your development.</p>';
+      return;
+    }
+
+    list.innerHTML = skills.map(skill => `
+      <div class="learning-card">
+        <div class="learning-card-header">
+          <h3>${skill.name}</h3>
+          <span class="skill-level">${skill.level} → ${skill.targetLevel || 'expert'}</span>
+        </div>
+        ${skill.category ? `<div class="learning-category">${skill.category}</div>` : ''}
+        <div class="skill-hours">${skill.hoursInvested || 0} hours invested</div>
+        ${skill.evidence ? `<p class="learning-summary">${skill.evidence.substring(0, 120)}...</p>` : ''}
+        ${skill.practiceLog && skill.practiceLog.length > 0 ? `<div class="learning-meta">${skill.practiceLog.length} practice sessions</div>` : ''}
+      </div>
+    `).join('');
+  },
+
+  async loadInsights() {
+    const insights = await this.apiGet('/learning/insights');
+    this.displayInsights(insights);
+  },
+
+  displayInsights(insights) {
+    const list = document.getElementById('insightsList');
+    if (!insights || insights.length === 0) {
+      list.innerHTML = '<p style="color: var(--text-muted); padding: 40px; text-align: center;">No insights yet. Click "+ Add Insight" to capture mentor wisdom.</p>';
+      return;
+    }
+
+    list.innerHTML = insights.map(insight => `
+      <div class="learning-card insight-card">
+        <div class="learning-card-header">
+          <h3>${insight.mentorName}</h3>
+          <span class="insight-date">${new Date(insight.date).toLocaleDateString()}</span>
+        </div>
+        <div class="insight-quote">"${insight.quote}"</div>
+        <p class="learning-summary">${insight.insight.substring(0, 150)}...</p>
+        ${insight.applied ? '<div class="applied-badge">✅ Applied</div>' : '<div class="pending-badge">⏳ Not Applied Yet</div>'}
+      </div>
+    `).join('');
+  },
+
+  async loadMistakes() {
+    const mistakes = await this.apiGet('/learning/mistakes');
+    this.displayMistakes(mistakes);
+  },
+
+  displayMistakes(mistakes) {
+    const list = document.getElementById('mistakesList');
+    if (!mistakes || mistakes.length === 0) {
+      list.innerHTML = '<p style="color: var(--text-muted); padding: 40px; text-align: center;">No mistakes logged yet. Click "+ Add Mistake" to learn from failures.</p>';
+      return;
+    }
+
+    list.innerHTML = mistakes.map(mistake => `
+      <div class="learning-card mistake-card">
+        <div class="learning-card-header">
+          <h3>${mistake.title}</h3>
+          <span class="mistake-date">${new Date(mistake.date).toLocaleDateString()}</span>
+        </div>
+        ${mistake.costFinancial ? `<div class="mistake-cost">💸 $${mistake.costFinancial.toLocaleString()}</div>` : ''}
+        <p class="learning-summary">${mistake.lessonLearned.substring(0, 150)}...</p>
+        ${mistake.systemImplemented ? '<div class="system-badge">🛡️ System Created</div>' : '<div class="no-system-badge">⚠️ No System Yet</div>'}
+      </div>
+    `).join('');
+  },
+
+  async loadWeeklyGoals() {
+    const goals = await this.apiGet('/learning/weekly-goals');
+    this.displayWeeklyGoals(goals);
+  },
+
+  displayWeeklyGoals(goals) {
+    const list = document.getElementById('weeklyGoalsList');
+    if (!goals || goals.length === 0) {
+      list.innerHTML = '<p style="color: var(--text-muted); padding: 40px; text-align: center;">No weekly goals yet. Click "+ Add Weekly Goal" to track your learning progress.</p>';
+      return;
+    }
+
+    list.innerHTML = goals.map(goal => `
+      <div class="learning-card weekly-card">
+        <div class="learning-card-header">
+          <h3>${goal.goal}</h3>
+          <span class="status-badge status-${goal.status}">${goal.status.replace('_', ' ')}</span>
+        </div>
+        <div class="weekly-dates">${new Date(goal.weekStart).toLocaleDateString()} - ${new Date(goal.weekEnd).toLocaleDateString()}</div>
+        ${goal.category ? `<div class="learning-category">${goal.category}</div>` : ''}
+        ${goal.timeInvested ? `<div class="learning-meta">${goal.timeInvested} hours invested</div>` : ''}
+        ${goal.whatLearned ? `<p class="learning-summary">${goal.whatLearned.substring(0, 150)}...</p>` : ''}
+      </div>
+    `).join('');
+  },
+
+  // Modal functions (simplified)
+  showAddBookModal() {
+    this.showNotification('Add Book modal - coming soon!');
+  },
+
+  showAddCourseModal() {
+    this.showNotification('Add Course modal - coming soon!');
+  },
+
+  showAddSkillModal() {
+    this.showNotification('Add Skill modal - coming soon!');
+  },
+
+  showAddInsightModal() {
+    this.showNotification('Add Insight modal - coming soon!');
+  },
+
+  showAddMistakeModal() {
+    this.showNotification('Add Mistake modal - coming soon!');
+  },
+
+  showAddWeeklyGoalModal() {
+    this.showNotification('Add Weekly Goal modal - coming soon!');
   },
 
   // Utilities

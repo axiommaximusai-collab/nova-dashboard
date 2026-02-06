@@ -1465,3 +1465,244 @@ body {
     gap: 10px;
   }
 }
+
+/* ========== LEARNING TAB ========== */
+
+.learning-subtabs {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.subtab-btn {
+  padding: 8px 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.subtab-btn:hover {
+  background: var(--card-bg);
+  border-color: var(--primary);
+}
+
+.subtab-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.learning-subtab {
+  display: none;
+}
+
+.learning-subtab.active {
+  display: block;
+}
+
+.subtab-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.learning-filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.learning-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.learning-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  transition: all 0.2s ease;
+}
+
+.learning-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: var(--primary);
+}
+
+.learning-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.learning-card-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+  margin-right: 10px;
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.status-reading,
+.status-in_progress {
+  background: #3b82f620;
+  color: #3b82f6;
+}
+
+.status-completed {
+  background: #10b98120;
+  color: #10b981;
+}
+
+.status-to_read,
+.status-not_started {
+  background: #6b728020;
+  color: #6b7280;
+}
+
+.learning-author,
+.learning-platform,
+.learning-category,
+.learning-meta {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.learning-rating {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.learning-summary {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text);
+  margin: 10px 0;
+}
+
+.learning-insights,
+.learning-skills {
+  font-size: 13px;
+  color: var(--primary);
+  font-weight: 500;
+  margin-top: 10px;
+}
+
+.skill-level {
+  padding: 4px 10px;
+  background: var(--bg);
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.skill-hours {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.insight-card {
+  border-left: 3px solid var(--warning);
+}
+
+.insight-quote {
+  font-style: italic;
+  color: var(--text);
+  margin: 10px 0;
+  padding-left: 12px;
+  border-left: 2px solid var(--border);
+}
+
+.insight-date {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.applied-badge,
+.system-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: #10b98120;
+  color: #10b981;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.pending-badge,
+.no-system-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: #f59e0b20;
+  color: #f59e0b;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.mistake-card {
+  border-left: 3px solid var(--danger);
+}
+
+.mistake-cost {
+  font-size: 14px;
+  color: var(--danger);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.mistake-date {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.weekly-card {
+  border-left: 3px solid var(--primary);
+}
+
+.weekly-dates {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--bg);
+  border-radius: 3px;
+  margin: 10px 0;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}

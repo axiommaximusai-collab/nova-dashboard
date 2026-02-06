@@ -9,7 +9,8 @@ const SERVICE_HOOKS = {
   memoryService: ['createEntry', 'updateEntry', 'deleteEntry'],
   projectsService: ['createProject', 'updateProject', 'deleteProject'],
   networkService: ['createContact', 'updateContact', 'deleteContact', 'logInteraction'],
-  counselService: ['createSession', 'updateSession', 'deleteSession', 'addAgentResponse', 'addSynthesis', 'recordDecision']
+  counselService: ['createSession', 'updateSession', 'deleteSession', 'addAgentResponse', 'addSynthesis', 'recordDecision'],
+  learningService: ['createBook', 'updateBook', 'deleteBook', 'createCourse', 'updateCourse', 'deleteCourse', 'createSkill', 'updateSkill', 'deleteSkill', 'logPractice', 'createInsight', 'updateInsight', 'deleteInsight', 'createMistake', 'updateMistake', 'deleteMistake', 'createWeeklyGoal', 'updateWeeklyGoal', 'deleteWeeklyGoal']
 };
 
 // Function to apply hooks to a service

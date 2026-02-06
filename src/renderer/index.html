@@ -23,6 +23,7 @@
         <button class="nav-btn" data-tab="memory">Memory</button>
         <button class="nav-btn" data-tab="network">Network</button>
         <button class="nav-btn" data-tab="counsel">Counsel</button>
+        <button class="nav-btn" data-tab="learning">Learning</button>
       </nav>
       <div class="header-actions">
         <button class="btn-icon" id="searchBtn">🔍</button>
@@ -267,6 +268,86 @@
             <button class="btn-secondary" id="backToSessions">← Back to Sessions</button>
             <div id="sessionDetailContent"></div>
           </div>
+        </div>
+      </section>
+
+      <!-- LEARNING TAB -->
+      <section class="tab-panel" id="learning">
+        <div class="tab-header">
+          <h2>Learning System</h2>
+          <div class="learning-subtabs">
+            <button class="subtab-btn active" data-subtab="books">📚 Books</button>
+            <button class="subtab-btn" data-subtab="courses">🎓 Courses</button>
+            <button class="subtab-btn" data-subtab="skills">⚡ Skills</button>
+            <button class="subtab-btn" data-subtab="insights">💡 Insights</button>
+            <button class="subtab-btn" data-subtab="mistakes">🔥 Mistakes</button>
+            <button class="subtab-btn" data-subtab="weekly">📅 Weekly</button>
+          </div>
+        </div>
+
+        <!-- Books Subtab -->
+        <div class="learning-subtab active" id="subtab-books">
+          <div class="subtab-actions">
+            <button class="btn-primary" id="addBookBtn">+ Add Book</button>
+          </div>
+          <div class="learning-filters">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="reading">Reading</button>
+            <button class="filter-btn" data-filter="completed">Completed</button>
+            <button class="filter-btn" data-filter="to_read">To Read</button>
+          </div>
+          <div id="booksList" class="learning-grid"></div>
+        </div>
+
+        <!-- Courses Subtab -->
+        <div class="learning-subtab" id="subtab-courses">
+          <div class="subtab-actions">
+            <button class="btn-primary" id="addCourseBtn">+ Add Course</button>
+          </div>
+          <div class="learning-filters">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="in_progress">In Progress</button>
+            <button class="filter-btn" data-filter="completed">Completed</button>
+            <button class="filter-btn" data-filter="not_started">Not Started</button>
+          </div>
+          <div id="coursesList" class="learning-grid"></div>
+        </div>
+
+        <!-- Skills Subtab -->
+        <div class="learning-subtab" id="subtab-skills">
+          <div class="subtab-actions">
+            <button class="btn-primary" id="addSkillBtn">+ Add Skill</button>
+          </div>
+          <div id="skillsList" class="learning-grid"></div>
+        </div>
+
+        <!-- Insights Subtab -->
+        <div class="learning-subtab" id="subtab-insights">
+          <div class="subtab-actions">
+            <button class="btn-primary" id="addInsightBtn">+ Add Insight</button>
+          </div>
+          <div id="insightsList" class="learning-grid"></div>
+        </div>
+
+        <!-- Mistakes Subtab -->
+        <div class="learning-subtab" id="subtab-mistakes">
+          <div class="subtab-actions">
+            <button class="btn-primary" id="addMistakeBtn">+ Add Mistake</button>
+          </div>
+          <div id="mistakesList" class="learning-grid"></div>
+        </div>
+
+        <!-- Weekly Goals Subtab -->
+        <div class="learning-subtab" id="subtab-weekly">
+          <div class="subtab-actions">
+            <button class="btn-primary" id="addWeeklyGoalBtn">+ Add Weekly Goal</button>
+          </div>
+          <div class="learning-filters">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="in_progress">In Progress</button>
+            <button class="filter-btn" data-filter="completed">Completed</button>
+          </div>
+          <div id="weeklyGoalsList" class="learning-grid"></div>
         </div>
       </section>
     </main>
