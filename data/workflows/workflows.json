@@ -1,0 +1,32 @@
+[
+  {
+    "id": "wf-001",
+    "name": "File Organization System",
+    "category": "Operations",
+    "description": "Automatically organize files sent by team members into the Studio Shade Co shared drive",
+    "status": "active",
+    "runCount": 47,
+    "lastRun": "2026-02-05T18:30:00Z",
+    "createdAt": "2026-01-15T00:00:00Z"
+  },
+  {
+    "id": "wf-002",
+    "name": "Contract Generation",
+    "category": "Sales",
+    "description": "Generate PDF contracts from Google Sheet order data for customer agreements",
+    "status": "active",
+    "runCount": 23,
+    "lastRun": "2026-02-04T14:20:00Z",
+    "createdAt": "2026-01-20T00:00:00Z"
+  },
+  {
+    "id": "wf-003",
+    "name": "Lead Qualification",
+    "category": "Sales",
+    "description": "Qualify incoming leads based on criteria: location, timeline, budget, decision maker",
+    "status": "active",
+    "runCount": 12,
+    "lastRun": "2026-02-05T09:15:00Z",
+    "createdAt": "2026-01-25T00:00:00Z"
+  }
+]

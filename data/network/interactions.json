@@ -1,0 +1,121 @@
+{
+  "interactions": [
+    {
+      "id": "touch-001",
+      "contactId": "contact-001",
+      "date": "2026-02-05",
+      "method": "video_call",
+      "duration": "60 minutes",
+      "context": "Weekly strategy call",
+      "topics": ["Nova Dashboard progress", "Q1 sales strategy", "Hiring plans"],
+      "insights": [
+        "Don't optimize for revenue in year 1, optimize for learning",
+        "Focus on systems before scaling"
+      ],
+      "actions": [
+        {"what": "Implement Nova workflows", "due": "2026-02-07", "completed": false},
+        {"what": "Schedule installer interviews", "due": "2026-02-10", "completed": false}
+      ],
+      "valueExchange": {
+        "gave": "Update on product progress",
+        "received": "Strategic direction"
+      },
+      "followUp": {
+        "needed": true,
+        "date": "2026-02-12",
+        "topic": "Progress review"
+      },
+      "createdAt": "2026-02-05T10:00:00Z"
+    },
+    {
+      "id": "touch-002",
+      "contactId": "contact-001",
+      "date": "2026-01-29",
+      "method": "video_call",
+      "duration": "45 minutes",
+      "context": "Weekly strategy call",
+      "topics": ["Contract generation workflow", "Automation progress"],
+      "insights": [
+        "Speed matters at customer homes - automate everything"
+      ],
+      "actions": [
+        {"what": "Finish contract automation", "due": "2026-02-01", "completed": true}
+      ],
+      "valueExchange": {
+        "gave": "Demo of new contract system",
+        "received": "Feedback on UX"
+      },
+      "followUp": {
+        "needed": false
+      },
+      "createdAt": "2026-01-29T10:00:00Z"
+    },
+    {
+      "id": "touch-003",
+      "contactId": "contact-002",
+      "date": "2026-02-02",
+      "method": "email",
+      "duration": null,
+      "context": "Production schedule confirmation",
+      "topics": ["Q1 production capacity", "Lead times"],
+      "insights": [],
+      "actions": [
+        {"what": "Confirm order volumes", "due": "2026-02-05", "completed": true}
+      ],
+      "valueExchange": {
+        "gave": "Updated forecasts",
+        "received": "Confirmed capacity"
+      },
+      "followUp": {
+        "needed": false
+      },
+      "createdAt": "2026-02-02T14:00:00Z"
+    },
+    {
+      "id": "touch-004",
+      "contactId": "contact-004",
+      "date": "2026-01-25",
+      "method": "email",
+      "duration": null,
+      "context": "Follow-up on builder intros",
+      "topics": ["Builder feedback", "Potential deals"],
+      "insights": [
+        "3 builders interested, need proposals"
+      ],
+      "actions": [
+        {"what": "Send proposals to interested builders", "due": "2026-01-30", "completed": false}
+      ],
+      "valueExchange": {
+        "gave": "Status update",
+        "received": "Lead information"
+      },
+      "followUp": {
+        "needed": true,
+        "date": "2026-02-25",
+        "topic": "Check on builder progress"
+      },
+      "createdAt": "2026-01-25T16:00:00Z"
+    },
+    {
+      "id": "touch-005",
+      "contactId": "contact-003",
+      "date": "2026-02-04",
+      "method": "slack",
+      "duration": "10 minutes",
+      "context": "Nova Dashboard feature request",
+      "topics": ["New features", "Bug fixes"],
+      "insights": [],
+      "actions": [
+        {"what": "Implement Network CRM tab", "due": "2026-02-05", "completed": false}
+      ],
+      "valueExchange": {
+        "gave": "Feature requirements",
+        "received": "Technical approach"
+      },
+      "followUp": {
+        "needed": false
+      },
+      "createdAt": "2026-02-04T11:00:00Z"
+    }
+  ]
+}

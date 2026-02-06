@@ -1,0 +1,76 @@
+{
+  "introductions": [
+    {
+      "id": "intro-001",
+      "from": "Francis Tran",
+      "to": "Chad Nickolas",
+      "date": "2025-08-01",
+      "context": "Manufacturing partnership for Studio Shade",
+      "outcome": {
+        "status": "successful",
+        "result": "Forma Living manufacturing partnership",
+        "value": "Critical - enables production"
+      },
+      "gratitude": {
+        "thanked": true,
+        "how": "Ongoing partnership appreciation",
+        "date": "ongoing"
+      },
+      "payItForward": []
+    },
+    {
+      "id": "intro-002",
+      "from": "Francis Tran",
+      "to": "Hung Dang",
+      "date": "2025-09-01",
+      "context": "Technical support for automation",
+      "outcome": {
+        "status": "successful",
+        "result": "Tech assistant handling contract automation and systems",
+        "value": "High - operational efficiency"
+      },
+      "gratitude": {
+        "thanked": true,
+        "how": "Project opportunities",
+        "date": "ongoing"
+      },
+      "payItForward": []
+    },
+    {
+      "id": "intro-003",
+      "from": "Sarah Johnson",
+      "to": "12 Luxury Builders",
+      "date": "2026-01-10",
+      "context": "Association member introductions",
+      "outcome": {
+        "status": "in_progress",
+        "result": "3 closed deals so far, 9 in pipeline",
+        "value": "$680k+ potential"
+      },
+      "gratitude": {
+        "thanked": false,
+        "how": null,
+        "date": null
+      },
+      "payItForward": []
+    },
+    {
+      "id": "intro-004",
+      "from": "Chad Nickolas",
+      "to": "Deb Gillette",
+      "date": "2025-08-01",
+      "context": "Order coordination at Forma Living",
+      "outcome": {
+        "status": "successful",
+        "result": "Smooth order processing",
+        "value": "Medium - operational support"
+      },
+      "gratitude": {
+        "thanked": true,
+        "how": "Professional courtesy",
+        "date": "ongoing"
+      },
+      "payItForward": []
+    }
+  ]
+}

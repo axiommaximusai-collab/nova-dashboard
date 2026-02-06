@@ -1,0 +1,293 @@
+{
+  "contacts": [
+    {
+      "id": "contact-001",
+      "name": "Francis Tran",
+      "email": "ftran@studioshadeco.com",
+      "phone": "+1-555-0100",
+      "company": "LoanDepot / Studio Shade Co",
+      "title": "Co-founder",
+      "relationship": {
+        "type": "mentor",
+        "strength": "strong",
+        "since": "2025-06-01",
+        "source": "Real estate conference"
+      },
+      "categories": ["Business Partner", "Mentor", "Investor"],
+      "valueExchange": {
+        "given": [
+          {"what": "Introduced to BlindMatrix team", "date": "2026-01-15", "value": "high"},
+          {"what": "Weekly strategy updates", "date": "ongoing", "value": "high"}
+        ],
+        "received": [
+          {"what": "Manufacturing partnership intro", "date": "2025-07-01", "value": "critical"},
+          {"what": "$50k co-founder investment", "date": "2025-08-01", "value": "critical"}
+        ],
+        "balance": "positive"
+      },
+      "dealFlow": {
+        "brought": 5,
+        "converted": 3,
+        "value": "$450,000",
+        "deals": [
+          {"name": "ABC Corp contract", "value": "$150k", "date": "2025-11-01"},
+          {"name": "XYZ Homes order", "value": "$200k", "date": "2026-01-10"},
+          {"name": "Metro Properties", "value": "$100k", "date": "2025-09-15"}
+        ]
+      },
+      "introductions": {
+        "made": [
+          {"who": "Chad Nickolas (Forma Living)", "date": "2025-08-01", "outcome": "Manufacturing partnership"},
+          {"who": "Hung Dang", "date": "2025-09-01", "outcome": "Tech support"}
+        ],
+        "received": []
+      },
+      "interactions": {
+        "lastContact": "2026-02-05",
+        "lastMethod": "video_call",
+        "frequency": "weekly",
+        "nextTouch": "2026-02-12",
+        "totalInteractions": 45
+      },
+      "notes": "Critical mentor and business partner. Weekly Saturday strategy calls. Former co-founder of LoanDepot.",
+      "createdAt": "2025-06-01T00:00:00Z",
+      "updatedAt": "2026-02-05T00:00:00Z"
+    },
+    {
+      "id": "contact-002",
+      "name": "Chad Nickolas",
+      "email": "cn@forma.living",
+      "phone": "+1-555-0101",
+      "company": "Forma Living",
+      "title": "Manufacturing Lead",
+      "relationship": {
+        "type": "partner",
+        "strength": "strong",
+        "since": "2025-08-01",
+        "source": "Francis Tran intro"
+      },
+      "categories": ["Manufacturing Partner", "Supplier"],
+      "valueExchange": {
+        "given": [
+          {"what": "Volume commitment", "date": "2025-08-01", "value": "high"}
+        ],
+        "received": [
+          {"what": "Direct manufacturing partnership", "date": "2025-08-01", "value": "critical"},
+          {"what": "Quality control processes", "date": "ongoing", "value": "high"}
+        ],
+        "balance": "positive"
+      },
+      "dealFlow": {
+        "brought": 0,
+        "converted": 0,
+        "value": "$0",
+        "deals": []
+      },
+      "introductions": {
+        "made": [],
+        "received": [
+          {"who": "Francis Tran", "date": "2025-08-01", "outcome": "Manufacturing partnership"}
+        ]
+      },
+      "interactions": {
+        "lastContact": "2026-02-02",
+        "lastMethod": "email",
+        "frequency": "weekly",
+        "nextTouch": "2026-02-09",
+        "totalInteractions": 28
+      },
+      "notes": "Manufacturing partner through Forma Living. Handles production capacity and quality.",
+      "createdAt": "2025-08-01T00:00:00Z",
+      "updatedAt": "2026-02-02T00:00:00Z"
+    },
+    {
+      "id": "contact-003",
+      "name": "Hung Dang",
+      "email": "hdang@studioshadeco.com",
+      "phone": "+1-555-0102",
+      "company": "Studio Shade Co",
+      "title": "Tech Assistant",
+      "relationship": {
+        "type": "colleague",
+        "strength": "medium",
+        "since": "2025-09-01",
+        "source": "Francis Tran intro"
+      },
+      "categories": ["Team Member", "Tech Support"],
+      "valueExchange": {
+        "given": [
+          {"what": "Development opportunities", "date": "ongoing", "value": "medium"}
+        ],
+        "received": [
+          {"what": "Technical implementation", "date": "ongoing", "value": "high"},
+          {"what": "Contract generation automation", "date": "2026-01-15", "value": "high"}
+        ],
+        "balance": "positive"
+      },
+      "dealFlow": {
+        "brought": 0,
+        "converted": 0,
+        "value": "$0",
+        "deals": []
+      },
+      "introductions": {
+        "made": [],
+        "received": [
+          {"who": "Francis Tran", "date": "2025-09-01", "outcome": "Tech support"}
+        ]
+      },
+      "interactions": {
+        "lastContact": "2026-02-04",
+        "lastMethod": "slack",
+        "frequency": "daily",
+        "nextTouch": "2026-02-05",
+        "totalInteractions": 120
+      },
+      "notes": "Tech assistant handling automation, contract generation, and technical implementation.",
+      "createdAt": "2025-09-01T00:00:00Z",
+      "updatedAt": "2026-02-04T00:00:00Z"
+    },
+    {
+      "id": "contact-004",
+      "name": "Sarah Johnson",
+      "email": "sarah.j@luxurybuilders.com",
+      "phone": "+1-555-0103",
+      "company": "Luxury Home Builders Association",
+      "title": "Association Director",
+      "relationship": {
+        "type": "deal_source",
+        "strength": "medium",
+        "since": "2025-10-01",
+        "source": "Cold outreach"
+      },
+      "categories": ["Deal Source", "Referral Partner"],
+      "valueExchange": {
+        "given": [
+          {"what": "Member discount program", "date": "2025-10-15", "value": "medium"}
+        ],
+        "received": [
+          {"what": "Introduction to 12 builders", "date": "2026-01-10", "value": "high"}
+        ],
+        "balance": "neutral"
+      },
+      "dealFlow": {
+        "brought": 5,
+        "converted": 3,
+        "value": "$680,000",
+        "deals": [
+          {"name": "Metro Property Management", "value": "$180k", "date": "2026-01-15"},
+          {"name": "Summit Builders", "value": "$220k", "date": "2025-12-20"},
+          {"name": "Coastal Homes", "value": "$150k", "date": "2025-11-10"}
+        ]
+      },
+      "introductions": {
+        "made": [
+          {"who": "12 luxury builders", "date": "2026-01-10", "outcome": "3 closed deals"}
+        ],
+        "received": []
+      },
+      "interactions": {
+        "lastContact": "2026-01-25",
+        "lastMethod": "email",
+        "frequency": "monthly",
+        "nextTouch": "2026-02-25",
+        "totalInteractions": 8
+      },
+      "notes": "Hot deal source. Association director with access to luxury builders. Needs follow-up.",
+      "createdAt": "2025-10-01T00:00:00Z",
+      "updatedAt": "2026-01-25T00:00:00Z"
+    },
+    {
+      "id": "contact-005",
+      "name": "Michael Chen",
+      "email": "mchen@realestategroup.com",
+      "phone": "+1-555-0104",
+      "company": "Real Estate Investment Group",
+      "title": "Managing Partner",
+      "relationship": {
+        "type": "deal_source",
+        "strength": "strong",
+        "since": "2025-07-15",
+        "source": "Referral"
+      },
+      "categories": ["Deal Source", "Investor"],
+      "valueExchange": {
+        "given": [
+          {"what": "Quick turnaround on proposals", "date": "ongoing", "value": "high"}
+        ],
+        "received": [
+          {"what": "Multi-property orders", "date": "ongoing", "value": "critical"}
+        ],
+        "balance": "positive"
+      },
+      "dealFlow": {
+        "brought": 8,
+        "converted": 5,
+        "value": "$320,000",
+        "deals": [
+          {"name": "Downtown Portfolio", "value": "$85k", "date": "2025-08-20"},
+          {"name": "Westside Properties", "value": "$120k", "date": "2025-10-05"},
+          {"name": "Mixed Use Development", "value": "$65k", "date": "2025-11-30"}
+        ]
+      },
+      "introductions": {
+        "made": [],
+        "received": []
+      },
+      "interactions": {
+        "lastContact": "2025-12-20",
+        "lastMethod": "phone",
+        "frequency": "bi-weekly",
+        "nextTouch": "2026-01-03",
+        "totalInteractions": 15
+      },
+      "notes": "🔴 TOUCH NEEDED - 47 days since last contact. High-value deal source. Real estate investor with multiple properties.",
+      "createdAt": "2025-07-15T00:00:00Z",
+      "updatedAt": "2025-12-20T00:00:00Z"
+    },
+    {
+      "id": "contact-006",
+      "name": "Deb Gillette",
+      "email": "dg@forma.living",
+      "phone": "+1-555-0105",
+      "company": "Forma Living",
+      "title": "Operations",
+      "relationship": {
+        "type": "partner",
+        "strength": "medium",
+        "since": "2025-08-01",
+        "source": "Chad Nickolas"
+      },
+      "categories": ["Supplier", "Operations"],
+      "valueExchange": {
+        "given": [],
+        "received": [
+          {"what": "Order coordination", "date": "ongoing", "value": "medium"}
+        ],
+        "balance": "neutral"
+      },
+      "dealFlow": {
+        "brought": 0,
+        "converted": 0,
+        "value": "$0",
+        "deals": []
+      },
+      "introductions": {
+        "made": [],
+        "received": [
+          {"who": "Chad Nickolas", "date": "2025-08-01", "outcome": "Order coordination"}
+        ]
+      },
+      "interactions": {
+        "lastContact": "2026-02-01",
+        "lastMethod": "email",
+        "frequency": "as_needed",
+        "nextTouch": null,
+        "totalInteractions": 12
+      },
+      "notes": "Chad's mom, handles order coordination at Forma Living.",
+      "createdAt": "2025-08-01T00:00:00Z",
+      "updatedAt": "2026-02-01T00:00:00Z"
+    }
+  ]
+}

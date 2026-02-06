@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NOVA - The Collective Mind</title>
+  <link rel="stylesheet" href="styles/nova.css">
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div class="logo">
+        <span class="logo-icon">◉</span>
+        <span class="logo-text">NOVA</span>
+      </div>
+      <nav class="main-nav">
+        <button class="nav-btn active" data-tab="dashboard">Dashboard</button>
+        <button class="nav-btn" data-tab="goals">Goals</button>
+        <button class="nav-btn" data-tab="tasks">Tasks</button>
+        <button class="nav-btn" data-tab="projects">Projects</button>
+        <button class="nav-btn" data-tab="workflows">Workflows</button>
+        <button class="nav-btn" data-tab="habits">Habits</button>
+        <button class="nav-btn" data-tab="memory">Memory</button>
+        <button class="nav-btn" data-tab="network">Network</button>
+      </nav>
+      <div class="header-actions">
+        <button class="btn-icon" id="searchBtn">🔍</button>
+        <button class="btn-icon" id="notifBtn">🔔</button>
+        <div class="user-avatar">N</div>
+      </div>
+    </header>
+
+    <main class="app-content">
+      <!-- DASHBOARD TAB -->
+      <section class="tab-panel active" id="dashboard">
+        <div class="dashboard-grid">
+          <div class="dash-card welcome">
+            <h2>Good <span id="timeGreeting">Day</span>, Nick</h2>
+            <p class="date" id="currentDate">Loading...</p>
+            <div class="daily-focus">
+              <h3>Today's Focus</h3>
+              <div id="dailyGoalsPreview">
+                <div class="loading">Loading goals...</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="dash-card stats">
+            <h3>Week at a Glance</h3>
+            <div class="stat-row">
+              <div class="stat">
+                <span class="stat-value" id="tasksCompleted">0</span>
+                <span class="stat-label">Tasks Done</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value" id="tasksTotal">0</span>
+                <span class="stat-label">Total</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value" id="habitStreak">0</span>
+                <span class="stat-label">Day Streak</span>
+              </div>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="weekProgress" style="width: 0%"></div>
+            </div>
+          </div>
+          
+          <div class="dash-card active-projects">
+            <h3>Active Projects</h3>
+            <div id="projectsPreview">
+              <div class="loading">Loading projects...</div>
+            </div>
+          </div>
+          
+          <div class="dash-card recent-memory">
+            <h3>Recent Memory</h3>
+            <div id="memoryPreview">
+              <div class="loading">Loading memories...</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- GOALS TAB -->
+      <section class="tab-panel" id="goals">
+        <div class="tab-header">
+          <h2>Goals</h2>
+          <div class="view-toggle">
+            <button class="toggle-btn active" data-view="daily">Daily</button>
+            <button class="toggle-btn" data-view="weekly">Weekly</button>
+            <button class="toggle-btn" data-view="monthly">Monthly</button>
+          </div>
+        </div>
+        
+        <div class="goals-content">
+          <div class="goal-editor">
+            <div class="form-group">
+              <label>Theme / Focus</label>
+              <input type="text" id="goalTheme" placeholder="What's the focus?">
+            </div>
+            <div class="form-group">
+              <label>Goals</label>
+              <div id="goalsList" class="goals-list"></div>
+              <button class="btn-secondary" id="addGoalBtn">+ Add Goal</button>
+            </div>
+            <div class="form-group">
+              <label>Notes</label>
+              <textarea id="goalNotes" rows="3" placeholder="Any thoughts or reflections..."></textarea>
+            </div>
+            <button class="btn-primary" id="saveGoalsBtn">Save Goals</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- TASKS TAB -->
+      <section class="tab-panel" id="tasks">
+        <div class="tab-header">
+          <h2>This Week's Tasks</h2>
+          <div class="header-actions-group">
+            <button class="btn-secondary" id="rolloverBtn">🔄 Rollover Last Week</button>
+            <button class="btn-primary" id="addTaskBtn">+ Add Task</button>
+          </div>
+        </div>
+        
+        <div class="tasks-container">
+          <div class="task-filters">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="pending">Pending</button>
+            <button class="filter-btn" data-filter="completed">Completed</button>
+          </div>
+          <div id="tasksList" class="tasks-list"></div>
+        </div>
+      </section>
+
+      <!-- PROJECTS TAB -->
+      <section class="tab-panel" id="projects">
+        <div class="tab-header">
+          <h2>Projects</h2>
+          <button class="btn-primary" id="newProjectBtn">+ New Project</button>
+        </div>
+        <div id="projectsGrid" class="projects-grid"></div>
+      </section>
+
+      <!-- WORKFLOWS TAB -->
+      <section class="tab-panel" id="workflows">
+        <div class="tab-header">
+          <h2>Workflows & SOPs</h2>
+          <button class="btn-primary" id="newWorkflowBtn">+ New Workflow</button>
+        </div>
+        <div id="workflowsList" class="workflows-list"></div>
+      </section>
+
+      <!-- HABITS TAB -->
+      <section class="tab-panel" id="habits">
+        <div class="tab-header">
+          <h2>Habit Tracker</h2>
+          <button class="btn-primary" id="newHabitBtn">+ New Habit</button>
+        </div>
+        <div id="habitsList" class="habits-list"></div>
+      </section>
+
+      <!-- MEMORY TAB -->
+      <section class="tab-panel" id="memory">
+        <div class="tab-header">
+          <h2>Memory</h2>
+          <div class="memory-actions">
+            <input type="text" id="memorySearch" placeholder="Search memory..." class="search-input">
+            <button class="btn-primary" id="quickAddMemory">+ Quick Add</button>
+          </div>
+        </div>
+        
+        <div class="memory-layout">
+          <aside class="memory-sidebar">
+            <div class="filter-group">
+              <h4>Filter</h4>
+              <button class="filter-link active" data-filter="all">All Entries</button>
+              <button class="filter-link" data-filter="decision">Decisions</button>
+              <button class="filter-link" data-filter="insight">Insights</button>
+              <button class="filter-link" data-filter="project_update">Projects</button>
+              <button class="filter-link" data-filter="people">People</button>
+            </div>
+            <div class="filter-group">
+              <h4>Tags</h4>
+              <div id="tagsList" class="tags-list"></div>
+            </div>
+          </aside>
+          <div id="memoryTimeline" class="memory-timeline"></div>
+        </div>
+      </section>
+
+      <!-- NETWORK TAB -->
+      <section class="tab-panel" id="network">
+        <div class="tab-header">
+          <h2>Network CRM</h2>
+          <button class="btn-primary" id="newContactBtn">+ Add Contact</button>
+        </div>
+        
+        <div class="network-layout">
+          <!-- Touch Reminders -->
+          <div class="network-section touch-reminders">
+            <h3>⚠️ Touch Needed</h3>
+            <div id="touchRemindersList"></div>
+          </div>
+          
+          <!-- Network Metrics -->
+          <div class="network-section metrics-grid">
+            <div class="metric-card">
+              <span class="metric-value" id="totalContacts">0</span>
+              <span class="metric-label">Contacts</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-value" id="strongRelations">0</span>
+              <span class="metric-label">Strong Relationships</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-value" id="dealSources">0</span>
+              <span class="metric-label">Deal Sources</span>
+            </div>
+            <div class="metric-card highlight">
+              <span class="metric-value" id="totalDealValue">$0</span>
+              <span class="metric-label">Total Deal Value</span>
+            </div>
+          </div>
+          
+          <!-- Top Deal Sources -->
+          <div class="network-section deal-sources">
+            <h3>💰 Top Deal Sources</h3>
+            <div id="topDealSourcesList"></div>
+          </div>
+          
+          <!-- Contacts List -->
+          <div class="network-section contacts-list">
+            <div class="contacts-filter">
+              <button class="filter-btn active" data-filter="all">All</button>
+              <button class="filter-btn" data-filter="mentor">Mentors</button>
+              <button class="filter-btn" data-filter="partner">Partners</button>
+              <button class="filter-btn" data-filter="deal_source">Deal Sources</button>
+            </div>
+            <div id="contactsGrid" class="contacts-grid"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal for adding/editing items -->
+  <div class="modal" id="itemModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle">Add Item</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-footer">
+        <button class="btn-secondary" id="modalCancel">Cancel</button>
+        <button class="btn-primary" id="modalSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="modules/nova.js"></script>
+</body>
+</html>

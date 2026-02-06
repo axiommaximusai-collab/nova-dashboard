@@ -1,0 +1,42 @@
+[
+  {
+    "id": "mem-001",
+    "timestamp": "2026-02-05T19:46:00Z",
+    "type": "project_update",
+    "content": "Completed Nova Dashboard core build. All 7 tabs implemented: Dashboard, Goals, Tasks, Projects, Workflows, Habits, and Memory. Ready for testing and deployment.",
+    "tags": ["nova", "build", "milestone"],
+    "importance": "high"
+  },
+  {
+    "id": "mem-002",
+    "timestamp": "2026-02-05T14:30:00Z",
+    "type": "decision",
+    "content": "Decided to store Nova Dashboard data in JSON files locally rather than database for easier GitHub sync and Axiom access. Trade-off: no concurrent editing but simpler architecture.",
+    "tags": ["nova", "architecture", "decision"],
+    "importance": "high"
+  },
+  {
+    "id": "mem-003",
+    "timestamp": "2026-02-04T10:00:00Z",
+    "type": "insight",
+    "content": "Francis emphasized that Q1 goal is to have 50 paying customers by end of March. Need to prioritize sales workflows and lead generation systems.",
+    "tags": ["francis", "sales", "goals", "q1-2026"],
+    "importance": "high"
+  },
+  {
+    "id": "mem-004",
+    "timestamp": "2026-02-03T16:00:00Z",
+    "type": "note",
+    "content": "Hung will help set up BlindMatrix API integration. He needs API credentials from Chad at Forma Living. Follow up next week.",
+    "tags": ["hung", "blindmatrix", "integration"],
+    "importance": "medium"
+  },
+  {
+    "id": "mem-005",
+    "timestamp": "2026-02-02T09:00:00Z",
+    "type": "insight",
+    "content": "Key differentiator for Studio Shade: direct manufacturer relationship through Francis. Competitors don't have this - we can undercut by 20-30% on price.",
+    "tags": ["competitive-advantage", "pricing", "francis"],
+    "importance": "high"
+  }
+]

@@ -1,0 +1,28 @@
+[
+  {
+    "id": "proj-001",
+    "name": "Launch Nova Dashboard",
+    "description": "Build and deploy the complete Nova Dashboard with all tabs: Goals, Tasks, Projects, Workflows, Habits, and Memory.",
+    "status": "active",
+    "progress": 85,
+    "createdAt": "2026-02-01T00:00:00Z",
+    "deadline": "2026-02-10"
+  },
+  {
+    "id": "proj-002",
+    "name": "BlindMatrix Integration",
+    "description": "Integrate with BlindMatrix API for automated order processing and customer management.",
+    "status": "active",
+    "progress": 30,
+    "createdAt": "2026-01-20T00:00:00Z",
+    "deadline": "2026-03-01"
+  },
+  {
+    "id": "proj-003",
+    "name": "Sales Process Documentation",
+    "description": "Document and systematize the complete sales process from lead to close.",
+    "status": "paused",
+    "progress": 60,
+    "createdAt": "2026-01-10T00:00:00Z"
+  }
+]

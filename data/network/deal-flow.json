@@ -1,0 +1,163 @@
+{
+  "dealSources": [
+    {
+      "id": "deal-source-001",
+      "contactId": "contact-001",
+      "contactName": "Francis Tran",
+      "opportunities": [
+        {
+          "id": "opp-001",
+          "name": "ABC Corp contract",
+          "description": "Corporate office window treatments",
+          "dateReceived": "2025-10-01",
+          "status": "closed_won",
+          "value": "$150,000",
+          "converted": true,
+          "closedDate": "2025-11-01"
+        },
+        {
+          "id": "opp-002",
+          "name": "XYZ Homes order",
+          "description": "New development window package",
+          "dateReceived": "2025-12-01",
+          "status": "closed_won",
+          "value": "$200,000",
+          "converted": true,
+          "closedDate": "2026-01-10"
+        },
+        {
+          "id": "opp-003",
+          "name": "Metro Properties",
+          "description": "Multi-family unit treatments",
+          "dateReceived": "2025-08-15",
+          "status": "closed_won",
+          "value": "$100,000",
+          "converted": true,
+          "closedDate": "2025-09-15"
+        },
+        {
+          "id": "opp-004",
+          "name": "Sunrise Development",
+          "description": "Commercial building project",
+          "dateReceived": "2026-01-20",
+          "status": "in_progress",
+          "value": "$300,000 potential",
+          "converted": false
+        }
+      ],
+      "metrics": {
+        "totalDealsBrought": 5,
+        "conversionRate": 60,
+        "totalValue": "$450k",
+        "averageDealSize": "$90k"
+      },
+      "quality": "hot"
+    },
+    {
+      "id": "deal-source-002",
+      "contactId": "contact-004",
+      "contactName": "Sarah Johnson",
+      "opportunities": [
+        {
+          "id": "opp-101",
+          "name": "Metro Property Management",
+          "description": "200 unit order",
+          "dateReceived": "2025-12-01",
+          "status": "closed_won",
+          "value": "$180,000",
+          "converted": true,
+          "closedDate": "2026-01-15"
+        },
+        {
+          "id": "opp-102",
+          "name": "Summit Builders",
+          "description": "Luxury home development",
+          "dateReceived": "2025-11-15",
+          "status": "closed_won",
+          "value": "$220,000",
+          "converted": true,
+          "closedDate": "2025-12-20"
+        },
+        {
+          "id": "opp-103",
+          "name": "Coastal Homes",
+          "description": "Beachfront property order",
+          "dateReceived": "2025-10-20",
+          "status": "closed_won",
+          "value": "$150,000",
+          "converted": true,
+          "closedDate": "2025-11-10"
+        },
+        {
+          "id": "opp-104",
+          "name": "Builder Group Introduction",
+          "description": "12 luxury builders",
+          "dateReceived": "2026-01-10",
+          "status": "in_progress",
+          "value": "$500,000 potential",
+          "converted": false
+        }
+      ],
+      "metrics": {
+        "totalDealsBrought": 5,
+        "conversionRate": 60,
+        "totalValue": "$680k",
+        "averageDealSize": "$136k"
+      },
+      "quality": "hot"
+    },
+    {
+      "id": "deal-source-003",
+      "contactId": "contact-005",
+      "contactName": "Michael Chen",
+      "opportunities": [
+        {
+          "id": "opp-201",
+          "name": "Downtown Portfolio",
+          "description": "5-building treatment package",
+          "dateReceived": "2025-08-01",
+          "status": "closed_won",
+          "value": "$85,000",
+          "converted": true,
+          "closedDate": "2025-08-20"
+        },
+        {
+          "id": "opp-202",
+          "name": "Westside Properties",
+          "description": "Apartment complex order",
+          "dateReceived": "2025-09-20",
+          "status": "closed_won",
+          "value": "$120,000",
+          "converted": true,
+          "closedDate": "2025-10-05"
+        },
+        {
+          "id": "opp-203",
+          "name": "Mixed Use Development",
+          "description": "Retail + residential units",
+          "dateReceived": "2025-11-10",
+          "status": "closed_won",
+          "value": "$65,000",
+          "converted": true,
+          "closedDate": "2025-11-30"
+        },
+        {
+          "id": "opp-204",
+          "name": "Industrial Park",
+          "description": "Office building treatments",
+          "dateReceived": "2025-12-15",
+          "status": "lost",
+          "value": "$50,000",
+          "converted": false
+        }
+      ],
+      "metrics": {
+        "totalDealsBrought": 8,
+        "conversionRate": 50,
+        "totalValue": "$320k",
+        "averageDealSize": "$40k"
+      },
+      "quality": "warm"
+    }
+  ]
+}
