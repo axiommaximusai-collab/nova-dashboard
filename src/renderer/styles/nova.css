@@ -2591,9 +2591,26 @@ body {
   margin-top: 4px;
 }
 
+.tasks-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
 .tasks-filters {
   display: flex;
   gap: 12px;
+}
+
+.tasks-weekly-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
 }
 
 .filter-select {
@@ -2905,6 +2922,36 @@ body {
   outline: none;
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+.project-tasks-preview {
+  max-height: 200px;
+  overflow-y: auto;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.project-tasks-preview .preview-task {
+  padding: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.project-tasks-preview .preview-task:last-child {
+  margin-bottom: 0;
+}
+
+.project-tasks-preview .empty-preview {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 12px;
+  padding: 20px;
 }
 
 .day-radio-group,

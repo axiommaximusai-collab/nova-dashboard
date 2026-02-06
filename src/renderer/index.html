@@ -332,17 +332,24 @@
             <h2>This Week's Tasks</h2>
             <p class="week-range" id="weekRange">Loading...</p>
           </div>
-          <div class="tasks-filters">
-            <select id="priorityFilter" class="filter-select">
-              <option value="all">Priority: All</option>
-              <option value="high">High</option>
-              <option value="medium">Medium</option>
-              <option value="low">Low</option>
-            </select>
-            <select id="categoryFilter" class="filter-select">
-              <option value="all">Category: All</option>
-              <!-- Populated dynamically from /api/categories -->
-            </select>
+          <div class="tasks-header-actions">
+            <div class="tasks-filters">
+              <select id="priorityFilter" class="filter-select">
+                <option value="all">Priority: All</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+              <select id="categoryFilter" class="filter-select">
+                <option value="all">Category: All</option>
+                <!-- Populated dynamically from /api/categories -->
+              </select>
+            </div>
+            <div class="tasks-weekly-actions">
+              <button class="btn-secondary btn-sm" id="viewPushedTasksBtn">→ Pushed</button>
+              <button class="btn-secondary btn-sm" id="viewArchivedTasksBtn">📦 Archived</button>
+              <button class="btn-secondary btn-sm" id="clearWeekBtn">🗑️ Clear Week</button>
+            </div>
           </div>
         </div>
 
@@ -488,6 +495,17 @@
                 <option value="">None</option>
                 <!-- Populated dynamically -->
               </select>
+            </div>
+
+            <div class="form-group">
+              <label>Description (optional)</label>
+              <textarea id="taskDescriptionInput" rows="3" placeholder="Add task details..." class="form-input"></textarea>
+            </div>
+
+            <!-- Project Tasks List (shown when project is selected) -->
+            <div class="form-group" id="projectTasksGroup" style="display: none;">
+              <label>Existing Project Tasks</label>
+              <div id="projectTasksList" class="project-tasks-preview"></div>
             </div>
           </div>
           <div class="task-modal-footer">

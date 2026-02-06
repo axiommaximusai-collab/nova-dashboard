@@ -126,6 +126,21 @@ const Nova = {
     document.getElementById('taskModalCancel')?.addEventListener('click', () => this.closeTaskModal());
     document.getElementById('taskModalSave')?.addEventListener('click', () => this.saveTask());
 
+    // Task project dropdown - show existing project tasks when selected
+    document.getElementById('taskProjectInput')?.addEventListener('change', (e) => {
+      const projectId = e.target.value;
+      if (projectId) {
+        this.showProjectTasks(projectId);
+      } else {
+        document.getElementById('projectTasksGroup').style.display = 'none';
+      }
+    });
+
+    // Weekly action buttons
+    document.getElementById('viewPushedTasksBtn')?.addEventListener('click', () => this.viewPushedTasks());
+    document.getElementById('viewArchivedTasksBtn')?.addEventListener('click', () => this.viewArchivedTasks());
+    document.getElementById('clearWeekBtn')?.addEventListener('click', () => this.clearWeek());
+
     document.getElementById('newProjectBtn').addEventListener('click', () => this.showAddProjectModal());
     document.getElementById('newHabitBtn').addEventListener('click', () => this.showAddHabitModal());
     document.getElementById('quickAddMemory').addEventListener('click', () => this.showAddMemoryModal());
@@ -700,6 +715,8 @@ const Nova = {
   currentPriorityFilter: 'all',
   currentCategoryFilter: 'all',
   categories: [],
+  projectsLoaded: false,
+  goalsLoaded: false,
   currentTaskYear: null,
   currentTaskWeek: null,
   editingTaskId: null,
@@ -739,6 +756,58 @@ const Nova = {
         }
       }
 
+      // Load projects and populate dropdown
+      if (!this.projectsLoaded) {
+        try {
+          const projectsData = await this.apiGet('/projects');
+          const projects = projectsData.projects || [];
+
+          const taskProjectInput = document.getElementById('taskProjectInput');
+          if (taskProjectInput) {
+            // Clear existing options except first
+            while (taskProjectInput.options.length > 1) {
+              taskProjectInput.remove(1);
+            }
+
+            projects.forEach(proj => {
+              const option = document.createElement('option');
+              option.value = proj.id;
+              option.textContent = proj.name;
+              taskProjectInput.appendChild(option);
+            });
+          }
+          this.projectsLoaded = true;
+        } catch (err) {
+          console.error('Failed to load projects:', err);
+        }
+      }
+
+      // Load goals and populate dropdown
+      if (!this.goalsLoaded) {
+        try {
+          const goalsData = await this.apiGet('/goals');
+          const goals = goalsData.goals || [];
+
+          const taskGoalInput = document.getElementById('taskGoalInput');
+          if (taskGoalInput) {
+            // Clear existing options except first
+            while (taskGoalInput.options.length > 1) {
+              taskGoalInput.remove(1);
+            }
+
+            goals.filter(g => !g.archived && g.status !== 'completed').forEach(goal => {
+              const option = document.createElement('option');
+              option.value = goal.id;
+              option.textContent = goal.title;
+              taskGoalInput.appendChild(option);
+            });
+          }
+          this.goalsLoaded = true;
+        } catch (err) {
+          console.error('Failed to load goals:', err);
+        }
+      }
+
       // Load tasks with filters
       const params = new URLSearchParams({
         week: `${year}-${week}`,
@@ -755,13 +824,13 @@ const Nova = {
       // Update dates for each column
       this.updateColumnDates(year, week);
 
-      // Organize tasks by day
+      // Organize tasks by day (filter out archived tasks)
       const tasksByDay = {
         Monday: [], Tuesday: [], Wednesday: [], Thursday: [],
         Friday: [], Saturday: [], Sunday: []
       };
 
-      tasks.forEach(task => {
+      tasks.filter(t => !t.archived).forEach(task => {
         if (tasksByDay[task.day]) {
           tasksByDay[task.day].push(task);
         }
@@ -844,15 +913,17 @@ const Nova = {
     }
 
     return `
-      <div class="task-card ${task.completed ? 'completed' : ''}" data-id="${task.id}" draggable="true" onclick="nova.openTaskEdit('${task.id}')">
+      <div class="task-card ${task.completed ? 'completed' : ''} ${task.archived ? 'archived' : ''}" data-id="${task.id}" draggable="true" onclick="nova.openTaskEdit('${task.id}')">
         <div class="task-priority ${task.priority}">${priorityEmoji} ${task.priority.toUpperCase()}</div>
         <div class="task-card-title">${task.title}</div>
         ${categoryDisplay}
         ${linkDisplay}
         <div class="task-card-actions" onclick="event.stopPropagation()">
-          <button class="task-action-btn" onclick="nova.toggleTaskComplete('${task.id}', ${!task.completed})">${task.completed ? '↺' : '✓'}</button>
-          <button class="task-action-btn" onclick="nova.openTaskEdit('${task.id}')">✎</button>
-          <button class="task-action-btn delete" onclick="nova.deleteTask('${task.id}')">🗑️</button>
+          <button class="task-action-btn" onclick="nova.toggleTaskComplete('${task.id}', ${!task.completed})" title="${task.completed ? 'Reopen' : 'Complete'}">${task.completed ? '↺' : '✓'}</button>
+          <button class="task-action-btn" onclick="nova.openTaskEdit('${task.id}')" title="Edit">✎</button>
+          <button class="task-action-btn" onclick="nova.pushTask('${task.id}')" title="Push to next week">→</button>
+          <button class="task-action-btn" onclick="nova.archiveTask('${task.id}')" title="Archive">📦</button>
+          <button class="task-action-btn delete" onclick="nova.deleteTask('${task.id}')" title="Delete">🗑️</button>
         </div>
       </div>
     `;
@@ -884,10 +955,11 @@ const Nova = {
     }
   },
 
-  openTaskModal(day = null) {
+  openTaskModal(day = null, projectId = null) {
     this.editingTaskId = null;
     document.getElementById('taskModalTitle').textContent = 'Add Task';
     document.getElementById('taskTitleInput').value = '';
+    document.getElementById('taskDescriptionInput').value = '';
 
     // Pre-select day if provided
     if (day) {
@@ -897,8 +969,15 @@ const Nova = {
     // Reset other fields
     document.querySelector('input[name="taskPriority"][value="medium"]').checked = true;
     document.getElementById('taskCategoryInput').value = '';
-    document.getElementById('taskProjectInput').value = '';
+    document.getElementById('taskProjectInput').value = projectId || '';
     document.getElementById('taskGoalInput').value = '';
+
+    // If project is pre-selected, show project tasks
+    if (projectId) {
+      this.showProjectTasks(projectId);
+    } else {
+      document.getElementById('projectTasksGroup').style.display = 'none';
+    }
 
     document.getElementById('taskModal').classList.add('active');
   },
@@ -914,11 +993,19 @@ const Nova = {
       this.editingTaskId = taskId;
       document.getElementById('taskModalTitle').textContent = 'Edit Task';
       document.getElementById('taskTitleInput').value = task.title;
+      document.getElementById('taskDescriptionInput').value = task.description || '';
       document.querySelector(`input[name="taskDay"][value="${task.day}"]`).checked = true;
       document.querySelector(`input[name="taskPriority"][value="${task.priority}"]`).checked = true;
       document.getElementById('taskCategoryInput').value = task.category;
       document.getElementById('taskProjectInput').value = task.projectId || '';
       document.getElementById('taskGoalInput').value = task.goalId || '';
+
+      // Show project tasks if project is linked
+      if (task.projectId) {
+        this.showProjectTasks(task.projectId);
+      } else {
+        document.getElementById('projectTasksGroup').style.display = 'none';
+      }
 
       document.getElementById('taskModal').classList.add('active');
     } catch (err) {
@@ -938,6 +1025,7 @@ const Nova = {
     const category = document.getElementById('taskCategoryInput').value;
     const projectId = document.getElementById('taskProjectInput').value || null;
     const goalId = document.getElementById('taskGoalInput').value || null;
+    const description = document.getElementById('taskDescriptionInput').value.trim() || '';
 
     if (!title) {
       alert('Please enter a task title');
@@ -962,6 +1050,7 @@ const Nova = {
         category,
         projectId,
         goalId,
+        description,
         year: this.currentTaskYear,
         week: this.currentTaskWeek
       };
@@ -1029,7 +1118,90 @@ const Nova = {
       });
     });
   },
-  
+
+  async showProjectTasks(projectId) {
+    try {
+      const params = new URLSearchParams({ week: `${this.currentTaskYear}-${this.currentTaskWeek}` });
+      const data = await this.apiGet(`/tasks?${params.toString()}`);
+      const projectTasks = data.tasks.filter(t => t.projectId === projectId);
+
+      const projectTasksList = document.getElementById('projectTasksList');
+      const projectTasksGroup = document.getElementById('projectTasksGroup');
+
+      if (projectTasks.length > 0) {
+        projectTasksList.innerHTML = projectTasks.map(t => `
+          <div class="preview-task">
+            <strong>${t.title}</strong> • ${t.day} • ${t.completed ? '✓ Done' : 'Pending'}
+          </div>
+        `).join('');
+        projectTasksGroup.style.display = 'block';
+      } else {
+        projectTasksList.innerHTML = '<div class="empty-preview">No tasks yet for this project</div>';
+        projectTasksGroup.style.display = 'block';
+      }
+    } catch (err) {
+      console.error('Failed to load project tasks:', err);
+    }
+  },
+
+  async archiveTask(taskId) {
+    if (!confirm('Archive this task?')) return;
+
+    try {
+      await this.apiPut(`/tasks/${taskId}/archive`, {
+        year: this.currentTaskYear,
+        week: this.currentTaskWeek
+      });
+      this.loadTasks();
+      this.showNotification('Task archived');
+    } catch (err) {
+      console.error('Failed to archive task:', err);
+      alert('Failed to archive task');
+    }
+  },
+
+  async pushTask(taskId) {
+    if (!confirm('Push this task to next week?')) return;
+
+    try {
+      await this.apiPut(`/tasks/${taskId}/push`, {
+        year: this.currentTaskYear,
+        week: this.currentTaskWeek
+      });
+      this.loadTasks();
+      this.showNotification('Task pushed to next week');
+    } catch (err) {
+      console.error('Failed to push task:', err);
+      alert('Failed to push task');
+    }
+  },
+
+  async clearWeek() {
+    if (!confirm('Clear all incomplete tasks from this week? (This will archive them)')) return;
+
+    try {
+      await this.apiPost('/tasks/clear-week', {
+        year: this.currentTaskYear,
+        week: this.currentTaskWeek
+      });
+      this.loadTasks();
+      this.showNotification('Week cleared - incomplete tasks archived');
+    } catch (err) {
+      console.error('Failed to clear week:', err);
+      alert('Failed to clear week');
+    }
+  },
+
+  async viewPushedTasks() {
+    alert('View Pushed Tasks - Feature coming soon!');
+    // TODO: Implement modal showing pushed tasks
+  },
+
+  async viewArchivedTasks() {
+    alert('View Archived Tasks - Feature coming soon!');
+    // TODO: Implement modal showing archived tasks
+  },
+
   // Projects
   async loadProjects() {
     const projects = await this.apiGet('/projects/');

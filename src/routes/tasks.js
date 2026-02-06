@@ -177,10 +177,100 @@ router.put('/:id/complete', async (req, res) => {
     task.updatedAt = new Date().toISOString().split('T')[0];
 
     await writeTasks(year, week, data);
+
+    // TODO: Auto-update project/goal progress when task is completed
+    // if (completed && (task.projectId || task.goalId)) {
+    //   // Calculate and update project or goal progress
+    // }
+
     res.json(task);
   } catch (error) {
     console.error('Error completing task:', error);
     res.status(500).json({ error: 'Failed to complete task' });
+  }
+});
+
+// PUT /api/tasks/:id/archive - Archive task
+router.put('/:id/archive', async (req, res) => {
+  try {
+    const { year, week } = req.body;
+    const data = await readTasks(year, week);
+    const task = data.tasks.find(t => t.id === req.params.id);
+
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    task.archived = true;
+    task.archivedAt = new Date().toISOString().split('T')[0];
+
+    await writeTasks(year, week, data);
+    res.json(task);
+  } catch (error) {
+    console.error('Error archiving task:', error);
+    res.status(500).json({ error: 'Failed to archive task' });
+  }
+});
+
+// PUT /api/tasks/:id/push - Push task to next week
+router.put('/:id/push', async (req, res) => {
+  try {
+    const { year, week } = req.body;
+    const data = await readTasks(year, week);
+    const taskIndex = data.tasks.findIndex(t => t.id === req.params.id);
+
+    if (taskIndex === -1) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    const task = data.tasks[taskIndex];
+
+    // Remove from current week
+    data.tasks.splice(taskIndex, 1);
+    await writeTasks(year, week, data);
+
+    // Calculate next week
+    const currentWeek = parseInt(week);
+    const nextWeek = currentWeek + 1;
+    const nextYear = year;
+
+    // Add to next week
+    const nextWeekData = await readTasks(nextYear, nextWeek);
+    task.week = nextWeek;
+    task.year = nextYear;
+    task.pushedFrom = `${year}-${week}`;
+    task.updatedAt = new Date().toISOString().split('T')[0];
+
+    nextWeekData.tasks.push(task);
+    await writeTasks(nextYear, nextWeek, nextWeekData);
+
+    res.json({ message: 'Task pushed to next week', task });
+  } catch (error) {
+    console.error('Error pushing task:', error);
+    res.status(500).json({ error: 'Failed to push task' });
+  }
+});
+
+// POST /api/tasks/clear-week - Clear week (archive all incomplete tasks)
+router.post('/clear-week', async (req, res) => {
+  try {
+    const { year, week } = req.body;
+    const data = await readTasks(year, week);
+
+    let archivedCount = 0;
+    data.tasks.forEach(task => {
+      if (!task.completed && !task.archived) {
+        task.archived = true;
+        task.archivedAt = new Date().toISOString().split('T')[0];
+        archivedCount++;
+      }
+    });
+
+    await writeTasks(year, week, data);
+    res.json({ message: `Cleared ${archivedCount} incomplete tasks`, archivedCount });
+  } catch (error) {
+    console.error('Error clearing week:', error);
+    res.status(500).json({ error: 'Failed to clear week' });
   }
 });
 
