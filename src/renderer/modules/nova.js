@@ -102,6 +102,30 @@ const Nova = {
         }
       });
     });
+
+    // Tasks kanban event listeners
+    document.querySelectorAll('.add-task-day-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const day = e.target.dataset.day;
+        this.openTaskModal(day);
+      });
+    });
+
+    document.getElementById('priorityFilter')?.addEventListener('change', (e) => {
+      this.currentPriorityFilter = e.target.value;
+      this.loadTasks();
+    });
+
+    document.getElementById('categoryFilter')?.addEventListener('change', (e) => {
+      this.currentCategoryFilter = e.target.value;
+      this.loadTasks();
+    });
+
+    // Task modal
+    document.querySelector('.task-modal-close')?.addEventListener('click', () => this.closeTaskModal());
+    document.getElementById('taskModalCancel')?.addEventListener('click', () => this.closeTaskModal());
+    document.getElementById('taskModalSave')?.addEventListener('click', () => this.saveTask());
+
     document.getElementById('newProjectBtn').addEventListener('click', () => this.showAddProjectModal());
     document.getElementById('newHabitBtn').addEventListener('click', () => this.showAddHabitModal());
     document.getElementById('quickAddMemory').addEventListener('click', () => this.showAddMemoryModal());
@@ -672,50 +696,338 @@ const Nova = {
     }, { offset: Number.NEGATIVE_INFINITY }).element;
   },
   
-  // Tasks
+  // Tasks - New Kanban System
+  currentPriorityFilter: 'all',
+  currentCategoryFilter: 'all',
+  categories: [],
+  currentTaskYear: null,
+  currentTaskWeek: null,
+  editingTaskId: null,
+
   async loadTasks() {
-    const year = new Date().getFullYear();
-    const week = this.getWeekNumber(new Date());
-    const data = await this.apiGet(`/tasks/${year}/${week}`);
-    
-    let tasks = data.tasks || [];
-    if (this.taskFilter === 'pending') tasks = tasks.filter(t => !t.completed);
-    if (this.taskFilter === 'completed') tasks = tasks.filter(t => t.completed);
-    
-    document.getElementById('tasksList').innerHTML = tasks.length
-      ? tasks.map(t => `
-        <div class="task-item" data-id="${t.id}">
-          <div class="task-priority ${t.priority || 'medium'}"></div>
-          <div class="task-content">
-            <div class="task-title ${t.completed ? 'completed' : ''}">${t.title}</div>
-            <div class="task-meta">${t.project || 'No project'} • ${t.dueDate || 'No due date'}</div>
-          </div>
-          <span class="task-project">${t.project || 'General'}</span>
-          <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="Nova.completeTask('${t.id}')">
-        </div>
-      `).join('')
-      : '<p style="color: var(--text-muted); padding: 20px;">No tasks for this view</p>';
+    try {
+      const year = new Date().getFullYear();
+      const week = this.getWeekNumber(new Date());
+      this.currentTaskYear = year;
+      this.currentTaskWeek = week;
+
+      // Load categories if not already loaded
+      if (this.categories.length === 0) {
+        const categoriesData = await this.apiGet('/tasks/categories');
+        this.categories = categoriesData.categories;
+
+        // Populate category filter
+        const categoryFilter = document.getElementById('categoryFilter');
+        if (categoryFilter) {
+          this.categories.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat.id;
+            option.textContent = `${cat.icon} ${cat.name}`;
+            categoryFilter.appendChild(option);
+          });
+        }
+
+        // Populate modal category dropdown
+        const taskCategoryInput = document.getElementById('taskCategoryInput');
+        if (taskCategoryInput) {
+          this.categories.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat.id;
+            option.textContent = `${cat.icon} ${cat.name}`;
+            taskCategoryInput.appendChild(option);
+          });
+        }
+      }
+
+      // Load tasks with filters
+      const params = new URLSearchParams({
+        week: `${year}-${week}`,
+        priority: this.currentPriorityFilter,
+        category: this.currentCategoryFilter
+      });
+
+      const data = await this.apiGet(`/tasks?${params.toString()}`);
+      const tasks = data.tasks || [];
+
+      // Update week range display
+      this.updateWeekRange(year, week);
+
+      // Update dates for each column
+      this.updateColumnDates(year, week);
+
+      // Organize tasks by day
+      const tasksByDay = {
+        Monday: [], Tuesday: [], Wednesday: [], Thursday: [],
+        Friday: [], Saturday: [], Sunday: []
+      };
+
+      tasks.forEach(task => {
+        if (tasksByDay[task.day]) {
+          tasksByDay[task.day].push(task);
+        }
+      });
+
+      // Render tasks for each day
+      ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].forEach(day => {
+        this.renderDayTasks(day, tasksByDay[day]);
+      });
+
+      // Setup drag and drop
+      this.setupTasksDragAndDrop();
+
+    } catch (err) {
+      console.error('Failed to load tasks:', err);
+    }
   },
-  
-  async completeTask(taskId) {
-    await fetch(`/api/tasks/${taskId}/complete`, { method: 'PATCH' });
-    this.loadTasks();
-    this.loadDashboard();
+
+  updateWeekRange(year, week) {
+    const weekRange = document.getElementById('weekRange');
+    if (!weekRange) return;
+
+    const startDate = this.getDateOfWeek(week, year);
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 6);
+
+    const options = { month: 'short', day: 'numeric' };
+    weekRange.textContent = `${startDate.toLocaleDateString('en-US', options)} - ${endDate.toLocaleDateString('en-US', options)}, ${year}`;
   },
-  
-  async rolloverTasks() {
-    const year = new Date().getFullYear();
-    const week = this.getWeekNumber(new Date());
-    const lastWeek = week > 1 ? week - 1 : 52;
-    const lastYear = week > 1 ? year : year - 1;
-    
-    await this.apiPost('/tasks/rollover', {
-      fromWeek: { year: lastYear, week: lastWeek },
-      toWeek: { year, week }
+
+  updateColumnDates(year, week) {
+    const startDate = this.getDateOfWeek(week, year);
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+    days.forEach((day, index) => {
+      const dateEl = document.getElementById(`date-${day}`);
+      if (dateEl) {
+        const dayDate = new Date(startDate);
+        dayDate.setDate(startDate.getDate() + index);
+        const options = { month: 'short', day: 'numeric' };
+        dateEl.textContent = dayDate.toLocaleDateString('en-US', options);
+      }
     });
-    
-    this.showNotification('Tasks rolled over!');
-    this.loadTasks();
+  },
+
+  getDateOfWeek(week, year) {
+    const simple = new Date(year, 0, 1 + (week - 1) * 7);
+    const dow = simple.getDay();
+    const ISOweekStart = simple;
+    if (dow <= 4) {
+      ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
+    } else {
+      ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
+    }
+    return ISOweekStart;
+  },
+
+  renderDayTasks(day, tasks) {
+    const container = document.getElementById(`tasks-${day}`);
+    if (!container) return;
+
+    if (tasks.length === 0) {
+      container.innerHTML = '<p style="color: var(--text-muted); font-size: 12px; text-align: center; padding: 20px 10px;">No tasks</p>';
+      return;
+    }
+
+    container.innerHTML = tasks.map(task => this.createTaskCard(task)).join('');
+  },
+
+  createTaskCard(task) {
+    const priorityEmoji = task.priority === 'high' ? '🔴' : task.priority === 'medium' ? '🟡' : '🟢';
+    const category = this.categories.find(c => c.id === task.category);
+    const categoryDisplay = category ? `<span class="task-card-category" style="color: ${category.color}">${category.icon} ${category.name}</span>` : '';
+
+    let linkDisplay = '';
+    if (task.projectId) {
+      linkDisplay = `<div class="task-card-link">→ Project</div>`;
+    } else if (task.goalId) {
+      linkDisplay = `<div class="task-card-link">→ Goal</div>`;
+    }
+
+    return `
+      <div class="task-card ${task.completed ? 'completed' : ''}" data-id="${task.id}" draggable="true" onclick="nova.openTaskEdit('${task.id}')">
+        <div class="task-priority ${task.priority}">${priorityEmoji} ${task.priority.toUpperCase()}</div>
+        <div class="task-card-title">${task.title}</div>
+        ${categoryDisplay}
+        ${linkDisplay}
+        <div class="task-card-actions" onclick="event.stopPropagation()">
+          <button class="task-action-btn" onclick="nova.toggleTaskComplete('${task.id}', ${!task.completed})">${task.completed ? '↺' : '✓'}</button>
+          <button class="task-action-btn" onclick="nova.openTaskEdit('${task.id}')">✎</button>
+          <button class="task-action-btn delete" onclick="nova.deleteTask('${task.id}')">🗑️</button>
+        </div>
+      </div>
+    `;
+  },
+
+  async toggleTaskComplete(taskId, completed) {
+    try {
+      await this.apiPut(`/tasks/${taskId}/complete`, {
+        year: this.currentTaskYear,
+        week: this.currentTaskWeek,
+        completed
+      });
+      this.loadTasks();
+      this.showNotification(completed ? 'Task completed!' : 'Task reopened');
+    } catch (err) {
+      console.error('Failed to toggle task:', err);
+    }
+  },
+
+  async deleteTask(taskId) {
+    if (!confirm('Delete this task?')) return;
+
+    try {
+      await this.apiDelete(`/tasks/${taskId}?year=${this.currentTaskYear}&week=${this.currentTaskWeek}`);
+      this.loadTasks();
+      this.showNotification('Task deleted');
+    } catch (err) {
+      console.error('Failed to delete task:', err);
+    }
+  },
+
+  openTaskModal(day = null) {
+    this.editingTaskId = null;
+    document.getElementById('taskModalTitle').textContent = 'Add Task';
+    document.getElementById('taskTitleInput').value = '';
+
+    // Pre-select day if provided
+    if (day) {
+      document.querySelector(`input[name="taskDay"][value="${day}"]`).checked = true;
+    }
+
+    // Reset other fields
+    document.querySelector('input[name="taskPriority"][value="medium"]').checked = true;
+    document.getElementById('taskCategoryInput').value = '';
+    document.getElementById('taskProjectInput').value = '';
+    document.getElementById('taskGoalInput').value = '';
+
+    document.getElementById('taskModal').classList.add('active');
+  },
+
+  async openTaskEdit(taskId) {
+    try {
+      const params = new URLSearchParams({ week: `${this.currentTaskYear}-${this.currentTaskWeek}` });
+      const data = await this.apiGet(`/tasks?${params.toString()}`);
+      const task = data.tasks.find(t => t.id === taskId);
+
+      if (!task) return;
+
+      this.editingTaskId = taskId;
+      document.getElementById('taskModalTitle').textContent = 'Edit Task';
+      document.getElementById('taskTitleInput').value = task.title;
+      document.querySelector(`input[name="taskDay"][value="${task.day}"]`).checked = true;
+      document.querySelector(`input[name="taskPriority"][value="${task.priority}"]`).checked = true;
+      document.getElementById('taskCategoryInput').value = task.category;
+      document.getElementById('taskProjectInput').value = task.projectId || '';
+      document.getElementById('taskGoalInput').value = task.goalId || '';
+
+      document.getElementById('taskModal').classList.add('active');
+    } catch (err) {
+      console.error('Failed to load task for editing:', err);
+    }
+  },
+
+  closeTaskModal() {
+    document.getElementById('taskModal').classList.remove('active');
+    this.editingTaskId = null;
+  },
+
+  async saveTask() {
+    const title = document.getElementById('taskTitleInput').value.trim();
+    const day = document.querySelector('input[name="taskDay"]:checked')?.value;
+    const priority = document.querySelector('input[name="taskPriority"]:checked')?.value;
+    const category = document.getElementById('taskCategoryInput').value;
+    const projectId = document.getElementById('taskProjectInput').value || null;
+    const goalId = document.getElementById('taskGoalInput').value || null;
+
+    if (!title) {
+      alert('Please enter a task title');
+      return;
+    }
+
+    if (!day) {
+      alert('Please select a day');
+      return;
+    }
+
+    if (!category) {
+      alert('Please select a category');
+      return;
+    }
+
+    try {
+      const taskData = {
+        title,
+        day,
+        priority,
+        category,
+        projectId,
+        goalId,
+        year: this.currentTaskYear,
+        week: this.currentTaskWeek
+      };
+
+      if (this.editingTaskId) {
+        await this.apiPut(`/tasks/${this.editingTaskId}`, taskData);
+        this.showNotification('Task updated');
+      } else {
+        await this.apiPost('/tasks', taskData);
+        this.showNotification('Task created');
+      }
+
+      this.closeTaskModal();
+      this.loadTasks();
+    } catch (err) {
+      console.error('Failed to save task:', err);
+      alert('Failed to save task');
+    }
+  },
+
+  setupTasksDragAndDrop() {
+    const cards = document.querySelectorAll('.task-card');
+    cards.forEach(card => {
+      card.addEventListener('dragstart', (e) => {
+        card.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', card.dataset.id);
+      });
+
+      card.addEventListener('dragend', () => {
+        card.classList.remove('dragging');
+      });
+    });
+
+    const lists = document.querySelectorAll('.tasks-list');
+    lists.forEach(list => {
+      list.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const dragging = document.querySelector('.dragging');
+        if (!dragging) return;
+
+        const afterElement = this.getDragAfterElement(list, e.clientY);
+        if (afterElement) {
+          list.insertBefore(dragging, afterElement);
+        } else {
+          list.appendChild(dragging);
+        }
+      });
+
+      list.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        const taskId = e.dataTransfer.getData('text/plain');
+        const newDay = list.dataset.day;
+
+        try {
+          await this.apiPut(`/tasks/${taskId}/move`, {
+            year: this.currentTaskYear,
+            week: this.currentTaskWeek,
+            day: newDay
+          });
+          this.loadTasks();
+        } catch (err) {
+          console.error('Failed to move task:', err);
+        }
+      });
+    });
   },
   
   // Projects

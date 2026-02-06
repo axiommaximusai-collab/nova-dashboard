@@ -5,20 +5,86 @@
     {
       "id": "task-001",
       "title": "Review Nova Dashboard",
+      "day": "Thursday",
+      "priority": "high",
+      "category": "business",
+      "projectId": "proj-001",
+      "goalId": "goal-001",
       "completed": true,
-      "day": "Thursday"
+      "createdAt": "2026-02-05",
+      "updatedAt": "2026-02-06"
     },
     {
       "id": "task-002",
-      "title": "Call Francis",
+      "title": "Call Francis about TX investment",
+      "day": "Friday",
+      "priority": "high",
+      "category": "finance",
+      "projectId": null,
+      "goalId": "goal-002",
       "completed": false,
-      "day": "Friday"
+      "createdAt": "2026-02-04",
+      "updatedAt": "2026-02-04"
     },
     {
       "id": "task-003",
-      "title": "Decide on TX investment",
+      "title": "Morning workout routine",
+      "day": "Monday",
+      "priority": "medium",
+      "category": "health",
+      "projectId": null,
+      "goalId": "goal-003",
       "completed": false,
-      "day": "Friday"
+      "createdAt": "2026-02-03",
+      "updatedAt": "2026-02-03"
+    },
+    {
+      "id": "task-004",
+      "title": "Code Goals API endpoints",
+      "day": "Wednesday",
+      "priority": "high",
+      "category": "tech",
+      "projectId": "proj-001",
+      "goalId": "goal-011",
+      "completed": false,
+      "createdAt": "2026-02-05",
+      "updatedAt": "2026-02-05"
+    },
+    {
+      "id": "task-005",
+      "title": "Review Q1 financials",
+      "day": "Tuesday",
+      "priority": "medium",
+      "category": "finance",
+      "projectId": null,
+      "goalId": null,
+      "completed": false,
+      "createdAt": "2026-02-04",
+      "updatedAt": "2026-02-04"
+    },
+    {
+      "id": "task-006",
+      "title": "Practice cold calling script",
+      "day": "Monday",
+      "priority": "low",
+      "category": "business",
+      "projectId": null,
+      "goalId": "goal-004",
+      "completed": false,
+      "createdAt": "2026-02-03",
+      "updatedAt": "2026-02-03"
+    },
+    {
+      "id": "task-007",
+      "title": "SQL tutorial - Chapter 5",
+      "day": "Thursday",
+      "priority": "medium",
+      "category": "learning",
+      "projectId": null,
+      "goalId": "goal-006",
+      "completed": false,
+      "createdAt": "2026-02-06",
+      "updatedAt": "2026-02-06"
     }
   ]
 }

@@ -328,22 +328,174 @@
       <!-- TASKS TAB -->
       <section class="tab-panel" id="tasks">
         <div class="tab-header">
-          <h2>This Week's Tasks</h2>
-          <div class="header-actions-group">
-            <button class="btn-secondary" id="rolloverBtn">🔄 Rollover Last Week</button>
-            <button class="btn-primary" id="addTaskBtn">+ Add Task</button>
+          <div>
+            <h2>This Week's Tasks</h2>
+            <p class="week-range" id="weekRange">Loading...</p>
+          </div>
+          <div class="tasks-filters">
+            <select id="priorityFilter" class="filter-select">
+              <option value="all">Priority: All</option>
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
+            <select id="categoryFilter" class="filter-select">
+              <option value="all">Category: All</option>
+              <!-- Populated dynamically from /api/categories -->
+            </select>
           </div>
         </div>
-        
-        <div class="tasks-container">
-          <div class="task-filters">
-            <button class="filter-btn active" data-filter="all">All</button>
-            <button class="filter-btn" data-filter="pending">Pending</button>
-            <button class="filter-btn" data-filter="completed">Completed</button>
+
+        <div class="tasks-kanban">
+          <!-- Monday -->
+          <div class="kanban-column" data-day="Monday">
+            <div class="column-header">
+              <div class="day-name">MON</div>
+              <div class="day-date" id="date-Monday">-</div>
+            </div>
+            <div class="tasks-list" id="tasks-Monday" data-day="Monday">
+              <div class="loading">Loading...</div>
+            </div>
+            <button class="add-task-day-btn" data-day="Monday">+ Add</button>
           </div>
-          <div id="tasksList" class="tasks-list"></div>
+
+          <!-- Tuesday -->
+          <div class="kanban-column" data-day="Tuesday">
+            <div class="column-header">
+              <div class="day-name">TUE</div>
+              <div class="day-date" id="date-Tuesday">-</div>
+            </div>
+            <div class="tasks-list" id="tasks-Tuesday" data-day="Tuesday">
+              <div class="loading">Loading...</div>
+            </div>
+            <button class="add-task-day-btn" data-day="Tuesday">+ Add</button>
+          </div>
+
+          <!-- Wednesday -->
+          <div class="kanban-column" data-day="Wednesday">
+            <div class="column-header">
+              <div class="day-name">WED</div>
+              <div class="day-date" id="date-Wednesday">-</div>
+            </div>
+            <div class="tasks-list" id="tasks-Wednesday" data-day="Wednesday">
+              <div class="loading">Loading...</div>
+            </div>
+            <button class="add-task-day-btn" data-day="Wednesday">+ Add</button>
+          </div>
+
+          <!-- Thursday -->
+          <div class="kanban-column" data-day="Thursday">
+            <div class="column-header">
+              <div class="day-name">THU</div>
+              <div class="day-date" id="date-Thursday">-</div>
+            </div>
+            <div class="tasks-list" id="tasks-Thursday" data-day="Thursday">
+              <div class="loading">Loading...</div>
+            </div>
+            <button class="add-task-day-btn" data-day="Thursday">+ Add</button>
+          </div>
+
+          <!-- Friday -->
+          <div class="kanban-column" data-day="Friday">
+            <div class="column-header">
+              <div class="day-name">FRI</div>
+              <div class="day-date" id="date-Friday">-</div>
+            </div>
+            <div class="tasks-list" id="tasks-Friday" data-day="Friday">
+              <div class="loading">Loading...</div>
+            </div>
+            <button class="add-task-day-btn" data-day="Friday">+ Add</button>
+          </div>
+
+          <!-- Saturday -->
+          <div class="kanban-column" data-day="Saturday">
+            <div class="column-header">
+              <div class="day-name">SAT</div>
+              <div class="day-date" id="date-Saturday">-</div>
+            </div>
+            <div class="tasks-list" id="tasks-Saturday" data-day="Saturday">
+              <div class="loading">Loading...</div>
+            </div>
+            <button class="add-task-day-btn" data-day="Saturday">+ Add</button>
+          </div>
+
+          <!-- Sunday -->
+          <div class="kanban-column" data-day="Sunday">
+            <div class="column-header">
+              <div class="day-name">SUN</div>
+              <div class="day-date" id="date-Sunday">-</div>
+            </div>
+            <div class="tasks-list" id="tasks-Sunday" data-day="Sunday">
+              <div class="loading">Loading...</div>
+            </div>
+            <button class="add-task-day-btn" data-day="Sunday">+ Add</button>
+          </div>
         </div>
       </section>
+
+      <!-- TASK MODAL -->
+      <div class="task-modal" id="taskModal">
+        <div class="task-modal-content">
+          <button class="task-modal-close">&times;</button>
+          <h2 id="taskModalTitle">Add Task</h2>
+          <div class="task-modal-body">
+            <div class="form-group">
+              <label>Task</label>
+              <input type="text" id="taskTitleInput" placeholder="Enter task..." class="form-input">
+            </div>
+
+            <div class="form-group">
+              <label>Day</label>
+              <div class="day-radio-group">
+                <label class="radio-option"><input type="radio" name="taskDay" value="Monday"> Mon</label>
+                <label class="radio-option"><input type="radio" name="taskDay" value="Tuesday"> Tue</label>
+                <label class="radio-option"><input type="radio" name="taskDay" value="Wednesday"> Wed</label>
+                <label class="radio-option"><input type="radio" name="taskDay" value="Thursday"> Thu</label>
+                <label class="radio-option"><input type="radio" name="taskDay" value="Friday"> Fri</label>
+                <label class="radio-option"><input type="radio" name="taskDay" value="Saturday"> Sat</label>
+                <label class="radio-option"><input type="radio" name="taskDay" value="Sunday"> Sun</label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Priority</label>
+              <div class="priority-radio-group">
+                <label class="radio-option priority-high"><input type="radio" name="taskPriority" value="high"> 🔴 High</label>
+                <label class="radio-option priority-medium"><input type="radio" name="taskPriority" value="medium" checked> 🟡 Medium</label>
+                <label class="radio-option priority-low"><input type="radio" name="taskPriority" value="low"> 🟢 Low</label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Category</label>
+              <select id="taskCategoryInput" class="form-input">
+                <option value="">Select category...</option>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Supports Project (optional)</label>
+              <select id="taskProjectInput" class="form-input">
+                <option value="">None</option>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Supports Goal (optional)</label>
+              <select id="taskGoalInput" class="form-input">
+                <option value="">None</option>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+          </div>
+          <div class="task-modal-footer">
+            <button class="btn-secondary" id="taskModalCancel">Cancel</button>
+            <button class="btn-primary" id="taskModalSave">Save</button>
+          </div>
+        </div>
+      </div>
 
       <!-- PROJECTS TAB -->
       <section class="tab-panel" id="projects">

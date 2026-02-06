@@ -1,0 +1,52 @@
+{
+  "categories": [
+    {
+      "id": "business",
+      "name": "Business",
+      "color": "#0ea5e9",
+      "icon": "💼"
+    },
+    {
+      "id": "personal",
+      "name": "Personal",
+      "color": "#be185d",
+      "icon": "👤"
+    },
+    {
+      "id": "health",
+      "name": "Health",
+      "color": "#10b981",
+      "icon": "💪"
+    },
+    {
+      "id": "finance",
+      "name": "Finance",
+      "color": "#f59e0b",
+      "icon": "💰"
+    },
+    {
+      "id": "learning",
+      "name": "Learning",
+      "color": "#8b5cf6",
+      "icon": "📚"
+    },
+    {
+      "id": "family",
+      "name": "Family",
+      "color": "#ec4899",
+      "icon": "👨‍👩‍👧‍👦"
+    },
+    {
+      "id": "tech",
+      "name": "Tech",
+      "color": "#06b6d4",
+      "icon": "💻"
+    },
+    {
+      "id": "network",
+      "name": "Network",
+      "color": "#84cc16",
+      "icon": "🤝"
+    }
+  ]
+}

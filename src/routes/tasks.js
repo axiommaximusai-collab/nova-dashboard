@@ -1,7 +1,190 @@
 const express = require('express');
 const router = express.Router();
 const tasksService = require('../services/tasksService');
+const fs = require('fs').promises;
+const path = require('path');
 
+// GET /api/categories - Get all categories
+router.get('/categories', async (req, res) => {
+  try {
+    const categoriesPath = path.join(__dirname, '../../data/categories.json');
+    const data = await fs.readFile(categoriesPath, 'utf8');
+    const categories = JSON.parse(data);
+    res.json(categories);
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    res.status(500).json({ error: 'Failed to fetch categories' });
+  }
+});
+
+// Helper functions for new tasks system
+const getTasksFilePath = (year, week) => {
+  return path.join(__dirname, `../../data/tasks/weekly-${year}-${week}.json`);
+};
+
+async function readTasks(year, week) {
+  try {
+    const filePath = getTasksFilePath(year, week);
+    const data = await fs.readFile(filePath, 'utf8');
+    return JSON.parse(data);
+  } catch (err) {
+    return { year, week, tasks: [] };
+  }
+}
+
+async function writeTasks(year, week, data) {
+  const filePath = getTasksFilePath(year, week);
+  await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8');
+}
+
+// GET /api/tasks?week=2026-6&priority=high&category=business
+router.get('/', async (req, res) => {
+  try {
+    const { week, priority, category } = req.query;
+
+    if (!week) {
+      return res.status(400).json({ error: 'Week parameter required (format: YYYY-W)' });
+    }
+
+    const [year, weekNum] = week.split('-');
+    const data = await readTasks(year, weekNum);
+    let tasks = data.tasks || [];
+
+    // Apply filters
+    if (priority && priority !== 'all') {
+      tasks = tasks.filter(t => t.priority === priority);
+    }
+    if (category && category !== 'all') {
+      tasks = tasks.filter(t => t.category === category);
+    }
+
+    res.json({ ...data, tasks });
+  } catch (error) {
+    console.error('Error fetching tasks:', error);
+    res.status(500).json({ error: 'Failed to fetch tasks' });
+  }
+});
+
+// POST /api/tasks - Create new task
+router.post('/', async (req, res) => {
+  try {
+    const { year, week } = req.body;
+    const data = await readTasks(year, week);
+
+    const newTask = {
+      id: `task-${Date.now()}`,
+      title: req.body.title,
+      day: req.body.day,
+      priority: req.body.priority || 'medium',
+      category: req.body.category || 'personal',
+      projectId: req.body.projectId || null,
+      goalId: req.body.goalId || null,
+      completed: false,
+      createdAt: new Date().toISOString().split('T')[0],
+      updatedAt: new Date().toISOString().split('T')[0]
+    };
+
+    data.tasks.push(newTask);
+    await writeTasks(year, week, data);
+    res.json(newTask);
+  } catch (error) {
+    console.error('Error creating task:', error);
+    res.status(500).json({ error: 'Failed to create task' });
+  }
+});
+
+// PUT /api/tasks/:id - Update task
+router.put('/:id', async (req, res) => {
+  try {
+    const { year, week } = req.body;
+    const data = await readTasks(year, week);
+    const taskIndex = data.tasks.findIndex(t => t.id === req.params.id);
+
+    if (taskIndex === -1) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    const task = data.tasks[taskIndex];
+    Object.assign(task, {
+      ...req.body,
+      id: task.id,
+      createdAt: task.createdAt,
+      updatedAt: new Date().toISOString().split('T')[0]
+    });
+
+    await writeTasks(year, week, data);
+    res.json(task);
+  } catch (error) {
+    console.error('Error updating task:', error);
+    res.status(500).json({ error: 'Failed to update task' });
+  }
+});
+
+// DELETE /api/tasks/:id - Delete task
+router.delete('/:id', async (req, res) => {
+  try {
+    const { year, week } = req.query;
+    const data = await readTasks(year, week);
+    const taskIndex = data.tasks.findIndex(t => t.id === req.params.id);
+
+    if (taskIndex === -1) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    data.tasks.splice(taskIndex, 1);
+    await writeTasks(year, week, data);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting task:', error);
+    res.status(500).json({ error: 'Failed to delete task' });
+  }
+});
+
+// PUT /api/tasks/:id/move - Move task to different day
+router.put('/:id/move', async (req, res) => {
+  try {
+    const { year, week, day } = req.body;
+    const data = await readTasks(year, week);
+    const task = data.tasks.find(t => t.id === req.params.id);
+
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    task.day = day;
+    task.updatedAt = new Date().toISOString().split('T')[0];
+
+    await writeTasks(year, week, data);
+    res.json(task);
+  } catch (error) {
+    console.error('Error moving task:', error);
+    res.status(500).json({ error: 'Failed to move task' });
+  }
+});
+
+// PUT /api/tasks/:id/complete - Toggle complete
+router.put('/:id/complete', async (req, res) => {
+  try {
+    const { year, week, completed } = req.body;
+    const data = await readTasks(year, week);
+    const task = data.tasks.find(t => t.id === req.params.id);
+
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    task.completed = completed;
+    task.updatedAt = new Date().toISOString().split('T')[0];
+
+    await writeTasks(year, week, data);
+    res.json(task);
+  } catch (error) {
+    console.error('Error completing task:', error);
+    res.status(500).json({ error: 'Failed to complete task' });
+  }
+});
+
+// Legacy endpoints
 router.get('/:year/:week', (req, res) => {
   const tasks = tasksService.getWeeklyTasks(req.params.year, req.params.week);
   res.json(tasks);
