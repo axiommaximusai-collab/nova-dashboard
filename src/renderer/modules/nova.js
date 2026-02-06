@@ -55,9 +55,53 @@ const Nova = {
     document.getElementById('modalCancel').addEventListener('click', () => this.closeModal());
     
     // Add buttons
-    document.getElementById('addGoalBtn').addEventListener('click', () => this.addGoalInput());
-    document.getElementById('saveGoalsBtn').addEventListener('click', () => this.saveGoals());
     document.getElementById('addTaskBtn').addEventListener('click', () => this.showAddTaskModal());
+
+    // New Goals system event listeners
+    document.querySelectorAll('.add-goal-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const timeframe = e.target.dataset.timeframe;
+        this.openCreateGoal(timeframe);
+      });
+    });
+
+    document.querySelectorAll('.goal-filter-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.goal-filter-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        this.currentGoalFilter = e.target.dataset.filter;
+        this.loadGoals();
+      });
+    });
+
+    const showArchivedBtn = document.getElementById('showArchivedBtn');
+    if (showArchivedBtn) {
+      showArchivedBtn.addEventListener('click', () => {
+        this.showArchived = !this.showArchived;
+        showArchivedBtn.textContent = this.showArchived ? '📦 Hide Archived' : '📦 Show Archived';
+        this.loadGoals();
+      });
+    }
+
+    // Goal detail modal
+    document.querySelector('.goal-detail-close')?.addEventListener('click', () => this.closeGoalDetail());
+    document.querySelector('.goal-back-btn')?.addEventListener('click', () => this.closeGoalDetail());
+
+    // Create goal modal
+    document.querySelector('.create-goal-close')?.addEventListener('click', () => this.closeCreateGoal());
+    document.getElementById('createGoalNextBtn')?.addEventListener('click', () => this.nextCreateGoalStep());
+    document.getElementById('createGoalBackBtn')?.addEventListener('click', () => this.backCreateGoalStep());
+    document.getElementById('createGoalSubmitBtn')?.addEventListener('click', () => this.submitCreateGoal());
+
+    // Parent goal radio toggle
+    document.querySelectorAll('input[name="goalParent"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        const parentSelect = document.getElementById('newGoalParent');
+        if (parentSelect) {
+          parentSelect.style.display = e.target.value === 'supports' ? 'block' : 'none';
+        }
+      });
+    });
     document.getElementById('newProjectBtn').addEventListener('click', () => this.showAddProjectModal());
     document.getElementById('newHabitBtn').addEventListener('click', () => this.showAddHabitModal());
     document.getElementById('quickAddMemory').addEventListener('click', () => this.showAddMemoryModal());
@@ -133,7 +177,23 @@ const Nova = {
     });
     return res.json();
   },
-  
+
+  async apiPut(endpoint, data) {
+    const res = await fetch(`/api${endpoint}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    return res.json();
+  },
+
+  async apiDelete(endpoint) {
+    const res = await fetch(`/api${endpoint}`, {
+      method: 'DELETE'
+    });
+    return res.json();
+  },
+
   // Dashboard
   async loadDashboard() {
     const today = new Date().toISOString().split('T')[0];
@@ -245,69 +305,371 @@ const Nova = {
   },
   
   // Goals
+  // New Goals System
+  currentGoalFilter: 'all',
+  showArchived: false,
+  createGoalStep: 1,
+  currentGoalData: {},
+
   async loadGoals() {
-    const year = new Date().getFullYear();
-    const month = String(new Date().getMonth() + 1).padStart(2, '0');
-    const week = this.getWeekNumber(new Date());
-    const today = new Date().toISOString().split('T')[0];
-    
-    let data;
-    if (this.currentGoalView === 'daily') {
-      data = await this.apiGet(`/goals/daily/${today}`);
-    } else if (this.currentGoalView === 'weekly') {
-      data = await this.apiGet(`/goals/weekly/${year}/${week}`);
-    } else {
-      data = await this.apiGet(`/goals/monthly/${year}/${month}`);
+    try {
+      const params = new URLSearchParams();
+      if (this.currentGoalFilter !== 'all') {
+        params.append('tag', this.currentGoalFilter);
+      }
+      if (!this.showArchived) {
+        params.append('archived', 'false');
+      }
+
+      const data = await this.apiGet(`/goals?${params.toString()}`);
+      const goals = data.goals || [];
+
+      // Organize goals by timeframe
+      const shortTerm = goals.filter(g => g.timeframe === 'short');
+      const midTerm = goals.filter(g => g.timeframe === 'mid');
+      const longTerm = goals.filter(g => g.timeframe === 'long');
+
+      this.renderGoalsList('goalsShortTerm', shortTerm);
+      this.renderGoalsList('goalsMidTerm', midTerm);
+      this.renderGoalsList('goalsLongTerm', longTerm);
+
+      this.setupGoalsDragAndDrop();
+    } catch (err) {
+      console.error('Failed to load goals:', err);
     }
-    
-    document.getElementById('goalTheme').value = data.theme || '';
-    document.getElementById('goalNotes').value = data.notes || '';
-    
-    const goalsList = document.getElementById('goalsList');
-    goalsList.innerHTML = '';
-    (data.goals || []).forEach((goal, i) => {
-      this.addGoalInput(goal.text, goal.completed, i);
-    });
   },
-  
-  addGoalInput(text = '', completed = false, index = null) {
-    const div = document.createElement('div');
-    div.className = 'goal-input-row';
-    div.innerHTML = `
-      <input type="text" value="${text}" placeholder="Enter goal..." class="goal-text-input">
-      <button onclick="this.parentElement.remove()">✕</button>
+
+  renderGoalsList(containerId, goals) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (goals.length === 0) {
+      container.innerHTML = '<p style="color: var(--text-muted); font-size: 13px; text-align: center; padding: 20px;">No goals yet</p>';
+      return;
+    }
+
+    container.innerHTML = goals.map(goal => this.createGoalCard(goal)).join('');
+  },
+
+  createGoalCard(goal) {
+    const priorityEmoji = goal.priority === 'high' ? '🔴' : goal.priority === 'medium' ? '🟡' : '🟢';
+    const dueDateText = goal.dueDate ? `Due: ${new Date(goal.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : 'No due date';
+
+    return `
+      <div class="goal-card" data-id="${goal.id}" draggable="true" onclick="nova.openGoalDetail('${goal.id}')">
+        <div class="priority-badge ${goal.priority}">${priorityEmoji} ${goal.priority.toUpperCase()}</div>
+        <div class="goal-title">${goal.title}</div>
+        <div class="goal-progress">
+          <div class="goal-progress-bar">
+            <div class="goal-progress-fill" style="width: ${goal.progress}%"></div>
+          </div>
+          <div class="goal-progress-text">${goal.progress}% complete</div>
+        </div>
+        <div class="goal-meta">
+          <span class="goal-due">${dueDateText}</span>
+        </div>
+        ${goal.tags.length > 0 ? `
+          <div class="goal-tags">
+            ${goal.tags.map(tag => `<span class="goal-tag">${tag}</span>`).join('')}
+          </div>
+        ` : ''}
+        <div class="goal-actions" onclick="event.stopPropagation()">
+          <button class="goal-action-btn" onclick="nova.quickCompleteGoal('${goal.id}')">✓</button>
+          <button class="goal-action-btn" onclick="nova.openEditGoal('${goal.id}')">✎</button>
+          <button class="goal-action-btn delete" onclick="nova.deleteGoal('${goal.id}')">🗑️</button>
+        </div>
+      </div>
     `;
-    document.getElementById('goalsList').appendChild(div);
   },
-  
-  async saveGoals() {
-    const year = new Date().getFullYear();
-    const month = String(new Date().getMonth() + 1).padStart(2, '0');
-    const week = this.getWeekNumber(new Date());
-    const today = new Date().toISOString().split('T')[0];
-    
-    const goals = [];
-    document.querySelectorAll('.goal-input-row').forEach(row => {
-      const text = row.querySelector('input').value.trim();
-      if (text) goals.push({ text, completed: false });
-    });
-    
-    const data = {
-      theme: document.getElementById('goalTheme').value,
-      notes: document.getElementById('goalNotes').value,
-      goals
-    };
-    
-    if (this.currentGoalView === 'daily') {
-      await this.apiPost(`/goals/daily/${today}`, { ...data, date: today });
-    } else if (this.currentGoalView === 'weekly') {
-      await this.apiPost(`/goals/weekly/${year}/${week}`, { ...data, year, week });
-    } else {
-      await this.apiPost(`/goals/monthly/${year}/${month}`, { ...data, year, month });
+
+  async openGoalDetail(goalId) {
+    try {
+      const data = await this.apiGet(`/goals/${goalId}`);
+      const { goal, parentGoal, childGoals } = data;
+
+      const modal = document.getElementById('goalDetailModal');
+      const body = document.getElementById('goalDetailBody');
+
+      body.innerHTML = `
+        <div class="goal-detail-section">
+          <div class="priority-badge ${goal.priority}">${goal.priority === 'high' ? '🔴' : goal.priority === 'medium' ? '🟡' : '🟢'} ${goal.priority.toUpperCase()} PRIORITY</div>
+          <h1 class="goal-detail-title">${goal.title}</h1>
+        </div>
+
+        <div class="goal-detail-info">
+          <div class="info-item">
+            <div class="info-label">Progress</div>
+            <div class="info-value">${goal.progress}%</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Status</div>
+            <div class="info-value">${goal.status.replace('-', ' ')}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Timeframe</div>
+            <div class="info-value">${goal.timeframe === 'short' ? '1-90 days' : goal.timeframe === 'mid' ? '6-12 months' : '2-5 years'}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Due Date</div>
+            <div class="info-value">${goal.dueDate ? new Date(goal.dueDate).toLocaleDateString() : 'Not set'}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Category</div>
+            <div class="info-value">${goal.tags.join(', ') || 'None'}</div>
+          </div>
+        </div>
+
+        ${goal.description ? `
+          <div class="goal-detail-section">
+            <h3>Description</h3>
+            <p style="color: var(--text-secondary); line-height: 1.6;">${goal.description}</p>
+          </div>
+        ` : ''}
+
+        ${parentGoal || childGoals.length > 0 ? `
+          <div class="goal-detail-section">
+            <h3>Hierarchy</h3>
+            ${parentGoal ? `
+              <div style="margin-bottom: 20px;">
+                <div class="info-label" style="margin-bottom: 8px;">SUPPORTS (Parent Goal):</div>
+                <div class="goal-hierarchy-item" onclick="nova.openGoalDetail('${parentGoal.id}')">
+                  <div class="hierarchy-title">→ ${parentGoal.title}</div>
+                  <div class="hierarchy-progress">
+                    <div class="hierarchy-progress-bar">
+                      <div class="hierarchy-progress-fill" style="width: ${parentGoal.progress}%"></div>
+                    </div>
+                    <span class="hierarchy-progress-text">${parentGoal.progress}%</span>
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+            ${childGoals.length > 0 ? `
+              <div>
+                <div class="info-label" style="margin-bottom: 8px;">COMPRISED OF (Child Goals):</div>
+                ${childGoals.map(child => `
+                  <div class="goal-hierarchy-item" onclick="nova.openGoalDetail('${child.id}')">
+                    <div class="hierarchy-title">• ${child.title}</div>
+                    <div class="hierarchy-progress">
+                      <div class="hierarchy-progress-bar">
+                        <div class="hierarchy-progress-fill" style="width: ${child.progress}%"></div>
+                      </div>
+                      <span class="hierarchy-progress-text">${child.progress}%</span>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+          </div>
+        ` : ''}
+
+        <div class="goal-detail-actions">
+          <button class="btn-secondary" onclick="nova.closeGoalDetail()">Close</button>
+          <button class="btn-secondary" onclick="nova.openEditGoal('${goal.id}')">Edit</button>
+          <button class="btn-primary" onclick="nova.completeGoal('${goal.id}')">Mark Complete</button>
+        </div>
+      `;
+
+      modal.classList.add('active');
+    } catch (err) {
+      console.error('Failed to load goal detail:', err);
     }
-    
-    this.showNotification('Goals saved!');
-    this.loadDashboard();
+  },
+
+  closeGoalDetail() {
+    document.getElementById('goalDetailModal').classList.remove('active');
+  },
+
+  async quickCompleteGoal(goalId) {
+    try {
+      await this.apiPut(`/goals/${goalId}/complete`, { archive: true });
+      this.loadGoals();
+      this.showNotification('Goal completed!');
+    } catch (err) {
+      console.error('Failed to complete goal:', err);
+    }
+  },
+
+  async completeGoal(goalId) {
+    try {
+      await this.apiPut(`/goals/${goalId}/complete`, { archive: false });
+      this.closeGoalDetail();
+      this.loadGoals();
+      this.showNotification('Goal completed!');
+    } catch (err) {
+      console.error('Failed to complete goal:', err);
+    }
+  },
+
+  async deleteGoal(goalId) {
+    if (!confirm('Are you sure you want to delete this goal?')) return;
+
+    try {
+      await this.apiDelete(`/goals/${goalId}`);
+      this.loadGoals();
+      this.showNotification('Goal deleted');
+    } catch (err) {
+      console.error('Failed to delete goal:', err);
+    }
+  },
+
+  openCreateGoal(timeframe = null) {
+    this.createGoalStep = 1;
+    this.currentGoalData = { timeframe };
+
+    // Pre-select timeframe if provided
+    if (timeframe) {
+      setTimeout(() => {
+        document.querySelector(`input[name="goalTimeframe"][value="${timeframe}"]`).checked = true;
+      }, 100);
+    }
+
+    document.getElementById('createGoalModal').classList.add('active');
+    this.updateCreateGoalStep();
+  },
+
+  closeCreateGoal() {
+    document.getElementById('createGoalModal').classList.remove('active');
+    this.createGoalStep = 1;
+    this.currentGoalData = {};
+  },
+
+  nextCreateGoalStep() {
+    // Validate current step
+    if (this.createGoalStep === 1) {
+      const title = document.getElementById('newGoalTitle').value.trim();
+      if (!title) {
+        alert('Please enter a goal title');
+        return;
+      }
+      this.currentGoalData.title = title;
+    } else if (this.createGoalStep === 2) {
+      const timeframe = document.querySelector('input[name="goalTimeframe"]:checked')?.value;
+      if (!timeframe) {
+        alert('Please select a timeframe');
+        return;
+      }
+      this.currentGoalData.timeframe = timeframe;
+    } else if (this.createGoalStep === 3) {
+      const priority = document.querySelector('input[name="goalPriority"]:checked')?.value;
+      if (!priority) {
+        alert('Please select a priority');
+        return;
+      }
+      this.currentGoalData.priority = priority;
+    } else if (this.createGoalStep === 4) {
+      this.currentGoalData.dueDate = document.getElementById('newGoalDueDate').value;
+    } else if (this.createGoalStep === 5) {
+      const parentType = document.querySelector('input[name="goalParent"]:checked')?.value;
+      if (parentType === 'supports') {
+        this.currentGoalData.parentGoalId = document.getElementById('newGoalParent').value || null;
+      } else {
+        this.currentGoalData.parentGoalId = null;
+      }
+    } else if (this.createGoalStep === 6) {
+      const tags = [];
+      document.querySelectorAll('input[name="goalTags"]:checked').forEach(cb => {
+        tags.push(cb.value);
+      });
+      const customTag = document.getElementById('newGoalCustomTag').value.trim();
+      if (customTag) tags.push(customTag);
+      this.currentGoalData.tags = tags;
+    } else if (this.createGoalStep === 7) {
+      this.currentGoalData.description = document.getElementById('newGoalDescription').value;
+    }
+
+    if (this.createGoalStep < 8) {
+      this.createGoalStep++;
+      this.updateCreateGoalStep();
+    }
+  },
+
+  backCreateGoalStep() {
+    if (this.createGoalStep > 1) {
+      this.createGoalStep--;
+      this.updateCreateGoalStep();
+    }
+  },
+
+  updateCreateGoalStep() {
+    // Update step indicators
+    document.querySelectorAll('.step-indicator .step').forEach((step, index) => {
+      step.classList.remove('active', 'completed');
+      if (index + 1 < this.createGoalStep) {
+        step.classList.add('completed');
+      } else if (index + 1 === this.createGoalStep) {
+        step.classList.add('active');
+      }
+    });
+
+    // Show/hide steps
+    document.querySelectorAll('.goal-step').forEach((step, index) => {
+      step.classList.toggle('active', index + 1 === this.createGoalStep);
+    });
+
+    // Update buttons
+    document.getElementById('createGoalBackBtn').style.display = this.createGoalStep > 1 ? 'block' : 'none';
+    document.getElementById('createGoalNextBtn').style.display = this.createGoalStep < 8 ? 'block' : 'none';
+    document.getElementById('createGoalSubmitBtn').style.display = this.createGoalStep === 8 ? 'block' : 'none';
+  },
+
+  async submitCreateGoal() {
+    // Get linked habits
+    const linkedHabits = [];
+    document.querySelectorAll('#habitsList input:checked').forEach(cb => {
+      linkedHabits.push(cb.value);
+    });
+    this.currentGoalData.linkedHabits = linkedHabits;
+
+    try {
+      await this.apiPost('/goals', this.currentGoalData);
+      this.closeCreateGoal();
+      this.loadGoals();
+      this.showNotification('Goal created!');
+    } catch (err) {
+      console.error('Failed to create goal:', err);
+      alert('Failed to create goal');
+    }
+  },
+
+  setupGoalsDragAndDrop() {
+    const cards = document.querySelectorAll('.goal-card');
+    cards.forEach(card => {
+      card.addEventListener('dragstart', (e) => {
+        card.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+
+      card.addEventListener('dragend', () => {
+        card.classList.remove('dragging');
+      });
+    });
+
+    const lists = document.querySelectorAll('.goals-list');
+    lists.forEach(list => {
+      list.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const dragging = document.querySelector('.dragging');
+        const afterElement = this.getDragAfterElement(list, e.clientY);
+        if (afterElement) {
+          list.insertBefore(dragging, afterElement);
+        } else {
+          list.appendChild(dragging);
+        }
+      });
+    });
+  },
+
+  getDragAfterElement(container, y) {
+    const draggableElements = [...container.querySelectorAll('.goal-card:not(.dragging)')];
+    return draggableElements.reduce((closest, child) => {
+      const box = child.getBoundingClientRect();
+      const offset = y - box.top - box.height / 2;
+      if (offset < 0 && offset > closest.offset) {
+        return { offset, element: child };
+      } else {
+        return closest;
+      }
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
   },
   
   // Tasks

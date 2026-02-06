@@ -117,32 +117,213 @@
       <section class="tab-panel" id="goals">
         <div class="tab-header">
           <h2>Goals</h2>
-          <div class="view-toggle">
-            <button class="toggle-btn active" data-view="daily">Daily</button>
-            <button class="toggle-btn" data-view="weekly">Weekly</button>
-            <button class="toggle-btn" data-view="monthly">Monthly</button>
+          <div class="goals-header-actions">
+            <div class="goals-filters">
+              <button class="goal-filter-btn active" data-filter="all">All</button>
+              <button class="goal-filter-btn" data-filter="business">Business</button>
+              <button class="goal-filter-btn" data-filter="tech">Tech</button>
+              <button class="goal-filter-btn" data-filter="health">Health</button>
+              <button class="goal-filter-btn" data-filter="finance">Finance</button>
+              <button class="goal-filter-btn" data-filter="personal">Personal</button>
+            </div>
+            <button class="btn-secondary" id="showArchivedBtn">📦 Show Archived</button>
           </div>
         </div>
-        
-        <div class="goals-content">
-          <div class="goal-editor">
-            <div class="form-group">
-              <label>Theme / Focus</label>
-              <input type="text" id="goalTheme" placeholder="What's the focus?">
+
+        <div class="goals-grid">
+          <!-- SHORT-TERM COLUMN -->
+          <div class="goals-column" data-timeframe="short">
+            <div class="column-header">
+              <h3>Short-term</h3>
+              <span class="column-subtitle">(1-90 days)</span>
             </div>
-            <div class="form-group">
-              <label>Goals</label>
-              <div id="goalsList" class="goals-list"></div>
-              <button class="btn-secondary" id="addGoalBtn">+ Add Goal</button>
+            <div class="goals-list" id="goalsShortTerm" data-timeframe="short">
+              <div class="loading">Loading goals...</div>
             </div>
-            <div class="form-group">
-              <label>Notes</label>
-              <textarea id="goalNotes" rows="3" placeholder="Any thoughts or reflections..."></textarea>
+            <button class="add-goal-btn" data-timeframe="short">+ Add Goal</button>
+          </div>
+
+          <!-- MID-TERM COLUMN -->
+          <div class="goals-column" data-timeframe="mid">
+            <div class="column-header">
+              <h3>Mid-term</h3>
+              <span class="column-subtitle">(6-12 months)</span>
             </div>
-            <button class="btn-primary" id="saveGoalsBtn">Save Goals</button>
+            <div class="goals-list" id="goalsMidTerm" data-timeframe="mid">
+              <div class="loading">Loading goals...</div>
+            </div>
+            <button class="add-goal-btn" data-timeframe="mid">+ Add Goal</button>
+          </div>
+
+          <!-- LONG-TERM COLUMN -->
+          <div class="goals-column" data-timeframe="long">
+            <div class="column-header">
+              <h3>Long-term</h3>
+              <span class="column-subtitle">(2-5 years)</span>
+            </div>
+            <div class="goals-list" id="goalsLongTerm" data-timeframe="long">
+              <div class="loading">Loading goals...</div>
+            </div>
+            <button class="add-goal-btn" data-timeframe="long">+ Add Goal</button>
           </div>
         </div>
       </section>
+
+      <!-- GOAL DETAIL VIEW MODAL -->
+      <div class="goal-detail-modal" id="goalDetailModal">
+        <div class="goal-detail-content">
+          <button class="goal-detail-close">&times;</button>
+          <div class="goal-detail-header">
+            <button class="btn-link goal-back-btn">← Back to Goals</button>
+          </div>
+          <div id="goalDetailBody">
+            <!-- Dynamic content loaded here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- CREATE GOAL WORKFLOW MODAL -->
+      <div class="create-goal-modal" id="createGoalModal">
+        <div class="create-goal-content">
+          <button class="create-goal-close">&times;</button>
+          <div class="create-goal-header">
+            <h2>Create New Goal</h2>
+            <div class="step-indicator">
+              <span class="step active" data-step="1">1</span>
+              <span class="step" data-step="2">2</span>
+              <span class="step" data-step="3">3</span>
+              <span class="step" data-step="4">4</span>
+              <span class="step" data-step="5">5</span>
+              <span class="step" data-step="6">6</span>
+              <span class="step" data-step="7">7</span>
+              <span class="step" data-step="8">8</span>
+            </div>
+          </div>
+          <div class="create-goal-body" id="createGoalBody">
+            <!-- Step 1: What's your goal? -->
+            <div class="goal-step active" data-step="1">
+              <h3>What's your goal?</h3>
+              <input type="text" id="newGoalTitle" placeholder="Enter your goal..." class="goal-input-large">
+            </div>
+
+            <!-- Step 2: Timeframe -->
+            <div class="goal-step" data-step="2">
+              <h3>Timeframe</h3>
+              <div class="radio-group">
+                <label class="radio-option">
+                  <input type="radio" name="goalTimeframe" value="short">
+                  <span>Short-term (1-90 days)</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="goalTimeframe" value="mid">
+                  <span>Mid-term (6-12 months)</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="goalTimeframe" value="long">
+                  <span>Long-term (2-5 years)</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Step 3: Priority -->
+            <div class="goal-step" data-step="3">
+              <h3>Priority</h3>
+              <div class="radio-group">
+                <label class="radio-option priority-high">
+                  <input type="radio" name="goalPriority" value="high">
+                  <span>🔴 High</span>
+                </label>
+                <label class="radio-option priority-medium">
+                  <input type="radio" name="goalPriority" value="medium">
+                  <span>🟡 Medium</span>
+                </label>
+                <label class="radio-option priority-low">
+                  <input type="radio" name="goalPriority" value="low">
+                  <span>🟢 Low</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Step 4: Due Date -->
+            <div class="goal-step" data-step="4">
+              <h3>Target completion date?</h3>
+              <input type="date" id="newGoalDueDate" class="goal-input">
+            </div>
+
+            <!-- Step 5: Parent Goal -->
+            <div class="goal-step" data-step="5">
+              <h3>Does this support a larger goal?</h3>
+              <div class="radio-group">
+                <label class="radio-option">
+                  <input type="radio" name="goalParent" value="standalone" checked>
+                  <span>Standalone goal</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="goalParent" value="supports">
+                  <span>Supports a larger goal</span>
+                </label>
+              </div>
+              <select id="newGoalParent" class="goal-input" style="display: none; margin-top: 12px;">
+                <option value="">Select parent goal...</option>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+
+            <!-- Step 6: Category Tags -->
+            <div class="goal-step" data-step="6">
+              <h3>Category tags</h3>
+              <div class="checkbox-group">
+                <label class="checkbox-option">
+                  <input type="checkbox" name="goalTags" value="business">
+                  <span>Business</span>
+                </label>
+                <label class="checkbox-option">
+                  <input type="checkbox" name="goalTags" value="health">
+                  <span>Health</span>
+                </label>
+                <label class="checkbox-option">
+                  <input type="checkbox" name="goalTags" value="personal">
+                  <span>Personal</span>
+                </label>
+                <label class="checkbox-option">
+                  <input type="checkbox" name="goalTags" value="tech">
+                  <span>Tech</span>
+                </label>
+                <label class="checkbox-option">
+                  <input type="checkbox" name="goalTags" value="finance">
+                  <span>Finance</span>
+                </label>
+                <label class="checkbox-option">
+                  <input type="checkbox" name="goalTags" value="family">
+                  <span>Family</span>
+                </label>
+              </div>
+              <div style="margin-top: 12px;">
+                <input type="text" id="newGoalCustomTag" placeholder="Other tag..." class="goal-input">
+              </div>
+            </div>
+
+            <!-- Step 7: Description -->
+            <div class="goal-step" data-step="7">
+              <h3>How will you measure success?</h3>
+              <textarea id="newGoalDescription" rows="5" placeholder="Describe how you'll know you've achieved this goal..." class="goal-textarea"></textarea>
+            </div>
+
+            <!-- Step 8: Link Habits -->
+            <div class="goal-step" data-step="8">
+              <h3>Link supporting habits? (optional)</h3>
+              <div class="checkbox-group" id="habitsList">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+          </div>
+          <div class="create-goal-footer">
+            <button class="btn-secondary" id="createGoalBackBtn" style="display: none;">← Back</button>
+            <button class="btn-primary" id="createGoalNextBtn">Next →</button>
+            <button class="btn-primary" id="createGoalSubmitBtn" style="display: none;">Create Goal</button>
+          </div>
+        </div>
+      </div>
 
       <!-- TASKS TAB -->
       <section class="tab-panel" id="tasks">
