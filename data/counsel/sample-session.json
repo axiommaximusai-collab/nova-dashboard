@@ -1,0 +1,171 @@
+[
+  {
+    "id": "counsel-001",
+    "createdAt": "2026-02-06T14:30:00.000Z",
+    "updatedAt": "2026-02-06T14:45:00.000Z",
+    "status": "decided",
+    "topic": "Should we expand to Texas market or double down on California?",
+    "category": "Strategy",
+    "context": {
+      "currentSituation": "Studio Shade has 80% market share in California, market is becoming saturated with competitors entering",
+      "resources": "$500,000 available for expansion, 2 installation teams (can train 1 more)",
+      "timeline": "Decision needed by Q2 2026, implementation in Q3-Q4",
+      "constraints": ["Limited brand recognition outside CA", "Supply chain setup required for new region", "Need local permits and licenses"],
+      "goals": ["Increase revenue by 30%", "Diversify geographic risk", "Establish national brand presence"]
+    },
+    "agents": [
+      {
+        "id": "business_strategist",
+        "name": "Business Strategist",
+        "role": "Long-term thinking, market positioning, competitive advantage",
+        "model": "claude-opus",
+        "avatar": "🏢",
+        "position": "Expand to Texas. While California has been our home market, we're hitting saturation. Texas represents a massive growth opportunity with its booming economy and favorable business climate. First-mover advantage in the Texas market could establish us as the premium brand before competitors arrive.",
+        "keyPoints": [
+          "First-mover advantage in Texas",
+          "Diversification reduces California market risk",
+          "Texas business-friendly environment",
+          "Establishes national brand foundation"
+        ],
+        "confidence": 85,
+        "reasoning": "The strategic value of establishing a beachhead in Texas outweighs the incremental gains from further California optimization. This positions us for national expansion over the next 3-5 years.",
+        "cost": 12.50,
+        "time": 45
+      },
+      {
+        "id": "data_analyst",
+        "name": "Data Analyst",
+        "role": "Market research, numbers, trends, competitive analysis",
+        "model": "gpt-4",
+        "avatar": "📊",
+        "position": "Texas expansion shows better ROI metrics. Texas has 30M population vs California's 39M, but only 3 major competitors vs 12 in California. Market research shows 15% annual growth in Texas home improvement vs 5% in California. Initial investment of $350k yields projected $1.2M Year 1 revenue in Texas vs $800k additional revenue from California optimization.",
+        "keyPoints": [
+          "Texas market growing 3x faster (15% vs 5%)",
+          "Less competitive landscape (3 vs 12 major players)",
+          "Better ROI: $350k investment → $1.2M Year 1 revenue",
+          "Lower customer acquisition cost estimated"
+        ],
+        "confidence": 90,
+        "reasoning": "The numbers clearly favor Texas expansion. Higher growth rate, less competition, and better unit economics make this the data-driven choice.",
+        "cost": 8.75,
+        "time": 30
+      },
+      {
+        "id": "risk_assessor",
+        "name": "Risk Assessor",
+        "role": "Devil's advocate, what could go wrong, downside scenarios",
+        "model": "deepseek-chat",
+        "avatar": "⚖️",
+        "position": "Moderate risk but manageable. Primary risks: 1) Underestimating Texas regulatory hurdles (permits vary by county), 2) Supply chain disruptions for new region, 3) Cultural mismatch (Texas homeowners may prefer different styles). However, all risks are mitigatable with proper planning. California optimization carries lower but different risks - mainly competitive squeeze and market saturation.",
+        "keyPoints": [
+          "Regulatory complexity across Texas counties",
+          "Supply chain setup risk",
+          "Cultural/style preferences may differ",
+          "Lower but different risks in California"
+        ],
+        "confidence": 75,
+        "reasoning": "While Texas expansion carries higher initial risk, the risks are identifiable and manageable. California optimization risks are more insidious - slow growth, margin compression, and competitive erosion.",
+        "cost": 5.25,
+        "time": 25
+      },
+      {
+        "id": "financial_advisor",
+        "name": "Financial Advisor",
+        "role": "ROI, cash flow, capital allocation, unit economics",
+        "model": "gemini-pro",
+        "avatar": "💰",
+        "position": "Texas expansion offers superior financial metrics. Projected ROI: 243% in Texas vs 129% in California optimization. Payback period: 8 months Texas vs 14 months California. Cash flow impact: Texas requires larger initial outlay but generates positive cash flow sooner. Capital efficiency favors Texas due to higher growth trajectory.",
+        "keyPoints": [
+          "ROI: 243% (Texas) vs 129% (California)",
+          "Payback: 8 months vs 14 months",
+          "Higher lifetime customer value in Texas",
+          "Better capital efficiency metrics"
+        ],
+        "confidence": 88,
+        "reasoning": "The financial case is clear. Texas expansion delivers better returns on capital, faster payback, and superior unit economics despite higher initial investment.",
+        "cost": 7.50,
+        "time": 28
+      }
+    ],
+    "debate": [
+      {
+        "agentId": "business_strategist",
+        "agentName": "Business Strategist",
+        "timestamp": "2026-02-06T14:31:00.000Z",
+        "position": "Texas offers strategic positioning for national expansion",
+        "keyPoints": ["First-mover advantage", "Diversification benefit"],
+        "confidence": 85
+      },
+      {
+        "agentId": "data_analyst",
+        "agentName": "Data Analyst",
+        "timestamp": "2026-02-06T14:32:00.000Z",
+        "position": "Data shows Texas has better growth metrics",
+        "keyPoints": ["15% market growth", "Less competition"],
+        "confidence": 90
+      },
+      {
+        "agentId": "risk_assessor",
+        "agentName": "Risk Assessor",
+        "timestamp": "2026-02-06T14:33:00.000Z",
+        "position": "Risks are manageable with proper planning",
+        "keyPoints": ["Regulatory hurdles", "Supply chain setup"],
+        "confidence": 75
+      },
+      {
+        "agentId": "financial_advisor",
+        "agentName": "Financial Advisor",
+        "timestamp": "2026-02-06T14:34:00.000Z",
+        "position": "Superior financial metrics favor Texas",
+        "keyPoints": ["243% ROI", "8-month payback"],
+        "confidence": 88
+      }
+    ],
+    "synthesis": {
+      "recommendation": "Proceed with Texas market expansion with phased approach",
+      "confidence": 84,
+      "keyPoints": [
+        "Strong consensus among all agents (average confidence: 84.5%)",
+        "Texas offers better growth, ROI, and strategic positioning",
+        "Risks are identifiable and manageable",
+        "Financial metrics clearly favor Texas"
+      ],
+      "risks": [
+        "Regulatory complexity across Texas counties",
+        "Supply chain setup for new region",
+        "Cultural/style preferences may require adaptation"
+      ],
+      "opportunities": [
+        "First-mover advantage in growing market",
+        "Establish national brand foundation",
+        "Diversify revenue streams away from California"
+      ],
+      "nextSteps": [
+        "Conduct detailed county-by-county permit research",
+        "Secure Texas-based supply chain partners",
+        "Develop Texas-specific marketing materials",
+        "Allocate $350k from expansion budget",
+        "Begin hiring/training Texas installation team"
+      ],
+      "synthesizedAt": "2026-02-06T14:40:00.000Z"
+    },
+    "decision": {
+      "decision": "Approve Texas expansion with $350k initial investment",
+      "rationale": "The counsel panel showed strong consensus (84.5% average confidence) that Texas expansion offers superior strategic positioning, financial returns, and growth potential compared to further California optimization. Risks are manageable with proper planning.",
+      "actionItems": [
+        "Task: Permit research - Due: 2026-02-20",
+        "Task: Supply chain setup - Due: 2026-03-15",
+        "Task: Marketing materials - Due: 2026-03-01",
+        "Task: Team training - Due: 2026-04-01"
+      ],
+      "followUpDate": "2026-06-30",
+      "confidence": 85,
+      "decidedAt": "2026-02-06T14:45:00.000Z"
+    },
+    "stats": {
+      "totalCost": 34.00,
+      "totalTime": 128,
+      "agentCount": 4
+    }
+  }
+]
