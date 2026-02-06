@@ -102,7 +102,6 @@ body {
   background: var(--bg);
   color: var(--accent);
   border-bottom: 2px solid var(--accent);
-  box-shadow: 0 0 8px rgba(190, 24, 93, 0.2);
 }
 
 .header-actions {
