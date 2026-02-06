@@ -72,17 +72,6 @@ const Nova = {
     document.getElementById('addMistakeBtn').addEventListener('click', () => this.showAddMistakeModal());
     document.getElementById('addWeeklyGoalBtn').addEventListener('click', () => this.showAddWeeklyGoalModal());
 
-    // Learning subtabs
-    document.querySelectorAll('.learning-subtabs .subtab-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        document.querySelectorAll('.learning-subtabs .subtab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.learning-subtab').forEach(s => s.classList.remove('active'));
-        e.target.classList.add('active');
-        const subtab = e.target.dataset.subtab;
-        document.getElementById(`subtab-${subtab}`).classList.add('active');
-      });
-    });
-
     // Network filter
     document.querySelectorAll('.contacts-filter .filter-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -1118,6 +1107,17 @@ const Nova = {
     await this.loadInsights();
     await this.loadMistakes();
     await this.loadWeeklyGoals();
+
+    // Setup subtab switchers
+    document.querySelectorAll('.learning-subtabs .subtab-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.learning-subtabs .subtab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.learning-subtab').forEach(s => s.classList.remove('active'));
+        e.target.classList.add('active');
+        const subtab = e.target.dataset.subtab;
+        document.getElementById(`subtab-${subtab}`).classList.add('active');
+      });
+    });
   },
 
   async loadBooks() {
