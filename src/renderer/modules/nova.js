@@ -464,6 +464,7 @@ const Nova = {
 
         <div class="goal-detail-actions">
           <button class="btn-secondary" onclick="nova.closeGoalDetail()">Close</button>
+          <button class="btn-secondary" onclick="nova.archiveGoal('${goal.id}')">${goal.archived ? '📤 Unarchive' : '📦 Archive'}</button>
           <button class="btn-secondary" onclick="nova.openEditGoal('${goal.id}')">Edit</button>
           <button class="btn-primary" onclick="nova.completeGoal('${goal.id}')">Mark Complete</button>
         </div>
@@ -509,6 +510,88 @@ const Nova = {
       this.showNotification('Goal deleted');
     } catch (err) {
       console.error('Failed to delete goal:', err);
+    }
+  },
+
+  async openEditGoal(goalId) {
+    try {
+      const data = await this.apiGet(`/goals/${goalId}`);
+      const goal = data.goal;
+
+      if (!goal) return;
+
+      this.createGoalStep = 1;
+      this.currentGoalData = {
+        id: goal.id,
+        title: goal.title,
+        timeframe: goal.timeframe,
+        priority: goal.priority,
+        dueDate: goal.dueDate,
+        parentGoalId: goal.parentGoalId,
+        tags: goal.tags,
+        description: goal.description,
+        linkedHabits: goal.linkedHabits || []
+      };
+
+      // Open modal and pre-fill fields
+      document.getElementById('createGoalModal').classList.add('active');
+      document.getElementById('newGoalTitle').value = goal.title || '';
+
+      // Pre-select timeframe
+      setTimeout(() => {
+        if (goal.timeframe) {
+          const timeframeRadio = document.querySelector(`input[name="goalTimeframe"][value="${goal.timeframe}"]`);
+          if (timeframeRadio) timeframeRadio.checked = true;
+        }
+        if (goal.priority) {
+          const priorityRadio = document.querySelector(`input[name="goalPriority"][value="${goal.priority}"]`);
+          if (priorityRadio) priorityRadio.checked = true;
+        }
+      }, 100);
+
+      document.getElementById('newGoalDueDate').value = goal.dueDate || '';
+      document.getElementById('newGoalDescription').value = goal.description || '';
+
+      // Handle parent goal
+      if (goal.parentGoalId) {
+        setTimeout(() => {
+          document.querySelector('input[name="goalParent"][value="supports"]').checked = true;
+          document.getElementById('newGoalParent').style.display = 'block';
+          document.getElementById('newGoalParent').value = goal.parentGoalId;
+        }, 100);
+      }
+
+      // Handle tags
+      setTimeout(() => {
+        goal.tags.forEach(tag => {
+          const checkbox = document.querySelector(`input[name="goalTags"][value="${tag}"]`);
+          if (checkbox) checkbox.checked = true;
+        });
+      }, 100);
+
+      this.updateCreateGoalStep();
+    } catch (err) {
+      console.error('Failed to load goal for editing:', err);
+    }
+  },
+
+  async archiveGoal(goalId) {
+    try {
+      const data = await this.apiGet(`/goals/${goalId}`);
+      const goal = data.goal;
+
+      if (!goal) return;
+
+      await this.apiPut(`/goals/${goalId}`, {
+        ...goal,
+        archived: !goal.archived
+      });
+
+      this.closeGoalDetail();
+      this.loadGoals();
+      this.showNotification(goal.archived ? 'Goal unarchived' : 'Goal archived');
+    } catch (err) {
+      console.error('Failed to archive goal:', err);
     }
   },
 
@@ -577,7 +660,9 @@ const Nova = {
       this.currentGoalData.description = document.getElementById('newGoalDescription').value;
     }
 
-    if (this.createGoalStep < 8) {
+    // Skip step 8 (habits) until Habits tab is built
+    const maxStep = 7;
+    if (this.createGoalStep < maxStep) {
       this.createGoalStep++;
       this.updateCreateGoalStep();
     }
@@ -606,28 +691,36 @@ const Nova = {
       step.classList.toggle('active', index + 1 === this.createGoalStep);
     });
 
-    // Update buttons
+    // Update buttons (hide step 8 - habits for now)
+    const maxStep = 7; // Skip habits step until Habits tab is built
     document.getElementById('createGoalBackBtn').style.display = this.createGoalStep > 1 ? 'block' : 'none';
-    document.getElementById('createGoalNextBtn').style.display = this.createGoalStep < 8 ? 'block' : 'none';
-    document.getElementById('createGoalSubmitBtn').style.display = this.createGoalStep === 8 ? 'block' : 'none';
+    document.getElementById('createGoalNextBtn').style.display = this.createGoalStep < maxStep ? 'block' : 'none';
+    document.getElementById('createGoalSubmitBtn').style.display = this.createGoalStep === maxStep ? 'block' : 'none';
   },
 
   async submitCreateGoal() {
-    // Get linked habits
+    // Skip habits for now - get linked habits when Habits tab is built
     const linkedHabits = [];
-    document.querySelectorAll('#habitsList input:checked').forEach(cb => {
-      linkedHabits.push(cb.value);
-    });
+    // document.querySelectorAll('#habitsList input:checked').forEach(cb => {
+    //   linkedHabits.push(cb.value);
+    // });
     this.currentGoalData.linkedHabits = linkedHabits;
 
     try {
-      await this.apiPost('/goals', this.currentGoalData);
+      if (this.currentGoalData.id) {
+        // Editing existing goal
+        await this.apiPut(`/goals/${this.currentGoalData.id}`, this.currentGoalData);
+        this.showNotification('Goal updated!');
+      } else {
+        // Creating new goal
+        await this.apiPost('/goals', this.currentGoalData);
+        this.showNotification('Goal created!');
+      }
       this.closeCreateGoal();
       this.loadGoals();
-      this.showNotification('Goal created!');
     } catch (err) {
-      console.error('Failed to create goal:', err);
-      alert('Failed to create goal');
+      console.error('Failed to save goal:', err);
+      alert('Failed to save goal');
     }
   },
 
