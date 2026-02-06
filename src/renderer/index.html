@@ -10,7 +10,36 @@
   <div class="app">
     <header class="app-header">
       <div class="logo">
-        <span class="logo-icon">◉</span>
+        <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="brainGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color:#00FFFF;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#EC4899;stop-opacity:1" />
+            </linearGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+              <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <!-- Left hemisphere -->
+          <path d="M 25,50 Q 15,35 25,25 Q 35,20 45,25 Q 50,30 50,40 L 50,60 Q 50,70 45,75 Q 35,80 25,75 Q 15,65 25,50 Z"
+                fill="none" stroke="url(#brainGradient)" stroke-width="1.5" filter="url(#glow)"/>
+          <!-- Right hemisphere -->
+          <path d="M 75,50 Q 85,35 75,25 Q 65,20 55,25 Q 50,30 50,40 L 50,60 Q 50,70 55,75 Q 65,80 75,75 Q 85,65 75,50 Z"
+                fill="none" stroke="url(#brainGradient)" stroke-width="1.5" filter="url(#glow)"/>
+          <!-- Folds/contours -->
+          <path d="M 30,35 Q 35,38 40,35" fill="none" stroke="url(#brainGradient)" stroke-width="1" opacity="0.7"/>
+          <path d="M 30,45 Q 35,48 40,45" fill="none" stroke="url(#brainGradient)" stroke-width="1" opacity="0.7"/>
+          <path d="M 30,55 Q 35,58 40,55" fill="none" stroke="url(#brainGradient)" stroke-width="1" opacity="0.7"/>
+          <path d="M 30,65 Q 35,68 40,65" fill="none" stroke="url(#brainGradient)" stroke-width="1" opacity="0.7"/>
+          <path d="M 60,35 Q 65,38 70,35" fill="none" stroke="url(#brainGradient)" stroke-width="1" opacity="0.7"/>
+          <path d="M 60,45 Q 65,48 70,45" fill="none" stroke="url(#brainGradient)" stroke-width="1" opacity="0.7"/>
+          <path d="M 60,55 Q 65,58 70,55" fill="none" stroke="url(#brainGradient)" stroke-width="1" opacity="0.7"/>
+          <path d="M 60,65 Q 65,68 70,65" fill="none" stroke="url(#brainGradient)" stroke-width="1" opacity="0.7"/>
+        </svg>
         <span class="logo-text">NOVA</span>
       </div>
       <nav class="main-nav">
