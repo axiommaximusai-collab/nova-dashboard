@@ -3,329 +3,326 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 
 const DATA_DIR = path.join(__dirname, '../../data/counsel');
+const SESSIONS_FILE = path.join(DATA_DIR, 'sessions.json');
+const AGENTS_FILE = path.join(DATA_DIR, 'agents.json');
 
 // Ensure data directory exists
 function ensureDir(dir) {
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
 }
 
-// Default AI agents configuration
-const DEFAULT_AGENTS = [
-  {
-    id: 'business_strategist',
-    name: 'Business Strategist',
-    role: 'Long-term thinking, market positioning, competitive advantage',
-    model: 'claude-opus',
-    avatar: '🏢',
-    style: 'Measured, considers second-order effects, focuses on sustainable growth',
-    systemPrompt: `You are a Business Strategist. You think in terms of long-term positioning, competitive moats, and sustainable growth. You consider second and third-order effects of decisions. You're not afraid to take calculated risks if they create lasting advantages. Focus on: What moat does this create? How does this position us in 3-5 years? What are the opportunity costs?`
-  },
-  {
-    id: 'data_analyst',
-    name: 'Data Analyst',
-    role: 'Market research, numbers, trends, competitive analysis',
-    model: 'gpt-4',
-    avatar: '📊',
-    style: 'Data-driven, seeks evidence, quantifies everything',
-    systemPrompt: `You are a Data Analyst. You need numbers, evidence, and data to make decisions. You research market sizes, competitor positioning, and historical trends. You calculate ROI, TAM, and success probabilities. You ask: What's the market size? What do the numbers say? What evidence supports this decision?`
-  },
-  {
-    id: 'risk_assessor',
-    name: 'Risk Assessor',
-    role: "Devil's advocate, what could go wrong, downside scenarios",
-    model: 'deepseek-chat',
-    avatar: '⚖️',
-    style: 'Critical thinking, worst-case planning, contingency focus',
-    systemPrompt: `You are a Risk Assessor. Your job is to identify what could go wrong. You think about failure modes, downside scenarios, and contingency plans. You're not pessimistic, but realistic. You ask: What are the 3 ways this could fail? What's our downside if we're wrong? Do we have the resources to recover?`
-  },
-  {
-    id: 'financial_advisor',
-    name: 'Financial Advisor',
-    role: 'ROI, cash flow, capital allocation, unit economics',
-    model: 'gemini-pro',
-    avatar: '💰',
-    style: 'Numbers-focused, profitability-minded, resource-conscious',
-    systemPrompt: `You are a Financial Advisor. You think in terms of ROI, cash flow, and capital efficiency. You calculate payback periods, unit economics, and opportunity costs. You ask: What's the expected ROI? How does this impact cash flow? What's the opportunity cost of this capital?`
-  }
-];
-
-// Initialize data files
-function initializeData() {
+// Initialize files if they don't exist
+function initFiles() {
   ensureDir(DATA_DIR);
-  
-  // Create agents.json if it doesn't exist
-  const agentsFile = path.join(DATA_DIR, 'agents.json');
-  if (!fs.existsSync(agentsFile)) {
-    fs.writeFileSync(agentsFile, JSON.stringify(DEFAULT_AGENTS, null, 2));
-  }
-  
-  // Create sessions.json if it doesn't exist - load sample data
-  const sessionsFile = path.join(DATA_DIR, 'sessions.json');
-  if (!fs.existsSync(sessionsFile)) {
-    // Load sample session
-    const sampleSession = JSON.parse(fs.readFileSync(
-      path.join(__dirname, '../../../data/counsel/sample-session.json'), 
-      'utf8'
-    ));
-    fs.writeFileSync(sessionsFile, JSON.stringify(sampleSession, null, 2));
-  }
-}
 
-// Get all agents
-function getAgents() {
-  const agentsFile = path.join(DATA_DIR, 'agents.json');
-  if (!fs.existsSync(agentsFile)) {
-    return DEFAULT_AGENTS;
+  if (!fs.existsSync(SESSIONS_FILE)) {
+    fs.writeFileSync(SESSIONS_FILE, JSON.stringify([], null, 2));
   }
-  return JSON.parse(fs.readFileSync(agentsFile, 'utf8'));
-}
 
-// Get all sessions
-function getSessions() {
-  const sessionsFile = path.join(DATA_DIR, 'sessions.json');
-  if (!fs.existsSync(sessionsFile)) {
-    return [];
-  }
-  return JSON.parse(fs.readFileSync(sessionsFile, 'utf8'));
-}
-
-// Get session by ID
-function getSession(id) {
-  const sessions = getSessions();
-  return sessions.find(session => session.id === id);
-}
-
-// Create a new counsel session
-function createSession(sessionData) {
-  const sessions = getSessions();
-  
-  const newSession = {
-    id: uuidv4(),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    status: 'pending', // pending, debating, synthesized, decided
-    topic: sessionData.topic,
-    category: sessionData.category || 'General',
-    context: sessionData.context || {},
-    agents: sessionData.agents || getAgents().map(agent => ({
-      ...agent,
-      position: '',
-      keyPoints: [],
-      confidence: 0,
-      reasoning: '',
-      cost: 0,
-      time: 0
-    })),
-    debate: [],
-    synthesis: null,
-    decision: null,
-    stats: {
-      totalCost: 0,
-      totalTime: 0,
-      agentCount: sessionData.agents?.length || DEFAULT_AGENTS.length
-    }
-  };
-  
-  sessions.push(newSession);
-  fs.writeFileSync(path.join(DATA_DIR, 'sessions.json'), JSON.stringify(sessions, null, 2));
-  
-  return newSession;
-}
-
-// Update agent position in a session
-function updateAgentPosition(sessionId, agentId, positionData) {
-  const sessions = getSessions();
-  const sessionIndex = sessions.findIndex(s => s.id === sessionId);
-  
-  if (sessionIndex === -1) {
-    throw new Error('Session not found');
-  }
-  
-  const session = sessions[sessionIndex];
-  const agentIndex = session.agents.findIndex(a => a.id === agentId);
-  
-  if (agentIndex === -1) {
-    throw new Error('Agent not found in session');
-  }
-  
-  // Update agent position
-  session.agents[agentIndex] = {
-    ...session.agents[agentIndex],
-    ...positionData,
-    updatedAt: new Date().toISOString()
-  };
-  
-  // Add to debate log
-  session.debate.push({
-    agentId,
-    agentName: session.agents[agentIndex].name,
-    timestamp: new Date().toISOString(),
-    position: positionData.position,
-    keyPoints: positionData.keyPoints,
-    confidence: positionData.confidence
-  });
-  
-  // Update session status
-  if (session.status === 'pending') {
-    session.status = 'debating';
-  }
-  
-  session.updatedAt = new Date().toISOString();
-  
-  // Update stats
-  session.stats.totalCost += positionData.cost || 0;
-  session.stats.totalTime += positionData.time || 0;
-  
-  sessions[sessionIndex] = session;
-  fs.writeFileSync(path.join(DATA_DIR, 'sessions.json'), JSON.stringify(sessions, null, 2));
-  
-  return session;
-}
-
-// Synthesize all agent positions into a recommendation
-function synthesizeSession(sessionId, synthesisData) {
-  const sessions = getSessions();
-  const sessionIndex = sessions.findIndex(s => s.id === sessionId);
-  
-  if (sessionIndex === -1) {
-    throw new Error('Session not found');
-  }
-  
-  const session = sessions[sessionIndex];
-  
-  session.synthesis = {
-    ...synthesisData,
-    synthesizedAt: new Date().toISOString()
-  };
-  
-  session.status = 'synthesized';
-  session.updatedAt = new Date().toISOString();
-  
-  sessions[sessionIndex] = session;
-  fs.writeFileSync(path.join(DATA_DIR, 'sessions.json'), JSON.stringify(sessions, null, 2));
-  
-  return session;
-}
-
-// Record a decision based on the counsel session
-function recordDecision(sessionId, decisionData) {
-  const sessions = getSessions();
-  const sessionIndex = sessions.findIndex(s => s.id === sessionId);
-  
-  if (sessionIndex === -1) {
-    throw new Error('Session not found');
-  }
-  
-  const session = sessions[sessionIndex];
-  
-  session.decision = {
-    ...decisionData,
-    decidedAt: new Date().toISOString()
-  };
-  
-  session.status = 'decided';
-  session.updatedAt = new Date().toISOString();
-  
-  sessions[sessionIndex] = session;
-  fs.writeFileSync(path.join(DATA_DIR, 'sessions.json'), JSON.stringify(sessions, null, 2));
-  
-  return session;
-}
-
-// Get session statistics
-function getSessionStats(sessionId) {
-  const session = getSession(sessionId);
-  if (!session) {
-    throw new Error('Session not found');
-  }
-  
-  return {
-    sessionId,
-    topic: session.topic,
-    status: session.status,
-    createdAt: session.createdAt,
-    updatedAt: session.updatedAt,
-    stats: session.stats,
-    agentCount: session.agents.length,
-    debateEntries: session.debate.length,
-    hasSynthesis: !!session.synthesis,
-    hasDecision: !!session.decision
-  };
-}
-
-// Get overall counsel statistics
-function getOverallStats() {
-  const sessions = getSessions();
-  
-  const stats = {
-    totalSessions: sessions.length,
-    sessionsByStatus: {
-      pending: 0,
-      debating: 0,
-      synthesized: 0,
-      decided: 0
-    },
-    totalCost: 0,
-    totalTime: 0,
-    decisionsMade: 0,
-    averageConfidence: 0,
-    mostActiveCategory: null
-  };
-  
-  const categoryCounts = {};
-  let totalConfidence = 0;
-  let confidenceCount = 0;
-  
-  sessions.forEach(session => {
-    stats.sessionsByStatus[session.status]++;
-    stats.totalCost += session.stats.totalCost;
-    stats.totalTime += session.stats.totalTime;
-    
-    if (session.status === 'decided') {
-      stats.decisionsMade++;
-    }
-    
-    // Count categories
-    const category = session.category || 'General';
-    categoryCounts[category] = (categoryCounts[category] || 0) + 1;
-    
-    // Calculate average confidence
-    session.agents.forEach(agent => {
-      if (agent.confidence > 0) {
-        totalConfidence += agent.confidence;
-        confidenceCount++;
+  if (!fs.existsSync(AGENTS_FILE)) {
+    // Default agents configuration
+    const defaultAgents = [
+      {
+        id: 'business-strategist',
+        name: 'Business Strategist',
+        model: 'Claude',
+        role: 'Strategic Advisor',
+        perspective: 'High-level strategic thinking, focus on long-term positioning, competitive advantage, and market dynamics',
+        systemPrompt: 'You are a strategic business advisor. Analyze the user\'s question from a high-level strategic perspective. Consider: competitive positioning, market dynamics, long-term vision, operational complexity, and strategic risk. Provide clear recommendations with reasoning. Be direct and actionable.',
+        strengths: [
+          'Long-term strategic planning',
+          'Competitive analysis',
+          'Market positioning',
+          'Operational complexity assessment'
+        ],
+        icon: '🎯',
+        color: '#8b5cf6'
+      },
+      {
+        id: 'data-analyst',
+        name: 'Data Analyst',
+        model: 'GPT-4',
+        role: 'Quantitative Analyst',
+        perspective: 'Data-driven, research-based, numerical analysis with focus on metrics, ROI, and quantifiable outcomes',
+        systemPrompt: 'You are a data analyst. Analyze the user\'s question using numbers, metrics, and data-driven reasoning. Calculate ROI, estimate timelines, compare scenarios quantitatively. Provide specific numbers and projections where possible. Show your math. Be precise and analytical.',
+        strengths: [
+          'Quantitative analysis',
+          'ROI calculations',
+          'Metric-based reasoning',
+          'Data interpretation'
+        ],
+        icon: '📊',
+        color: '#3b82f6'
+      },
+      {
+        id: 'risk-assessor',
+        name: 'Risk Assessor',
+        model: 'DeepSeek',
+        role: 'Contrarian Thinker',
+        perspective: 'Contrarian viewpoint, challenge assumptions, identify blind spots, highlight risks and alternative perspectives',
+        systemPrompt: 'You are a risk assessor and contrarian thinker. Your job is to challenge the obvious answer, identify what could go wrong, highlight blind spots, and present alternative perspectives others might miss. Don\'t just agree with consensus - find the holes in the logic and present legitimate counterarguments. Still provide a recommendation, but make people think twice.',
+        strengths: [
+          'Risk identification',
+          'Contrarian analysis',
+          'Assumption challenging',
+          'Blind spot detection'
+        ],
+        icon: '⚠️',
+        color: '#ef4444'
+      },
+      {
+        id: 'financial-advisor',
+        name: 'Financial Advisor',
+        model: 'Gemini',
+        role: 'Financial Analyst',
+        perspective: 'Cash flow, burn rate, ROI, financial sustainability, and capital efficiency',
+        systemPrompt: 'You are a financial advisor. Analyze the user\'s question from a financial perspective. Focus on: cash flow implications, burn rate, ROI, payback period, financial risk, and capital efficiency. Calculate financial scenarios. Recommend the option with the best financial outcomes. Be specific with numbers.',
+        strengths: [
+          'Cash flow analysis',
+          'ROI calculations',
+          'Financial modeling',
+          'Capital efficiency'
+        ],
+        icon: '💰',
+        color: '#10b981'
+      },
+      {
+        id: 'synthesizer',
+        name: 'Synthesizer',
+        model: 'Claude',
+        role: 'Decision Synthesizer',
+        perspective: 'Combines all agent perspectives into a unified, actionable recommendation',
+        systemPrompt: 'You are a decision synthesizer. You\'ve received input from 4 different advisors (Business Strategist, Data Analyst, Risk Assessor, Financial Advisor). Your job is to:\n\n1. Analyze all four perspectives\n2. Identify consensus vs. disagreement\n3. Weigh the strength of each argument\n4. Provide a clear, unified recommendation\n5. Acknowledge trade-offs and uncertainties\n6. Give specific next steps\n\nBe decisive. If there\'s consensus, state it confidently. If there\'s disagreement, explain your reasoning for which perspective weighs more heavily and why. Provide confidence score (0-100%).',
+        strengths: [
+          'Multi-perspective synthesis',
+          'Decision clarity',
+          'Trade-off analysis',
+          'Actionable recommendations'
+        ],
+        icon: '🧠',
+        color: '#ec4899'
       }
-    });
-  });
-  
-  // Find most active category
-  let maxCount = 0;
-  let maxCategory = null;
-  Object.entries(categoryCounts).forEach(([category, count]) => {
-    if (count > maxCount) {
-      maxCount = count;
-      maxCategory = category;
-    }
-  });
-  
-  stats.mostActiveCategory = maxCategory;
-  stats.averageConfidence = confidenceCount > 0 ? totalConfidence / confidenceCount : 0;
-  
-  return stats;
+    ];
+    fs.writeFileSync(AGENTS_FILE, JSON.stringify(defaultAgents, null, 2));
+  }
 }
 
-// Initialize data on module load
-initializeData();
+initFiles();
 
-module.exports = {
-  initializeData,
-  getAgents,
-  getSessions,
-  getSession,
-  createSession,
-  updateAgentPosition,
-  synthesizeSession,
-  recordDecision,
-  getSessionStats,
-  getOverallStats
+function loadSessions() {
+  if (!fs.existsSync(SESSIONS_FILE)) return [];
+  return JSON.parse(fs.readFileSync(SESSIONS_FILE, 'utf8'));
+}
+
+function saveSessions(sessions) {
+  ensureDir(DATA_DIR);
+  fs.writeFileSync(SESSIONS_FILE, JSON.stringify(sessions, null, 2));
+}
+
+function loadAgents() {
+  if (!fs.existsSync(AGENTS_FILE)) return [];
+  return JSON.parse(fs.readFileSync(AGENTS_FILE, 'utf8'));
+}
+
+function saveAgents(agents) {
+  ensureDir(DATA_DIR);
+  fs.writeFileSync(AGENTS_FILE, JSON.stringify(agents, null, 2));
+}
+
+const CounselService = {
+  // ========== SESSIONS ==========
+
+  getAllSessions() {
+    return loadSessions();
+  },
+
+  getSessionById(id) {
+    return loadSessions().find(s => s.id === id);
+  },
+
+  getSessionsByStatus(status) {
+    return loadSessions().filter(s => s.status === status);
+  },
+
+  getSessionsByCategory(category) {
+    return loadSessions().filter(s => s.category === category);
+  },
+
+  createSession(sessionData) {
+    const sessions = loadSessions();
+    const session = {
+      id: `session-${Date.now()}`,
+      topic: sessionData.topic,
+      context: sessionData.context || '',
+      category: sessionData.category || 'General',
+      status: 'pending', // pending, in-progress, completed
+      createdAt: new Date().toISOString(),
+      completedAt: null,
+      agentResponses: [],
+      synthesis: null,
+      decision: null
+    };
+    sessions.push(session);
+    saveSessions(sessions);
+    return session;
+  },
+
+  updateSession(id, updates) {
+    const sessions = loadSessions();
+    const index = sessions.findIndex(s => s.id === id);
+    if (index === -1) return null;
+
+    sessions[index] = {
+      ...sessions[index],
+      ...updates,
+      updatedAt: new Date().toISOString()
+    };
+    saveSessions(sessions);
+    return sessions[index];
+  },
+
+  deleteSession(id) {
+    const sessions = loadSessions();
+    const index = sessions.findIndex(s => s.id === id);
+    if (index === -1) return false;
+
+    sessions.splice(index, 1);
+    saveSessions(sessions);
+    return true;
+  },
+
+  // ========== AGENT RESPONSES ==========
+
+  addAgentResponse(sessionId, agentResponse) {
+    const sessions = loadSessions();
+    const session = sessions.find(s => s.id === sessionId);
+    if (!session) return null;
+
+    const response = {
+      agentId: agentResponse.agentId,
+      agentName: agentResponse.agentName,
+      response: agentResponse.response,
+      confidence: agentResponse.confidence || 50,
+      keyPoints: agentResponse.keyPoints || [],
+      timestamp: new Date().toISOString()
+    };
+
+    session.agentResponses.push(response);
+    session.status = 'in-progress';
+    saveSessions(sessions);
+    return response;
+  },
+
+  getAgentResponses(sessionId) {
+    const session = this.getSessionById(sessionId);
+    return session ? session.agentResponses : [];
+  },
+
+  // ========== SYNTHESIS ==========
+
+  addSynthesis(sessionId, synthesisData) {
+    const sessions = loadSessions();
+    const session = sessions.find(s => s.id === sessionId);
+    if (!session) return null;
+
+    session.synthesis = {
+      recommendation: synthesisData.recommendation,
+      reasoning: synthesisData.reasoning,
+      confidence: synthesisData.confidence || 50,
+      keyTakeaways: synthesisData.keyTakeaways || [],
+      nextSteps: synthesisData.nextSteps || [],
+      createdAt: new Date().toISOString()
+    };
+
+    saveSessions(sessions);
+    return session.synthesis;
+  },
+
+  // ========== DECISIONS ==========
+
+  recordDecision(sessionId, decisionData) {
+    const sessions = loadSessions();
+    const session = sessions.find(s => s.id === sessionId);
+    if (!session) return null;
+
+    session.decision = {
+      chosen: decisionData.chosen,
+      reasoning: decisionData.reasoning || '',
+      implementationPlan: decisionData.implementationPlan || '',
+      recordedAt: new Date().toISOString()
+    };
+
+    session.status = 'completed';
+    session.completedAt = new Date().toISOString();
+    saveSessions(sessions);
+    return session.decision;
+  },
+
+  // ========== AGENTS CONFIGURATION ==========
+
+  getAllAgents() {
+    return loadAgents();
+  },
+
+  getAgentById(id) {
+    return loadAgents().find(a => a.id === id);
+  },
+
+  updateAgent(id, updates) {
+    const agents = loadAgents();
+    const index = agents.findIndex(a => a.id === id);
+    if (index === -1) return null;
+
+    agents[index] = {
+      ...agents[index],
+      ...updates
+    };
+    saveAgents(agents);
+    return agents[index];
+  },
+
+  // ========== ANALYTICS ==========
+
+  getSessionMetrics() {
+    const sessions = loadSessions();
+    const completed = sessions.filter(s => s.status === 'completed');
+
+    // Category breakdown
+    const categoryCount = {};
+    sessions.forEach(s => {
+      categoryCount[s.category] = (categoryCount[s.category] || 0) + 1;
+    });
+
+    // Average confidence by agent
+    const agentConfidence = {};
+    sessions.forEach(session => {
+      session.agentResponses?.forEach(response => {
+        if (!agentConfidence[response.agentId]) {
+          agentConfidence[response.agentId] = { total: 0, count: 0 };
+        }
+        agentConfidence[response.agentId].total += response.confidence;
+        agentConfidence[response.agentId].count += 1;
+      });
+    });
+
+    const avgConfidenceByAgent = {};
+    Object.keys(agentConfidence).forEach(agentId => {
+      const { total, count } = agentConfidence[agentId];
+      avgConfidenceByAgent[agentId] = Math.round(total / count);
+    });
+
+    return {
+      totalSessions: sessions.length,
+      completedSessions: completed.length,
+      pendingSessions: sessions.filter(s => s.status === 'pending').length,
+      inProgressSessions: sessions.filter(s => s.status === 'in-progress').length,
+      categoryBreakdown: categoryCount,
+      avgConfidenceByAgent,
+      recentSessions: sessions.slice(-5).reverse()
+    };
+  }
 };
+
+module.exports = CounselService;

@@ -1,0 +1,103 @@
+[
+  {
+    "id": "session-001",
+    "topic": "Should I expand to Texas or focus on California?",
+    "context": "Studio Shade Co is at $40K MRR in California. I have two options: 1) Expand to Texas market (new contractors, new leads), or 2) Double down on California (existing relationships, proven market). Both require $50K investment.",
+    "category": "Business Strategy",
+    "status": "completed",
+    "createdAt": "2026-02-03T10:00:00Z",
+    "completedAt": "2026-02-03T11:30:00Z",
+    "agentResponses": [
+      {
+        "agentId": "business-strategist",
+        "agentName": "Business Strategist (Claude)",
+        "response": "**Strategic Recommendation: Focus on California**\n\nExpanding to a new market (Texas) introduces significant operational complexity: new contractor relationships, different building codes, unknown competitive landscape, and split attention between two markets.\n\nCalifornia advantages:\n- Proven unit economics ($40K MRR validates product-market fit)\n- Existing contractor network (lower risk, faster scaling)\n- Known customer acquisition costs\n- Concentrated marketing spend (better ROI)\n\n**The path to $100K MRR is clearer in California.** You can always expand to Texas once California hits $80K+ MRR and operations are systematized.\n\n**Key principle:** Master one market before expanding. Depth beats breadth at this stage.",
+        "confidence": 85,
+        "keyPoints": [
+          "Proven product-market fit in California",
+          "Lower operational risk staying focused",
+          "Easier to scale what's working vs. starting fresh",
+          "Can expand to Texas after systematizing CA operations"
+        ],
+        "timestamp": "2026-02-03T10:15:00Z"
+      },
+      {
+        "agentId": "data-analyst",
+        "agentName": "Data Analyst (GPT-4)",
+        "response": "**Data-Driven Analysis:**\n\n**California Metrics:**\n- Current MRR: $40K\n- CAC (Customer Acquisition Cost): $800/customer (assumed)\n- LTV (Lifetime Value): $4,500/customer (assumed)\n- LTV:CAC ratio: 5.6x (healthy)\n\n**Texas Expansion Risk Factors:**\n- New market CAC likely 2-3x higher initially ($1,600-$2,400)\n- 6-12 month ramp to profitability\n- Contractor onboarding: 3-6 months\n- Split focus reduces CA growth rate by ~40%\n\n**California Deep Focus:**\n- Can likely 2x MRR to $80K in 6 months\n- Same CAC, better marketing efficiency\n- Contractor capacity already exists\n\n**ROI Comparison (6 months):**\n- Texas expansion: +$15K MRR (net), high risk\n- California focus: +$40K MRR (to $80K total), medium risk\n\n**Recommendation: California.** Higher ROI, lower risk, faster path to $100K MRR.",
+        "confidence": 78,
+        "keyPoints": [
+          "CA has proven 5.6x LTV:CAC ratio",
+          "TX expansion = 2-3x higher initial CAC",
+          "CA can 2x MRR in 6 months vs TX adding only $15K",
+          "Split focus reduces CA growth by 40%"
+        ],
+        "timestamp": "2026-02-03T10:30:00Z"
+      },
+      {
+        "agentId": "risk-assessor",
+        "agentName": "Risk Assessor (DeepSeek)",
+        "response": "**Contrarian View: Consider Texas (with caveats)**\n\nEveryone will tell you to focus on California. But here's the counterargument:\n\n**California Concentration Risk:**\n- Single-market dependency (economic downturn, regulatory change)\n- Competitive saturation (if market is heating up, expansion NOW is cheaper than later)\n- Hiring challenges (CA labor costs rising)\n\n**Texas Upside:**\n- Second-mover advantage if competitors haven't entered yet\n- Lower operating costs (contractors, labor)\n- Faster growth market (TX construction growth rate higher than CA)\n- Geographic diversification\n\n**However, I agree Texas is PREMATURE at $40K MRR.** You need:\n- $60K+ MRR minimum before multi-market\n- Systematized operations (can run on autopilot)\n- Dedicated Texas GM (don't run both yourself)\n\n**My take:** Focus California NOW, but start Texas market research (spend $5K on research, contractor interviews). Expand to Texas at $80K MRR with a local operator.",
+        "confidence": 65,
+        "keyPoints": [
+          "CA concentration risk exists but not urgent at $40K MRR",
+          "TX is right move EVENTUALLY, wrong move NOW",
+          "Need $60K+ MRR and systematized ops first",
+          "Start TX research now, execute at $80K MRR"
+        ],
+        "timestamp": "2026-02-03T10:45:00Z"
+      },
+      {
+        "agentId": "financial-advisor",
+        "agentName": "Financial Advisor (Gemini)",
+        "response": "**Financial Analysis:**\n\n**$50K Investment Scenarios:**\n\n**Option A: Texas Expansion**\n- Marketing: $20K\n- Contractor onboarding: $15K\n- Operations setup: $10K\n- Buffer: $5K\n- Expected return (Year 1): $180K revenue ($15K MRR × 12)\n- ROI: 260% (but high risk, split focus)\n\n**Option B: California Doubling**\n- Marketing: $30K (concentrated)\n- Contractor scaling: $10K\n- Operations optimization: $5K\n- Buffer: $5K\n- Expected return (Year 1): $480K revenue ($40K MRR × 12)\n- ROI: 860% (lower risk)\n\n**Cash Flow Impact:**\n- CA option: Positive cash flow Month 2\n- TX option: Negative cash flow Months 1-5, breakeven Month 6\n\n**Burn Rate:**\n- CA option: ~$8K/month burn (manageable)\n- TX option: ~$15K/month burn (risky at your stage)\n\n**Financial Recommendation: California.** Better ROI, faster payback, lower burn rate, positive cash flow immediately.",
+        "confidence": 82,
+        "keyPoints": [
+          "CA ROI: 860% vs TX ROI: 260%",
+          "CA = positive cash flow Month 2, TX = Month 6",
+          "TX burns $15K/mo vs CA $8K/mo",
+          "CA investment pays back in 60 days vs TX 150 days"
+        ],
+        "timestamp": "2026-02-03T11:00:00Z"
+      }
+    ],
+    "synthesis": {
+      "recommendation": "**Focus on California - Unanimous Consensus**",
+      "reasoning": "All four agents (Business Strategist, Data Analyst, Risk Assessor, Financial Advisor) recommend focusing on California, despite the Risk Assessor offering a contrarian perspective.\n\n**Why California wins:**\n\n1. **Financial**: 860% ROI vs 260% ROI (Gemini)\n2. **Data**: Proven 5.6x LTV:CAC ratio, can 2x MRR in 6 months (GPT-4)\n3. **Strategic**: Master one market before expanding, lower operational risk (Claude)\n4. **Risk**: Texas is right move eventually but premature at $40K MRR (DeepSeek)\n\n**The plan:**\n- Invest $50K in California marketing and operations\n- Target: $80K MRR in 6 months\n- Once at $80K MRR: Systematize operations, then expand to Texas with dedicated GM\n- Meanwhile: Spend $5K on Texas market research (contacts, competitor analysis)\n\n**Key insight from Risk Assessor:** While California is the right choice NOW, don't ignore Texas forever. Start research now, execute at $80K MRR.\n\n**Confidence in recommendation: 95%**\n\nThis is a clear case where focus beats expansion. You're pre-product-market fit in Texas but post-product-market fit in California. Double down on what's working.",
+      "confidence": 95,
+      "keyTakeaways": [
+        "Focus $50K investment on California (unanimous recommendation)",
+        "Target $80K MRR in 6 months (vs $55K if split focus)",
+        "Begin Texas market research now ($5K budget)",
+        "Expand to Texas only after $80K MRR + systematized operations",
+        "Hire dedicated Texas GM when ready (don't run both yourself)"
+      ],
+      "nextSteps": [
+        "Allocate $50K to CA: $30K marketing, $10K contractors, $10K ops/buffer",
+        "Set $80K MRR target for 6-month milestone",
+        "Spend $5K on Texas market research (lightweight)",
+        "Document CA operations for future systematization",
+        "Plan Texas expansion for Q3 2026 (after hitting $80K MRR)"
+      ],
+      "createdAt": "2026-02-03T11:15:00Z"
+    },
+    "decision": {
+      "chosen": "Focus on California",
+      "reasoning": "All four agents agreed. Financial ROI is 3x better, risk is lower, and I can always expand to Texas once CA is systematized. The Risk Assessor's point about starting TX research now is smart - I'll allocate $5K for that.",
+      "implementationPlan": "Week 1: Allocate $30K to CA marketing campaigns. Week 2: Onboard 3 new contractors ($10K). Week 3-4: Optimize operations and set up TX research calls. Track progress weekly toward $80K MRR goal.",
+      "recordedAt": "2026-02-03T11:30:00Z"
+    }
+  },
+  {
+    "id": "session-1770404591215",
+    "topic": "Should I hire a full-time developer or use contractors?",
+    "context": "Currently at $50K MRR, need to build new features faster. Option 1: Hire FTE at $120K/year. Option 2: Use contractors at $80/hr.",
+    "category": "Hiring",
+    "status": "pending",
+    "createdAt": "2026-02-06T19:03:11.215Z",
+    "completedAt": null,
+    "agentResponses": [],
+    "synthesis": null,
+    "decision": null
+  }
+]

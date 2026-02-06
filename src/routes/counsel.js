@@ -2,255 +2,144 @@ const express = require('express');
 const router = express.Router();
 const counselService = require('../services/counselService');
 
-// Get all counsel sessions
+// ========== SESSIONS ==========
+
+// Get all sessions
 router.get('/sessions', (req, res) => {
-  try {
-    const sessions = counselService.getSessions();
-    res.json({
-      success: true,
-      data: sessions,
-      count: sessions.length
-    });
-  } catch (error) {
-    console.error('Error getting counsel sessions:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to get counsel sessions'
-    });
+  const { status, category } = req.query;
+
+  let sessions;
+  if (status) {
+    sessions = counselService.getSessionsByStatus(status);
+  } else if (category) {
+    sessions = counselService.getSessionsByCategory(category);
+  } else {
+    sessions = counselService.getAllSessions();
   }
+
+  res.json(sessions);
 });
 
-// Get a specific session
+// Get session by ID
 router.get('/sessions/:id', (req, res) => {
-  try {
-    const session = counselService.getSession(req.params.id);
-    if (!session) {
-      return res.status(404).json({
-        success: false,
-        error: 'Session not found'
-      });
-    }
-    
-    res.json({
-      success: true,
-      data: session
-    });
-  } catch (error) {
-    console.error('Error getting counsel session:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to get counsel session'
-    });
+  const session = counselService.getSessionById(req.params.id);
+  if (!session) {
+    return res.status(404).json({ error: 'Session not found' });
   }
+  res.json(session);
 });
 
-// Create a new counsel session
+// Create new session
 router.post('/sessions', (req, res) => {
   try {
-    const { topic, category, context, agents } = req.body;
-    
-    if (!topic) {
-      return res.status(400).json({
-        success: false,
-        error: 'Topic is required'
-      });
-    }
-    
-    const session = counselService.createSession({
-      topic,
-      category,
-      context,
-      agents
-    });
-    
-    res.status(201).json({
-      success: true,
-      message: 'Counsel session created',
-      data: session
-    });
+    const session = counselService.createSession(req.body);
+    res.status(201).json(session);
   } catch (error) {
-    console.error('Error creating counsel session:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to create counsel session'
-    });
+    res.status(500).json({ error: 'Failed to create session' });
   }
 });
 
-// Update agent position in a session
-router.put('/sessions/:sessionId/agents/:agentId/position', (req, res) => {
+// Update session
+router.put('/sessions/:id', (req, res) => {
+  const updated = counselService.updateSession(req.params.id, req.body);
+  if (!updated) {
+    return res.status(404).json({ error: 'Session not found' });
+  }
+  res.json(updated);
+});
+
+// Delete session
+router.delete('/sessions/:id', (req, res) => {
+  const deleted = counselService.deleteSession(req.params.id);
+  if (!deleted) {
+    return res.status(404).json({ error: 'Session not found' });
+  }
+  res.json({ success: true });
+});
+
+// ========== AGENT RESPONSES ==========
+
+// Get agent responses for a session
+router.get('/sessions/:id/responses', (req, res) => {
+  const responses = counselService.getAgentResponses(req.params.id);
+  res.json(responses);
+});
+
+// Add agent response to session
+router.post('/sessions/:id/responses', (req, res) => {
   try {
-    const { sessionId, agentId } = req.params;
-    const { position, keyPoints, confidence, reasoning, cost, time } = req.body;
-    
-    if (!position) {
-      return res.status(400).json({
-        success: false,
-        error: 'Position is required'
-      });
+    const response = counselService.addAgentResponse(req.params.id, req.body);
+    if (!response) {
+      return res.status(404).json({ error: 'Session not found' });
     }
-    
-    const session = counselService.updateAgentPosition(sessionId, agentId, {
-      position,
-      keyPoints: keyPoints || [],
-      confidence: confidence || 0,
-      reasoning: reasoning || '',
-      cost: cost || 0,
-      time: time || 0
-    });
-    
-    res.json({
-      success: true,
-      message: 'Agent position updated',
-      data: session
-    });
+    res.status(201).json(response);
   } catch (error) {
-    console.error('Error updating agent position:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to update agent position'
-    });
+    res.status(500).json({ error: 'Failed to add agent response' });
   }
 });
 
-// Synthesize session (create recommendation)
-router.put('/sessions/:id/synthesize', (req, res) => {
+// ========== SYNTHESIS ==========
+
+// Add synthesis to session
+router.post('/sessions/:id/synthesis', (req, res) => {
   try {
-    const { id } = req.params;
-    const { 
-      recommendation, 
-      confidence, 
-      keyPoints, 
-      risks, 
-      opportunities,
-      nextSteps 
-    } = req.body;
-    
-    if (!recommendation) {
-      return res.status(400).json({
-        success: false,
-        error: 'Recommendation is required'
-      });
+    const synthesis = counselService.addSynthesis(req.params.id, req.body);
+    if (!synthesis) {
+      return res.status(404).json({ error: 'Session not found' });
     }
-    
-    const session = counselService.synthesizeSession(id, {
-      recommendation,
-      confidence: confidence || 0,
-      keyPoints: keyPoints || [],
-      risks: risks || [],
-      opportunities: opportunities || [],
-      nextSteps: nextSteps || []
-    });
-    
-    res.json({
-      success: true,
-      message: 'Session synthesized',
-      data: session
-    });
+    res.status(201).json(synthesis);
   } catch (error) {
-    console.error('Error synthesizing session:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to synthesize session'
-    });
+    res.status(500).json({ error: 'Failed to add synthesis' });
   }
 });
 
-// Record decision for a session
-router.put('/sessions/:id/decide', (req, res) => {
+// ========== DECISIONS ==========
+
+// Record user decision
+router.post('/sessions/:id/decision', (req, res) => {
   try {
-    const { id } = req.params;
-    const { 
-      decision, 
-      rationale, 
-      actionItems,
-      followUpDate,
-      confidence 
-    } = req.body;
-    
+    const decision = counselService.recordDecision(req.params.id, req.body);
     if (!decision) {
-      return res.status(400).json({
-        success: false,
-        error: 'Decision is required'
-      });
+      return res.status(404).json({ error: 'Session not found' });
     }
-    
-    const session = counselService.recordDecision(id, {
-      decision,
-      rationale: rationale || '',
-      actionItems: actionItems || [],
-      followUpDate: followUpDate || null,
-      confidence: confidence || 0
-    });
-    
-    res.json({
-      success: true,
-      message: 'Decision recorded',
-      data: session
-    });
+    res.status(201).json(decision);
   } catch (error) {
-    console.error('Error recording decision:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to record decision'
-    });
+    res.status(500).json({ error: 'Failed to record decision' });
   }
 });
 
-// Get session statistics
-router.get('/sessions/:id/stats', (req, res) => {
-  try {
-    const { id } = req.params;
-    const stats = counselService.getSessionStats(id);
-    
-    res.json({
-      success: true,
-      data: stats
-    });
-  } catch (error) {
-    console.error('Error getting session stats:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to get session stats'
-    });
-  }
-});
-
-// Get overall counsel statistics
-router.get('/stats', (req, res) => {
-  try {
-    const stats = counselService.getOverallStats();
-    
-    res.json({
-      success: true,
-      data: stats
-    });
-  } catch (error) {
-    console.error('Error getting counsel stats:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to get counsel stats'
-    });
-  }
-});
+// ========== AGENTS CONFIGURATION ==========
 
 // Get all agents
 router.get('/agents', (req, res) => {
-  try {
-    const agents = counselService.getAgents();
-    
-    res.json({
-      success: true,
-      data: agents,
-      count: agents.length
-    });
-  } catch (error) {
-    console.error('Error getting agents:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to get agents'
-    });
+  const agents = counselService.getAllAgents();
+  res.json(agents);
+});
+
+// Get agent by ID
+router.get('/agents/:id', (req, res) => {
+  const agent = counselService.getAgentById(req.params.id);
+  if (!agent) {
+    return res.status(404).json({ error: 'Agent not found' });
   }
+  res.json(agent);
+});
+
+// Update agent configuration
+router.put('/agents/:id', (req, res) => {
+  const updated = counselService.updateAgent(req.params.id, req.body);
+  if (!updated) {
+    return res.status(404).json({ error: 'Agent not found' });
+  }
+  res.json(updated);
+});
+
+// ========== ANALYTICS ==========
+
+// Get session metrics
+router.get('/metrics', (req, res) => {
+  const metrics = counselService.getSessionMetrics();
+  res.json(metrics);
 });
 
 module.exports = router;

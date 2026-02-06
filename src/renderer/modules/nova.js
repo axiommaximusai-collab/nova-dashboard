@@ -16,6 +16,7 @@ const Nova = {
     this.loadHabits();
     this.loadMemory();
     this.loadNetwork();
+    this.loadCounsel();
   },
   
   setupNavigation() {
@@ -62,7 +63,8 @@ const Nova = {
     document.getElementById('newWorkflowBtn').addEventListener('click', () => this.showAddWorkflowModal());
     document.getElementById('rolloverBtn').addEventListener('click', () => this.rolloverTasks());
     document.getElementById('newContactBtn').addEventListener('click', () => this.showAddContactModal());
-    
+    document.getElementById('newCounselBtn').addEventListener('click', () => this.showAddCounselModal());
+
     // Network filter
     document.querySelectorAll('.contacts-filter .filter-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -806,7 +808,287 @@ const Nova = {
       this.loadNetwork();
     });
   },
-  
+
+  // ========== COUNSEL ==========
+
+  counselFilter: 'all',
+  currentSession: null,
+
+  async loadCounsel() {
+    const sessions = await this.apiGet('/counsel/sessions');
+    this.displayCounselSessions(sessions);
+
+    // Setup filter listeners
+    document.querySelectorAll('.counsel-filters .filter-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.counsel-filters .filter-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        this.counselFilter = e.target.dataset.filter;
+        this.filterCounselSessions(sessions);
+      });
+    });
+
+    // Setup back button
+    document.getElementById('backToSessions')?.addEventListener('click', () => {
+      document.getElementById('counselSessionsList').style.display = 'block';
+      document.getElementById('counselSessionDetail').style.display = 'none';
+    });
+  },
+
+  displayCounselSessions(sessions) {
+    const list = document.getElementById('counselSessionsList');
+    if (!sessions || sessions.length === 0) {
+      list.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 40px;">No counsel sessions yet. Click "+ New Session" to start your first AI advisory session.</p>';
+      return;
+    }
+
+    list.innerHTML = sessions.map(session => {
+      const statusColors = {
+        pending: '#fbbf24',
+        'in-progress': '#3b82f6',
+        completed: '#10b981'
+      };
+      const statusColor = statusColors[session.status] || '#6b7280';
+
+      return `
+        <div class="counsel-session-card" onclick="Nova.viewCounselSession('${session.id}')">
+          <div class="session-header">
+            <h3>${session.topic}</h3>
+            <span class="session-status" style="background: ${statusColor}20; color: ${statusColor};">
+              ${session.status}
+            </span>
+          </div>
+          <div class="session-category">${session.category || 'General'}</div>
+          <div class="session-meta">
+            <span>Created: ${new Date(session.createdAt).toLocaleDateString()}</span>
+            ${session.agentResponses ? `<span>${session.agentResponses.length} agent responses</span>` : ''}
+            ${session.synthesis ? '<span>✓ Synthesis complete</span>' : ''}
+          </div>
+          ${session.decision ? '<div class="session-decision">✓ Decision recorded</div>' : ''}
+        </div>
+      `;
+    }).join('');
+  },
+
+  filterCounselSessions(sessions) {
+    const filtered = this.counselFilter === 'all'
+      ? sessions
+      : sessions.filter(s => s.status === this.counselFilter);
+    this.displayCounselSessions(filtered);
+  },
+
+  async viewCounselSession(sessionId) {
+    const session = await this.apiGet(`/counsel/sessions/${sessionId}`);
+    this.currentSession = session;
+
+    document.getElementById('counselSessionsList').style.display = 'none';
+    document.getElementById('counselSessionDetail').style.display = 'block';
+
+    const content = document.getElementById('sessionDetailContent');
+    content.innerHTML = `
+      <div class="session-detail-header">
+        <h2>${session.topic}</h2>
+        <span class="session-status">${session.status}</span>
+      </div>
+
+      <div class="session-detail-section">
+        <h3>Context</h3>
+        <p>${session.context || 'No context provided'}</p>
+      </div>
+
+      ${session.agentResponses && session.agentResponses.length > 0 ? `
+        <div class="session-detail-section">
+          <h3>Agent Responses</h3>
+          ${session.agentResponses.map(response => `
+            <div class="agent-response-card">
+              <div class="agent-header">
+                <span class="agent-icon">${this.getAgentIcon(response.agentId)}</span>
+                <span class="agent-name">${response.agentName}</span>
+                <span class="confidence-badge">${response.confidence}% confidence</span>
+              </div>
+              <div class="agent-response-content">${response.response}</div>
+              ${response.keyPoints && response.keyPoints.length > 0 ? `
+                <div class="key-points">
+                  <strong>Key Points:</strong>
+                  <ul>
+                    ${response.keyPoints.map(point => `<li>${point}</li>`).join('')}
+                  </ul>
+                </div>
+              ` : ''}
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+
+      ${session.synthesis ? `
+        <div class="session-detail-section synthesis-section">
+          <h3>🧠 Synthesis & Recommendation</h3>
+          <div class="synthesis-card">
+            <h4>${session.synthesis.recommendation}</h4>
+            <div class="confidence-score">Confidence: ${session.synthesis.confidence}%</div>
+            <div class="synthesis-reasoning">${session.synthesis.reasoning}</div>
+            ${session.synthesis.keyTakeaways && session.synthesis.keyTakeaways.length > 0 ? `
+              <div class="key-takeaways">
+                <strong>Key Takeaways:</strong>
+                <ul>
+                  ${session.synthesis.keyTakeaways.map(item => `<li>${item}</li>`).join('')}
+                </ul>
+              </div>
+            ` : ''}
+            ${session.synthesis.nextSteps && session.synthesis.nextSteps.length > 0 ? `
+              <div class="next-steps">
+                <strong>Next Steps:</strong>
+                <ol>
+                  ${session.synthesis.nextSteps.map(step => `<li>${step}</li>`).join('')}
+                </ol>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      ` : ''}
+
+      ${session.decision ? `
+        <div class="session-detail-section decision-section">
+          <h3>✓ Your Decision</h3>
+          <div class="decision-card">
+            <h4>${session.decision.chosen}</h4>
+            <p>${session.decision.reasoning}</p>
+            ${session.decision.implementationPlan ? `
+              <div class="implementation-plan">
+                <strong>Implementation Plan:</strong>
+                <p>${session.decision.implementationPlan}</p>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      ` : session.synthesis ? `
+        <div class="session-detail-section">
+          <button class="btn-primary" onclick="Nova.showRecordDecisionModal('${session.id}')">
+            Record Your Decision
+          </button>
+        </div>
+      ` : ''}
+    `;
+  },
+
+  getAgentIcon(agentId) {
+    const icons = {
+      'business-strategist': '🎯',
+      'data-analyst': '📊',
+      'risk-assessor': '⚠️',
+      'financial-advisor': '💰',
+      'synthesizer': '🧠'
+    };
+    return icons[agentId] || '🤖';
+  },
+
+  showAddCounselModal() {
+    const modal = document.getElementById('itemModal');
+    const content = document.querySelector('.modal-content');
+    content.innerHTML = `
+      <span class="modal-close">&times;</span>
+      <h2>New Counsel Session</h2>
+      <form id="counselForm">
+        <div class="form-group">
+          <label>Topic / Decision to Make</label>
+          <input type="text" id="counselTopic" placeholder="What decision do you need help with?" required>
+        </div>
+        <div class="form-group">
+          <label>Context</label>
+          <textarea id="counselContext" rows="5" placeholder="Provide background, constraints, options, and any relevant details..." required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select id="counselCategory">
+            <option>Business Strategy</option>
+            <option>Product Development</option>
+            <option>Marketing</option>
+            <option>Sales</option>
+            <option>Finance</option>
+            <option>Operations</option>
+            <option>Hiring</option>
+            <option>Personal</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="modalCancel">Cancel</button>
+          <button type="submit" class="btn-primary">Create Session</button>
+        </div>
+      </form>
+    `;
+
+    document.querySelector('.modal-close').addEventListener('click', () => this.closeModal());
+    document.getElementById('modalCancel').addEventListener('click', () => this.closeModal());
+
+    document.getElementById('counselForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const session = await this.apiPost('/counsel/sessions', {
+        topic: document.getElementById('counselTopic').value,
+        context: document.getElementById('counselContext').value,
+        category: document.getElementById('counselCategory').value
+      });
+      this.closeModal();
+      this.showNotification('Counsel session created! Generating agent responses...');
+      this.loadCounsel();
+
+      // Auto-generate agent responses (simulated for now)
+      setTimeout(() => this.generateMockAgentResponses(session.id), 1000);
+    });
+
+    modal.style.display = 'flex';
+  },
+
+  async generateMockAgentResponses(sessionId) {
+    // This would call actual LLM APIs in production
+    // For now, we'll just notify that responses would be generated
+    this.showNotification('In production: AI agents would analyze your question now');
+  },
+
+  showRecordDecisionModal(sessionId) {
+    const modal = document.getElementById('itemModal');
+    const content = document.querySelector('.modal-content');
+    content.innerHTML = `
+      <span class="modal-close">&times;</span>
+      <h2>Record Your Decision</h2>
+      <form id="decisionForm">
+        <div class="form-group">
+          <label>What did you decide?</label>
+          <input type="text" id="decisionChosen" placeholder="Your chosen path..." required>
+        </div>
+        <div class="form-group">
+          <label>Why?</label>
+          <textarea id="decisionReasoning" rows="3" placeholder="What convinced you?" required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Implementation Plan</label>
+          <textarea id="decisionPlan" rows="4" placeholder="How will you execute this decision?"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="modalCancel">Cancel</button>
+          <button type="submit" class="btn-primary">Save Decision</button>
+        </div>
+      </form>
+    `;
+
+    document.querySelector('.modal-close').addEventListener('click', () => this.closeModal());
+    document.getElementById('modalCancel').addEventListener('click', () => this.closeModal());
+
+    document.getElementById('decisionForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await this.apiPost(`/counsel/sessions/${sessionId}/decision`, {
+        chosen: document.getElementById('decisionChosen').value,
+        reasoning: document.getElementById('decisionReasoning').value,
+        implementationPlan: document.getElementById('decisionPlan').value
+      });
+      this.closeModal();
+      this.showNotification('Decision recorded!');
+      this.viewCounselSession(sessionId);
+    });
+
+    modal.style.display = 'flex';
+  },
+
   // Utilities
   getWeekNumber(date) {
     const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
