@@ -162,12 +162,18 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e5e5;
 }
 
 .tab-header h2 {
-  font-size: 28px;
-  font-weight: 600;
+  font-size: 24px;
+  font-weight: 300;
+  letter-spacing: 2px;
+  color: #1a1a1a;
+  text-transform: uppercase;
+  font-family: 'Helvetica Neue', 'Arial', sans-serif;
 }
 
 /* Buttons */
