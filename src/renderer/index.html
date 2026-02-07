@@ -530,10 +530,61 @@
       <section class="tab-panel" id="workflows">
         <div class="tab-header">
           <h2>Workflows & SOPs</h2>
-          <button class="btn-primary" id="newWorkflowBtn">+ New Workflow</button>
+          <div style="display: flex; gap: 12px;">
+            <button class="btn-secondary" id="toggleArchivedWorkflowsBtn">📦 Show Archived</button>
+            <button class="btn-primary" id="newWorkflowBtn">+ New Workflow</button>
+          </div>
         </div>
-        <div id="workflowsList" class="workflows-list"></div>
+        <div id="workflowsList" class="workflows-grid"></div>
       </section>
+
+      <!-- WORKFLOW DETAIL MODAL -->
+      <div class="workflow-detail-modal" id="workflowDetailModal">
+        <div class="workflow-detail-content">
+          <button class="workflow-detail-close">&times;</button>
+          <div id="workflowDetailBody">
+            <!-- Dynamic content loaded here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- CREATE/EDIT WORKFLOW MODAL -->
+      <div class="workflow-edit-modal" id="workflowEditModal">
+        <div class="workflow-edit-content">
+          <button class="workflow-edit-close">&times;</button>
+          <h2 id="workflowEditTitle">Create Workflow</h2>
+          <div class="workflow-edit-body">
+            <div class="form-group">
+              <label>Workflow Name</label>
+              <input type="text" id="workflowNameInput" placeholder="Enter workflow name..." class="form-input">
+            </div>
+            <div class="form-group">
+              <label>Category</label>
+              <select id="workflowCategoryInput" class="form-input">
+                <option value="Operations">Operations</option>
+                <option value="Sales">Sales</option>
+                <option value="Tech">Tech</option>
+                <option value="Personal">Personal</option>
+                <option value="Health">Health</option>
+                <option value="Finance">Finance</option>
+                <option value="Learning">Learning</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea id="workflowDescriptionInput" rows="3" placeholder="Brief description..." class="form-input"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Steps (one per line)</label>
+              <textarea id="workflowStepsInput" rows="8" placeholder="1. First step&#10;2. Second step&#10;3. Third step..." class="form-input"></textarea>
+            </div>
+          </div>
+          <div class="workflow-edit-footer">
+            <button class="btn-secondary" id="workflowEditCancel">Cancel</button>
+            <button class="btn-primary" id="workflowEditSave">Save</button>
+          </div>
+        </div>
+      </div>
 
       <!-- HABITS TAB -->
       <section class="tab-panel" id="habits">
