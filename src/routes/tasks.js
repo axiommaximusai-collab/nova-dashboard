@@ -295,4 +295,72 @@ router.post('/rollover', (req, res) => {
   res.json(result);
 });
 
+// GET /api/tasks/pushed - Get all pushed tasks
+router.get('/pushed', async (req, res) => {
+  try {
+    const tasksDir = path.join(__dirname, '../../data/tasks');
+    const files = await fs.readdir(tasksDir);
+    const pushedTasks = [];
+
+    for (const file of files) {
+      if (file.startsWith('weekly-') && file.endsWith('.json')) {
+        const filePath = path.join(tasksDir, file);
+        const data = await fs.readFile(filePath, 'utf8');
+        const weekData = JSON.parse(data);
+        
+        if (weekData.tasks) {
+          weekData.tasks.forEach(task => {
+            if (task.pushed || task.status === 'pushed') {
+              pushedTasks.push({
+                ...task,
+                year: weekData.year,
+                week: weekData.week
+              });
+            }
+          });
+        }
+      }
+    }
+
+    res.json(pushedTasks);
+  } catch (error) {
+    console.error('Error fetching pushed tasks:', error);
+    res.status(500).json({ error: 'Failed to fetch pushed tasks' });
+  }
+});
+
+// GET /api/tasks/archived - Get all archived tasks
+router.get('/archived', async (req, res) => {
+  try {
+    const tasksDir = path.join(__dirname, '../../data/tasks');
+    const files = await fs.readdir(tasksDir);
+    const archivedTasks = [];
+
+    for (const file of files) {
+      if (file.startsWith('weekly-') && file.endsWith('.json')) {
+        const filePath = path.join(tasksDir, file);
+        const data = await fs.readFile(filePath, 'utf8');
+        const weekData = JSON.parse(data);
+        
+        if (weekData.tasks) {
+          weekData.tasks.forEach(task => {
+            if (task.archived || task.status === 'archived') {
+              archivedTasks.push({
+                ...task,
+                year: weekData.year,
+                week: weekData.week
+              });
+            }
+          });
+        }
+      }
+    }
+
+    res.json(archivedTasks);
+  } catch (error) {
+    console.error('Error fetching archived tasks:', error);
+    res.status(500).json({ error: 'Failed to fetch archived tasks' });
+  }
+});
+
 module.exports = router;

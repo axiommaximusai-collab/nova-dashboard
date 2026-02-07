@@ -27,18 +27,6 @@
       "updatedAt": "2026-02-04"
     },
     {
-      "id": "task-003",
-      "title": "Morning workout routine",
-      "day": "Tuesday",
-      "priority": "medium",
-      "category": "health",
-      "projectId": null,
-      "goalId": "goal-003",
-      "completed": false,
-      "createdAt": "2026-02-03",
-      "updatedAt": "2026-02-07"
-    },
-    {
       "id": "task-004",
       "title": "Code Goals API endpoints",
       "day": "Wednesday",

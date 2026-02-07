@@ -16,6 +16,21 @@
       "week": 7,
       "year": 2026,
       "pushedFrom": "2026-6"
+    },
+    {
+      "id": "task-003",
+      "title": "Morning workout routine",
+      "day": "Tuesday",
+      "priority": "medium",
+      "category": "health",
+      "projectId": null,
+      "goalId": "goal-003",
+      "completed": false,
+      "createdAt": "2026-02-03",
+      "updatedAt": "2026-02-07",
+      "week": 7,
+      "year": 2026,
+      "pushedFrom": "2026-6"
     }
   ]
 }

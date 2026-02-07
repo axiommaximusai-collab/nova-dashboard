@@ -58,8 +58,8 @@
       "description": "Develop cold calling expertise for sales outreach. Target 100 quality calls per week consistently.",
       "timeframe": "mid",
       "priority": "high",
-      "progress": 35,
-      "status": "in-progress",
+      "progress": 100,
+      "status": "complete",
       "dueDate": "2026-08-01",
       "tags": [
         "business"
@@ -70,8 +70,8 @@
         "habit-005"
       ],
       "createdAt": "2026-01-10",
-      "updatedAt": "2026-02-06",
-      "completedAt": null,
+      "updatedAt": "2026-02-07",
+      "completedAt": "2026-02-07",
       "archived": false
     },
     {
@@ -299,6 +299,27 @@
       "linkedHabits": [],
       "createdAt": "2026-01-05",
       "updatedAt": "2026-01-05",
+      "completedAt": null,
+      "archived": false
+    },
+    {
+      "id": "goal-1770445399320",
+      "title": "d",
+      "description": "dd",
+      "timeframe": "mid",
+      "priority": "low",
+      "progress": 0,
+      "status": "not-started",
+      "dueDate": "2026-02-07",
+      "tags": [
+        "health",
+        "personal"
+      ],
+      "parentGoalId": null,
+      "childGoalIds": [],
+      "linkedHabits": [],
+      "createdAt": "2026-02-07",
+      "updatedAt": "2026-02-07",
       "completedAt": null,
       "archived": false
     }
