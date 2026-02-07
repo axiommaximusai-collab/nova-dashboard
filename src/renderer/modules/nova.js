@@ -5,6 +5,8 @@ const Nova = {
   taskFilter: 'all',
   showPushedColumn: false,
   showArchivedColumn: false,
+  showArchivedWorkflows: false,
+  currentWorkflowId: null,
 
   init() {
     this.setupNavigation();
@@ -147,6 +149,7 @@ const Nova = {
     document.getElementById('newHabitBtn').addEventListener('click', () => this.showAddHabitModal());
     document.getElementById('quickAddMemory').addEventListener('click', () => this.showAddMemoryModal());
     document.getElementById('newWorkflowBtn').addEventListener('click', () => this.showAddWorkflowModal());
+    document.getElementById('toggleArchivedWorkflowsBtn')?.addEventListener('click', () => this.toggleArchivedWorkflows());
     document.getElementById('rolloverBtn').addEventListener('click', () => this.rolloverTasks());
     document.getElementById('newContactBtn').addEventListener('click', () => this.showAddContactModal());
     document.getElementById('newCounselBtn').addEventListener('click', () => this.showAddCounselModal());
@@ -1373,28 +1376,283 @@ const Nova = {
   
   // Workflows
   async loadWorkflows() {
-    const workflows = await this.apiGet('/workflows/');
-    document.getElementById('workflowsList').innerHTML = workflows.length
-      ? workflows.map(w => `
-        <div class="workflow-card" onclick="Nova.viewWorkflow('${w.id}')">
-          <div class="workflow-header">
-            <div>
-              <div class="workflow-category">${w.category || 'General'}</div>
-              <h4 style="margin-top: 6px;">${w.name}</h4>
-            </div>
-            <span style="font-size: 12px; color: var(--text-muted);">${w.status}</span>
-          </div>
-          <p style="color: var(--text-secondary); font-size: 14px;">${w.description?.substring(0, 100) || ''}...</p>
-          <div class="workflow-stats">
-            <span>▶ ${w.runCount || 0} runs</span>
-            <span>🕐 ${w.lastRun ? new Date(w.lastRun).toLocaleDateString() : 'Never'}</span>
+    try {
+      const workflows = await this.apiGet('/workflows/');
+
+      let filteredWorkflows = workflows.filter(w => {
+        if (this.showArchivedWorkflows) {
+          return w.archived;
+        } else {
+          return !w.archived;
+        }
+      });
+
+      document.getElementById('workflowsList').innerHTML = filteredWorkflows.length
+        ? filteredWorkflows.map(w => this.createWorkflowCard(w)).join('')
+        : `<div style="text-align: center; padding: 40px; color: var(--text-muted);">
+            <p>${this.showArchivedWorkflows ? 'No archived workflows' : 'No workflows defined yet.'}</p>
+            ${!this.showArchivedWorkflows ? '<p style="font-size: 14px; margin-top: 8px;">Create SOPs and processes here.</p>' : ''}
+          </div>`;
+    } catch (err) {
+      console.error('Failed to load workflows:', err);
+      document.getElementById('workflowsList').innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 40px;">Failed to load workflows</p>';
+    }
+  },
+
+  createWorkflowCard(workflow) {
+    const statusIcon = workflow.active ? '🟢' : '⚫';
+    const statusText = workflow.active ? 'Active' : 'Inactive';
+
+    return `
+      <div class="workflow-card" onclick="Nova.viewWorkflow('${workflow.id}')">
+        <div class="workflow-card-header">
+          <div class="workflow-card-title">${workflow.name}</div>
+          <div class="workflow-card-status">
+            <span>${statusIcon} ${statusText}</span>
           </div>
         </div>
-      `).join('')
-      : '<div style="text-align: center; padding: 40px; color: var(--text-muted);">' +
-        '<p>No workflows defined yet.</p>' +
-        '<p style="font-size: 14px; margin-top: 8px;">Create SOPs and processes here.</p>' +
-        '</div>';
+        <div class="workflow-card-category">${workflow.category || 'General'}</div>
+        <div class="workflow-card-actions" onclick="event.stopPropagation()">
+          <button class="btn-icon" onclick="Nova.viewWorkflow('${workflow.id}')" title="View">👁️</button>
+          <button class="btn-icon" onclick="Nova.editWorkflow('${workflow.id}')" title="Edit">✎</button>
+          <button class="btn-icon btn-danger" onclick="Nova.deleteWorkflow('${workflow.id}')" title="Delete">🗑️</button>
+        </div>
+      </div>
+    `;
+  },
+
+  async viewWorkflow(workflowId) {
+    try {
+      const workflow = await this.apiGet(`/workflows/${workflowId}`);
+      this.currentWorkflowId = workflowId;
+
+      const modal = document.getElementById('workflowDetailModal');
+      const body = document.getElementById('workflowDetailBody');
+
+      const steps = Array.isArray(workflow.steps) ? workflow.steps :
+                    (workflow.steps ? workflow.steps.split('\n').filter(s => s.trim()) : []);
+
+      body.innerHTML = `
+        <div class="workflow-detail-header">
+          <h1>${workflow.name}</h1>
+          <div class="workflow-detail-meta">
+            <span class="workflow-badge">${workflow.category || 'General'}</span>
+            <span class="workflow-status-badge ${workflow.active ? 'active' : 'inactive'}">
+              ${workflow.active ? '🟢 Active' : '⚫ Inactive'}
+            </span>
+          </div>
+        </div>
+
+        ${workflow.description ? `
+          <div class="workflow-detail-section">
+            <h3>Description</h3>
+            <p style="color: var(--text-secondary); line-height: 1.6;">${workflow.description}</p>
+          </div>
+        ` : ''}
+
+        <div class="workflow-detail-section">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h3>Step-by-Step Procedure</h3>
+            <button class="btn-secondary btn-sm" onclick="Nova.editWorkflow('${workflow.id}')">✎ Edit Steps</button>
+          </div>
+          ${steps.length > 0 ? `
+            <ol class="workflow-steps-list">
+              ${steps.map(step => `<li>${step.replace(/^\d+\.\s*/, '')}</li>`).join('')}
+            </ol>
+          ` : '<p style="color: var(--text-muted);">No steps defined yet</p>'}
+        </div>
+
+        <div class="workflow-detail-section">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h3>📎 Attached Documents</h3>
+            <button class="btn-secondary btn-sm" onclick="Nova.showAttachFileDialog('${workflow.id}')">+ Attach</button>
+          </div>
+          ${workflow.attachments && workflow.attachments.length > 0 ? `
+            <div class="attachments-list">
+              ${workflow.attachments.map(att => `
+                <div class="attachment-item">
+                  <span>📎 ${att.name}</span>
+                  <button class="btn-icon btn-danger" onclick="Nova.deleteAttachment('${workflow.id}', '${att.id}')">🗑️</button>
+                </div>
+              `).join('')}
+            </div>
+          ` : '<p style="color: var(--text-muted);">No attachments</p>'}
+        </div>
+
+        <div class="workflow-detail-actions">
+          <button class="btn-secondary" onclick="Nova.closeWorkflowDetail()">Close</button>
+          <button class="btn-secondary" onclick="Nova.toggleWorkflowStatus('${workflow.id}', ${!workflow.active})">
+            ${workflow.active ? 'Mark Inactive' : 'Mark Active'}
+          </button>
+          <button class="btn-secondary" onclick="Nova.archiveWorkflow('${workflow.id}', ${!workflow.archived})">
+            ${workflow.archived ? 'Unarchive' : 'Archive'}
+          </button>
+          <button class="btn-danger" onclick="Nova.deleteWorkflow('${workflow.id}')">Delete</button>
+        </div>
+      `;
+
+      modal.classList.add('active');
+    } catch (err) {
+      console.error('Failed to load workflow:', err);
+      alert('Failed to load workflow details');
+    }
+  },
+
+  closeWorkflowDetail() {
+    document.getElementById('workflowDetailModal').classList.remove('active');
+  },
+
+  toggleArchivedWorkflows() {
+    this.showArchivedWorkflows = !this.showArchivedWorkflows;
+    const btn = document.getElementById('toggleArchivedWorkflowsBtn');
+    if (btn) {
+      btn.textContent = this.showArchivedWorkflows ? '📦 Hide Archived' : '📦 Show Archived';
+    }
+    this.loadWorkflows();
+  },
+
+  showAddWorkflowModal() {
+    this.currentWorkflowId = null;
+    document.getElementById('workflowEditTitle').textContent = 'Create Workflow';
+    document.getElementById('workflowNameInput').value = '';
+    document.getElementById('workflowCategoryInput').value = 'Operations';
+    document.getElementById('workflowDescriptionInput').value = '';
+    document.getElementById('workflowStepsInput').value = '';
+
+    const modal = document.getElementById('workflowEditModal');
+    modal.classList.add('active');
+
+    // Setup event listeners
+    document.getElementById('workflowEditClose').onclick = () => this.closeWorkflowEditModal();
+    document.getElementById('workflowEditCancel').onclick = () => this.closeWorkflowEditModal();
+    document.getElementById('workflowEditSave').onclick = () => this.saveWorkflow();
+  },
+
+  async editWorkflow(workflowId) {
+    try {
+      const workflow = await this.apiGet(`/workflows/${workflowId}`);
+      this.currentWorkflowId = workflowId;
+
+      document.getElementById('workflowEditTitle').textContent = 'Edit Workflow';
+      document.getElementById('workflowNameInput').value = workflow.name || '';
+      document.getElementById('workflowCategoryInput').value = workflow.category || 'Operations';
+      document.getElementById('workflowDescriptionInput').value = workflow.description || '';
+
+      const steps = Array.isArray(workflow.steps) ? workflow.steps.join('\n') : (workflow.steps || '');
+      document.getElementById('workflowStepsInput').value = steps;
+
+      const modal = document.getElementById('workflowEditModal');
+      modal.classList.add('active');
+
+      // Close detail modal if open
+      this.closeWorkflowDetail();
+
+      // Setup event listeners
+      document.getElementById('workflowEditClose').onclick = () => this.closeWorkflowEditModal();
+      document.getElementById('workflowEditCancel').onclick = () => this.closeWorkflowEditModal();
+      document.getElementById('workflowEditSave').onclick = () => this.saveWorkflow();
+    } catch (err) {
+      console.error('Failed to load workflow for editing:', err);
+      alert('Failed to load workflow');
+    }
+  },
+
+  closeWorkflowEditModal() {
+    document.getElementById('workflowEditModal').classList.remove('active');
+  },
+
+  async saveWorkflow() {
+    const name = document.getElementById('workflowNameInput').value.trim();
+    const category = document.getElementById('workflowCategoryInput').value;
+    const description = document.getElementById('workflowDescriptionInput').value.trim();
+    const stepsText = document.getElementById('workflowStepsInput').value.trim();
+
+    if (!name) {
+      alert('Please enter a workflow name');
+      return;
+    }
+
+    const steps = stepsText.split('\n').filter(s => s.trim());
+
+    const workflowData = {
+      name,
+      category,
+      description,
+      steps,
+      active: true,
+      archived: false
+    };
+
+    try {
+      if (this.currentWorkflowId) {
+        await this.apiPut(`/workflows/${this.currentWorkflowId}`, workflowData);
+        this.showNotification('Workflow updated');
+      } else {
+        await this.apiPost('/workflows/', workflowData);
+        this.showNotification('Workflow created');
+      }
+
+      this.closeWorkflowEditModal();
+      this.loadWorkflows();
+    } catch (err) {
+      console.error('Failed to save workflow:', err);
+      alert('Failed to save workflow');
+    }
+  },
+
+  async deleteWorkflow(workflowId) {
+    if (!confirm('Delete this workflow? This cannot be undone.')) return;
+
+    try {
+      await this.apiDelete(`/workflows/${workflowId}`);
+      this.showNotification('Workflow deleted');
+      this.closeWorkflowDetail();
+      this.loadWorkflows();
+    } catch (err) {
+      console.error('Failed to delete workflow:', err);
+      alert('Failed to delete workflow');
+    }
+  },
+
+  async toggleWorkflowStatus(workflowId, active) {
+    try {
+      await this.apiPut(`/workflows/${workflowId}`, { active });
+      this.showNotification(`Workflow marked ${active ? 'active' : 'inactive'}`);
+      this.closeWorkflowDetail();
+      this.loadWorkflows();
+    } catch (err) {
+      console.error('Failed to update workflow status:', err);
+      alert('Failed to update workflow status');
+    }
+  },
+
+  async archiveWorkflow(workflowId, archived) {
+    try {
+      await this.apiPut(`/workflows/${workflowId}`, { archived });
+      this.showNotification(archived ? 'Workflow archived' : 'Workflow unarchived');
+      this.closeWorkflowDetail();
+      this.loadWorkflows();
+    } catch (err) {
+      console.error('Failed to archive workflow:', err);
+      alert('Failed to archive workflow');
+    }
+  },
+
+  showAttachFileDialog(workflowId) {
+    alert('File attachment feature coming soon!\n\nThis will allow you to upload documents, PDFs, and other files to your workflows.');
+  },
+
+  async deleteAttachment(workflowId, attachmentId) {
+    if (!confirm('Delete this attachment?')) return;
+
+    try {
+      await this.apiDelete(`/workflows/${workflowId}/attachments/${attachmentId}`);
+      this.showNotification('Attachment deleted');
+      this.viewWorkflow(workflowId); // Reload the detail view
+    } catch (err) {
+      console.error('Failed to delete attachment:', err);
+      alert('Failed to delete attachment');
+    }
   },
   
   // Habits
