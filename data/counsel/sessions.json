@@ -99,5 +99,29 @@
     "agentResponses": [],
     "synthesis": null,
     "decision": null
+  },
+  {
+    "id": "session-1770449840805",
+    "topic": "trial",
+    "context": "trial\n",
+    "category": "Product Development",
+    "status": "pending",
+    "createdAt": "2026-02-07T07:37:20.805Z",
+    "completedAt": null,
+    "agentResponses": [],
+    "synthesis": null,
+    "decision": null
+  },
+  {
+    "id": "session-1770449841512",
+    "topic": "trial",
+    "context": "trial\n",
+    "category": "Product Development",
+    "status": "pending",
+    "createdAt": "2026-02-07T07:37:21.512Z",
+    "completedAt": null,
+    "agentResponses": [],
+    "synthesis": null,
+    "decision": null
   }
 ]

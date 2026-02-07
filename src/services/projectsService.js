@@ -49,9 +49,21 @@ function updateProgress(id, progress) {
   return project;
 }
 
+function updateProject(id, updates) {
+  const projects = loadProjects();
+  const project = projects.find(p => p.id === id);
+  if (project) {
+    Object.assign(project, updates);
+    project.updatedAt = new Date().toISOString();
+    saveProjects(projects);
+  }
+  return project;
+}
+
 module.exports = {
   getAllProjects,
   getProject,
   createProject,
-  updateProgress
+  updateProgress,
+  updateProject
 };

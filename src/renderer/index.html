@@ -666,8 +666,20 @@
           <h2>Add Backlog Task</h2>
           <div class="backlog-task-body">
             <div class="form-group">
-              <label>Task</label>
-              <input type="text" id="backlogTaskTitleInput" placeholder="Enter task..." class="form-input">
+              <label>Task Title *</label>
+              <input type="text" id="backlogTaskTitleInput" placeholder="Enter task title..." class="form-input">
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea id="backlogTaskDescriptionInput" placeholder="Enter task description (optional)..." class="form-textarea" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Priority</label>
+              <select id="backlogTaskPriorityInput" class="form-select">
+                <option value="high">🔴 High</option>
+                <option value="medium" selected>🟡 Medium</option>
+                <option value="low">🟢 Low</option>
+              </select>
             </div>
             <div class="form-group">
               <label>Project</label>
@@ -677,6 +689,16 @@
           <div class="backlog-task-footer">
             <button class="btn-secondary" id="backlogTaskCancel">Cancel</button>
             <button class="btn-primary" id="backlogTaskSave">Add to Backlog</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TASK DETAIL MODAL -->
+      <div class="task-detail-modal" id="taskDetailModal">
+        <div class="task-detail-content">
+          <button class="task-detail-close">&times;</button>
+          <div id="taskDetailBody">
+            <!-- Dynamic content loaded here -->
           </div>
         </div>
       </div>

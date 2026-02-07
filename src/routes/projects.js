@@ -22,4 +22,9 @@ router.patch('/:id/progress', (req, res) => {
   res.json(project);
 });
 
+router.put('/:id', (req, res) => {
+  const project = projectsService.updateProject(req.params.id, req.body);
+  res.json(project);
+});
+
 module.exports = router;

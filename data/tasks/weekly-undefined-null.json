@@ -1,0 +1,94 @@
+{
+  "week": null,
+  "tasks": [
+    {
+      "id": "task-1770481714571",
+      "title": "test",
+      "day": null,
+      "priority": "high",
+      "category": "personal",
+      "projectId": "10abcb91-9be4-46b0-bfd3-d8303dd143bf",
+      "goalId": null,
+      "completed": false,
+      "createdAt": "2026-02-07",
+      "updatedAt": "2026-02-07",
+      "subtasks": [
+        {
+          "title": "test",
+          "completed": true,
+          "createdAt": "2026-02-07T16:36:44.989Z",
+          "completedAt": "2026-02-07T16:36:52.745Z"
+        }
+      ],
+      "description": ""
+    },
+    {
+      "id": "task-1770481720904",
+      "title": "Test",
+      "day": null,
+      "priority": "low",
+      "category": "personal",
+      "projectId": "10abcb91-9be4-46b0-bfd3-d8303dd143bf",
+      "goalId": null,
+      "completed": false,
+      "createdAt": "2026-02-07",
+      "updatedAt": "2026-02-07",
+      "description": "",
+      "subtasks": [
+        {
+          "title": "test",
+          "completed": false,
+          "createdAt": "2026-02-07T16:43:06.964Z"
+        }
+      ],
+      "week": 6,
+      "year": 2026,
+      "status": "todo"
+    },
+    {
+      "id": "task-1770481782433",
+      "title": "teset",
+      "day": "Monday",
+      "priority": "low",
+      "category": "personal",
+      "projectId": "87c87fd6-3fcf-409f-8707-bba3a4121411",
+      "goalId": null,
+      "completed": false,
+      "createdAt": "2026-02-07",
+      "updatedAt": "2026-02-07",
+      "subtasks": [
+        {
+          "title": "test",
+          "completed": false,
+          "createdAt": "2026-02-07T16:44:04.156Z"
+        }
+      ],
+      "description": "",
+      "week": 6,
+      "year": 2026,
+      "status": "todo"
+    },
+    {
+      "id": "task-1770481785563",
+      "title": "test",
+      "day": "Wednesday",
+      "priority": "high",
+      "category": "personal",
+      "projectId": "87c87fd6-3fcf-409f-8707-bba3a4121411",
+      "goalId": null,
+      "completed": false,
+      "createdAt": "2026-02-07",
+      "updatedAt": "2026-02-07",
+      "subtasks": [
+        {
+          "title": "test",
+          "completed": false,
+          "createdAt": "2026-02-07T16:44:18.164Z"
+        }
+      ],
+      "week": 6,
+      "year": 2026,
+      "status": "todo"
+    }
+  ]
+}

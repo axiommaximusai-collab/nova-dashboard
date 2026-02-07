@@ -61,6 +61,22 @@
       "week": 7,
       "year": 2026,
       "pushedFrom": "2026-6"
+    },
+    {
+      "id": "task-1770445636369",
+      "title": "test",
+      "day": "Monday",
+      "priority": "medium",
+      "category": "business",
+      "projectId": null,
+      "goalId": null,
+      "completed": false,
+      "createdAt": "2026-02-07",
+      "updatedAt": "2026-02-07",
+      "week": 7,
+      "year": 2026,
+      "pushed": true,
+      "pushedFrom": "2026-6"
     }
   ]
 }

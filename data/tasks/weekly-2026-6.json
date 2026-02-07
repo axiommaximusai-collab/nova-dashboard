@@ -5,14 +5,14 @@
     {
       "id": "task-001",
       "title": "Review Nova Dashboard",
-      "day": "Thursday",
+      "day": "Wednesday",
       "priority": "high",
       "category": "business",
       "projectId": "proj-001",
       "goalId": "goal-001",
       "completed": true,
       "createdAt": "2026-02-05",
-      "updatedAt": "2026-02-06"
+      "updatedAt": "2026-02-07"
     },
     {
       "id": "task-002",
@@ -27,6 +27,22 @@
       "updatedAt": "2026-02-04",
       "archived": true,
       "archivedAt": "2026-02-07"
+    },
+    {
+      "id": "task-1770483248443",
+      "title": "test test",
+      "description": "",
+      "day": null,
+      "priority": "low",
+      "category": "personal",
+      "projectId": "e8108d46-6c9a-47bf-a795-be10fb928c6b",
+      "goalId": null,
+      "status": "backlog",
+      "year": 2026,
+      "week": 6,
+      "completed": false,
+      "createdAt": "2026-02-07",
+      "updatedAt": "2026-02-07"
     }
   ]
 }

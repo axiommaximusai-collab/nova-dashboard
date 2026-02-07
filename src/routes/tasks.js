@@ -40,7 +40,31 @@ async function writeTasks(year, week, data) {
 // GET /api/tasks?week=2026-6&priority=high&category=business
 router.get('/', async (req, res) => {
   try {
-    const { week, priority, category } = req.query;
+    const { week, priority, category, all } = req.query;
+
+    // If 'all' is specified, return tasks from all weeks
+    if (all === 'true') {
+      const tasksDir = path.join(__dirname, '../../data/tasks');
+      const allTasks = [];
+      
+      try {
+        const files = await fs.readdir(tasksDir);
+        for (const file of files) {
+          if (file.startsWith('weekly-') && file.endsWith('.json')) {
+            const filePath = path.join(tasksDir, file);
+            const data = await fs.readFile(filePath, 'utf8');
+            const weekData = JSON.parse(data);
+            if (weekData.tasks) {
+              allTasks.push(...weekData.tasks);
+            }
+          }
+        }
+      } catch (err) {
+        // Directory might not exist yet
+      }
+      
+      return res.json({ tasks: allTasks });
+    }
 
     if (!week) {
       return res.status(400).json({ error: 'Week parameter required (format: YYYY-W)' });
@@ -74,11 +98,15 @@ router.post('/', async (req, res) => {
     const newTask = {
       id: `task-${Date.now()}`,
       title: req.body.title,
+      description: req.body.description || '',
       day: req.body.day,
       priority: req.body.priority || 'medium',
       category: req.body.category || 'personal',
       projectId: req.body.projectId || null,
       goalId: req.body.goalId || null,
+      status: req.body.status || 'todo',
+      year: req.body.year || new Date().getFullYear(),
+      week: req.body.week || null,
       completed: false,
       createdAt: new Date().toISOString().split('T')[0],
       updatedAt: new Date().toISOString().split('T')[0]
@@ -93,27 +121,40 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT /api/tasks/:id - Update task
+// PUT /api/tasks/:id - Update task (searches all week files)
 router.put('/:id', async (req, res) => {
   try {
-    const { year, week } = req.body;
-    const data = await readTasks(year, week);
-    const taskIndex = data.tasks.findIndex(t => t.id === req.params.id);
-
-    if (taskIndex === -1) {
-      return res.status(404).json({ error: 'Task not found' });
+    const taskId = req.params.id;
+    const tasksDir = path.join(__dirname, '../../data/tasks');
+    
+    // Search all week files for the task
+    const files = await fs.readdir(tasksDir);
+    
+    for (const file of files) {
+      if (file.startsWith('weekly-') && file.endsWith('.json')) {
+        const filePath = path.join(tasksDir, file);
+        const fileData = await fs.readFile(filePath, 'utf8');
+        const weekData = JSON.parse(fileData);
+        
+        const taskIndex = weekData.tasks.findIndex(t => t.id === taskId);
+        if (taskIndex !== -1) {
+          // Found the task - update it
+          const task = weekData.tasks[taskIndex];
+          Object.assign(task, {
+            ...req.body,
+            id: task.id,
+            createdAt: task.createdAt,
+            updatedAt: new Date().toISOString().split('T')[0]
+          });
+          
+          await fs.writeFile(filePath, JSON.stringify(weekData, null, 2), 'utf8');
+          return res.json(task);
+        }
+      }
     }
-
-    const task = data.tasks[taskIndex];
-    Object.assign(task, {
-      ...req.body,
-      id: task.id,
-      createdAt: task.createdAt,
-      updatedAt: new Date().toISOString().split('T')[0]
-    });
-
-    await writeTasks(year, week, data);
-    res.json(task);
+    
+    // Task not found in any week file
+    return res.status(404).json({ error: 'Task not found' });
   } catch (error) {
     console.error('Error updating task:', error);
     res.status(500).json({ error: 'Failed to update task' });

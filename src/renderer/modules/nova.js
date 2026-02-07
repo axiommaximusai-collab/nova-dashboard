@@ -163,6 +163,7 @@ const Nova = {
     document.querySelector('.backlog-task-close')?.addEventListener('click', () => this.closeBacklogTaskModal());
     document.getElementById('backlogTaskCancel')?.addEventListener('click', () => this.closeBacklogTaskModal());
     document.getElementById('backlogTaskSave')?.addEventListener('click', () => this.saveBacklogTask());
+    document.querySelector('.task-detail-close')?.addEventListener('click', () => this.closeTaskDetail());
 
     document.querySelectorAll('.add-project-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -1829,10 +1830,19 @@ const Nova = {
       this.currentProjectId = projectId;
 
       // Get backlog tasks for this project
-      const tasksData = await this.apiGet('/tasks/');
-      const allTasks = tasksData.tasks || tasksData;
-      const backlogTasks = allTasks.filter(t => t.projectId === projectId && !t.week && !t.day);
-      const activeTasks = allTasks.filter(t => t.projectId === projectId && t.week && !t.completed);
+      let allTasks = [];
+      try {
+        const tasksData = await this.apiGet('/tasks/?all=true');
+        allTasks = tasksData.tasks || [];
+      } catch (err) {
+        console.log('Could not fetch tasks:', err);
+        allTasks = [];
+      }
+      // Backlog = status is 'backlog' OR has no week assigned
+      const backlogTasks = allTasks.filter(t => t.projectId === projectId && (t.status === 'backlog' || !t.week));
+      // Active = has week assigned, not completed, not backlog
+      const activeTasks = allTasks.filter(t => t.projectId === projectId && t.week && !t.completed && t.status !== 'backlog');
+      // Completed = completed flag is true
       const completedTasks = allTasks.filter(t => t.projectId === projectId && t.completed);
 
       const modal = document.getElementById('projectDetailModal');
@@ -1871,9 +1881,9 @@ const Nova = {
           ${backlogTasks.length > 0 ? `
             <div class="backlog-tasks-list">
               ${backlogTasks.map(task => `
-                <div class="backlog-task-item">
+                <div class="backlog-task-item" onclick="Nova.viewTaskDetail('${task.id}')">
                   <div class="backlog-task-title">${task.title}</div>
-                  <button class="btn-sm btn-secondary" onclick="Nova.scheduleTaskToWeek('${task.id}')">Add to Week</button>
+                  <button class="btn-sm btn-secondary" onclick="event.stopPropagation(); Nova.scheduleTaskToWeek('${task.id}')">Add to Week</button>
                 </div>
               `).join('')}
             </div>
@@ -1921,6 +1931,172 @@ const Nova = {
   closeProjectDetail() {
     document.getElementById('projectDetailModal').classList.remove('active');
     this.currentProjectId = null;
+  },
+
+  async viewTaskDetail(taskId) {
+    try {
+      // Fetch task from all weeks
+      const tasksData = await this.apiGet('/tasks/?all=true');
+      const allTasks = tasksData.tasks || [];
+      const task = allTasks.find(t => t.id === taskId);
+      
+      if (!task) {
+        alert('Task not found');
+        return;
+      }
+      
+      this.currentTaskId = taskId;
+      this.currentTask = task;
+      
+      const modal = document.getElementById('taskDetailModal');
+      const body = document.getElementById('taskDetailBody');
+      
+      // Get subtasks/checklist
+      const subtasks = task.subtasks || [];
+      const completedSubtasks = subtasks.filter(s => s.completed).length;
+      
+      body.innerHTML = `
+        <div class="task-detail-header">
+          <h2>${task.title}</h2>
+          <div class="task-detail-meta">
+            <span class="task-status-badge ${task.completed ? 'completed' : 'active'}">${task.completed ? '✅ Completed' : '⏳ Active'}</span>
+            ${task.priority ? `<span class="task-priority-badge ${task.priority}">${task.priority}</span>` : ''}
+            ${task.category ? `<span class="task-category-badge">${task.category}</span>` : ''}
+          </div>
+        </div>
+        
+        <div class="task-detail-section">
+          <div class="section-header">
+            <h4>Description</h4>
+            <button class="btn-sm btn-secondary" onclick="Nova.editTaskDescription()">Edit</button>
+          </div>
+          <div id="taskDescriptionDisplay">
+            ${task.description ? `<p class="task-description">${task.description}</p>` : '<p class="empty-state">No description. Click Edit to add one.</p>'}
+          </div>
+          <div id="taskDescriptionEdit" style="display: none;">
+            <textarea id="taskDescriptionInput" class="form-textarea" rows="4" placeholder="Enter task description...">${task.description || ''}</textarea>
+            <div style="margin-top: 12px; display: flex; gap: 8px;">
+              <button class="btn-sm btn-primary" onclick="Nova.saveTaskDescription()">Save</button>
+              <button class="btn-sm btn-secondary" onclick="Nova.cancelEditDescription()">Cancel</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="task-detail-section">
+          <h4>Priority</h4>
+          <div class="priority-selector">
+            <button class="priority-btn ${task.priority === 'high' ? 'active' : ''}" onclick="Nova.setTaskPriority('high')">High</button>
+            <button class="priority-btn ${task.priority === 'medium' || !task.priority ? 'active' : ''}" onclick="Nova.setTaskPriority('medium')">Medium</button>
+            <button class="priority-btn ${task.priority === 'low' ? 'active' : ''}" onclick="Nova.setTaskPriority('low')">Low</button>
+          </div>
+        </div>
+        
+        <div class="task-detail-section">
+          <div class="section-header">
+            <h4>✓ Checklist (${completedSubtasks}/${subtasks.length})</h4>
+            <button class="btn-sm btn-primary" onclick="Nova.addSubtaskPrompt()">+ Add Item</button>
+          </div>
+          ${subtasks.length > 0 ? `
+            <div class="subtask-list">
+              ${subtasks.map((subtask, index) => `
+                <div class="subtask-item ${subtask.completed ? 'completed' : ''}">
+                  <input type="checkbox" 
+                    ${subtask.completed ? 'checked' : ''} 
+                    onchange="Nova.toggleSubtask(${index})"
+                    class="subtask-checkbox">
+                  <span class="subtask-title">${subtask.title}</span>
+                  <button class="btn-icon btn-sm" onclick="Nova.deleteSubtask(${index})" title="Delete">🗑️</button>
+                </div>
+              `).join('')}
+            </div>
+          ` : '<p class="empty-state">No checklist items yet. Add one above.</p>'}
+        </div>
+        
+        <div class="task-detail-actions">
+          <button class="btn-secondary" onclick="Nova.editTask('${taskId}')">Edit Task</button>
+          <button class="btn-danger" onclick="Nova.deleteTask('${taskId}')">Delete Task</button>
+        </div>
+      `;
+      
+      modal.classList.add('active');
+    } catch (err) {
+      console.error('Failed to load task detail:', err);
+      alert('Failed to load task details');
+    }
+  },
+  
+  closeTaskDetail() {
+    document.getElementById('taskDetailModal').classList.remove('active');
+    this.currentTaskId = null;
+    this.currentTask = null;
+  },
+  
+  editTaskDescription() {
+    document.getElementById('taskDescriptionDisplay').style.display = 'none';
+    document.getElementById('taskDescriptionEdit').style.display = 'block';
+  },
+  
+  cancelEditDescription() {
+    document.getElementById('taskDescriptionDisplay').style.display = 'block';
+    document.getElementById('taskDescriptionEdit').style.display = 'none';
+  },
+  
+  async saveTaskDescription() {
+    const description = document.getElementById('taskDescriptionInput').value.trim();
+    await this.updateTask(this.currentTaskId, { description });
+    this.currentTask.description = description;
+    this.cancelEditDescription();
+    this.viewTaskDetail(this.currentTaskId);
+  },
+  
+  async setTaskPriority(priority) {
+    await this.updateTask(this.currentTaskId, { priority });
+    this.currentTask.priority = priority;
+    this.viewTaskDetail(this.currentTaskId);
+  },
+  
+  async addSubtaskPrompt() {
+    const title = prompt('Enter checklist item:');
+    if (!title || !this.currentTask) return;
+    
+    const subtasks = this.currentTask.subtasks || [];
+    subtasks.push({
+      title,
+      completed: false,
+      createdAt: new Date().toISOString()
+    });
+    
+    // Update task with new subtask
+    await this.updateTask(this.currentTaskId, { subtasks });
+    this.viewTaskDetail(this.currentTaskId); // Refresh view
+  },
+  
+  async toggleSubtask(index) {
+    if (!this.currentTask) return;
+    
+    const subtasks = this.currentTask.subtasks || [];
+    if (subtasks[index]) {
+      subtasks[index].completed = !subtasks[index].completed;
+      subtasks[index].completedAt = subtasks[index].completed ? new Date().toISOString() : null;
+      
+      await this.updateTask(this.currentTaskId, { subtasks });
+      this.viewTaskDetail(this.currentTaskId); // Refresh view
+    }
+  },
+  
+  async deleteSubtask(index) {
+    if (!this.currentTask || !confirm('Delete this checklist item?')) return;
+    
+    const subtasks = this.currentTask.subtasks || [];
+    subtasks.splice(index, 1);
+    
+    await this.updateTask(this.currentTaskId, { subtasks });
+    this.viewTaskDetail(this.currentTaskId); // Refresh view
+  },
+  
+  async updateTask(taskId, updates) {
+    // Server now searches all week files automatically
+    await this.apiPut(`/tasks/${taskId}`, updates);
   },
 
   async editProject(projectId) {
@@ -2033,6 +2209,10 @@ const Nova = {
 
   async saveBacklogTask() {
     const title = document.getElementById('backlogTaskTitleInput').value.trim();
+    const descriptionInput = document.getElementById('backlogTaskDescriptionInput');
+    const description = descriptionInput ? descriptionInput.value.trim() : '';
+    const priorityInput = document.getElementById('backlogTaskPriorityInput');
+    const priority = priorityInput ? priorityInput.value : 'medium';
 
     if (!title) {
       alert('Please enter a task title');
@@ -2045,49 +2225,91 @@ const Nova = {
     }
 
     try {
+      // Get current week for storage (even though it's backlog)
+      const now = new Date();
+      const year = now.getFullYear();
+      const week = this.getWeekNumber(now);
+      
       const taskData = {
         title,
+        description,
+        priority,
         projectId: this.currentProjectId,
         status: 'backlog',
-        week: null,
+        week: week,
         day: null,
         completed: false,
+        year,
         createdAt: new Date().toISOString()
       };
+      
+      console.log('Creating backlog task:', taskData);
 
       await this.apiPost('/tasks/', taskData);
       this.showNotification('Task added to backlog');
       this.closeBacklogTaskModal();
-      this.viewProjectDetail(this.currentProjectId); // Reload project detail
-      this.loadProjects(); // Reload to update backlog count
+      this.viewProjectDetail(this.currentProjectId);
+      this.loadProjects();
     } catch (err) {
       console.error('Failed to create backlog task:', err);
-      alert('Failed to create task');
+      alert('Failed to create task: ' + err.message);
     }
+  },
+  
+  getWeekNumber(date) {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
   },
 
   async scheduleTaskToWeek(taskId) {
+    // Show day selector instead of immediately scheduling
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const dayHtml = days.map((day, i) => `
+      <button class="day-select-btn" onclick="Nova.scheduleTaskToDay('${taskId}', '${day}')">${day}</button>
+    `).join('');
+    
+    // Create a simple modal for day selection
+    const modal = document.createElement('div');
+    modal.className = 'day-select-modal';
+    modal.innerHTML = `
+      <div class="day-select-content">
+        <h3>Schedule to which day?</h3>
+        <div class="day-select-grid">
+          ${dayHtml}
+        </div>
+        <button class="btn-secondary" onclick="this.closest('.day-select-modal').remove()">Cancel</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  },
+  
+  async scheduleTaskToDay(taskId, day) {
     try {
+      // Remove the day selector modal
+      document.querySelector('.day-select-modal')?.remove();
+      
       // Get current week number
       const now = new Date();
-      const startOfYear = new Date(now.getFullYear(), 0, 1);
-      const weekNum = Math.ceil((((now - startOfYear) / 86400000) + startOfYear.getDay() + 1) / 7);
-      const currentWeek = `${now.getFullYear()}-${weekNum}`;
+      const year = now.getFullYear();
+      const week = this.getWeekNumber(now);
 
-      // Update task with week but no day yet (unscheduled in weekly view)
+      // Update task with week, day, and change status from backlog to todo
       await this.apiPut(`/tasks/${taskId}`, {
-        week: currentWeek,
-        day: null,
+        week: week,
+        year: year,
+        day: day,
         status: 'todo'
       });
 
-      this.showNotification('Task added to this week');
+      this.showNotification(`Task scheduled for ${day}`);
       this.viewProjectDetail(this.currentProjectId);
       this.loadTasks(); // Reload tasks tab
-      this.loadProjects(); // Update project
     } catch (err) {
       console.error('Failed to schedule task:', err);
-      alert('Failed to schedule task');
+      alert('Failed to schedule task: ' + err.message);
     }
   },
 
