@@ -3,6 +3,8 @@ const Nova = {
   currentTab: 'dashboard',
   currentGoalView: 'daily',
   taskFilter: 'all',
+  showPushedColumn: false,
+  showArchivedColumn: false,
   
   init() {
     this.setupNavigation();
@@ -63,6 +65,8 @@ const Nova = {
     document.getElementById('quickAddMemory').addEventListener('click', () => this.showAddMemoryModal());
     document.getElementById('newWorkflowBtn').addEventListener('click', () => this.showAddWorkflowModal());
     document.getElementById('rolloverBtn').addEventListener('click', () => this.rolloverTasks());
+    document.getElementById('togglePushedBtn').addEventListener('click', () => this.togglePushedColumn());
+    document.getElementById('toggleArchivedBtn').addEventListener('click', () => this.toggleArchivedColumn());
     document.getElementById('newContactBtn').addEventListener('click', () => this.showAddContactModal());
     document.getElementById('newCounselBtn').addEventListener('click', () => this.showAddCounselModal());
     document.getElementById('addBookBtn').addEventListener('click', () => this.showAddBookModal());
@@ -218,19 +222,19 @@ const Nova = {
     const month = String(new Date().getMonth() + 1).padStart(2, '0');
     const week = this.getWeekNumber(new Date());
     const today = new Date().toISOString().split('T')[0];
-    
+
     const goals = [];
     document.querySelectorAll('.goal-input-row').forEach(row => {
       const text = row.querySelector('input').value.trim();
       if (text) goals.push({ text, completed: false });
     });
-    
+
     const data = {
       theme: document.getElementById('goalTheme').value,
       notes: document.getElementById('goalNotes').value,
       goals
     };
-    
+
     if (this.currentGoalView === 'daily') {
       await this.apiPost(`/goals/daily/${today}`, { ...data, date: today });
     } else if (this.currentGoalView === 'weekly') {
@@ -238,40 +242,190 @@ const Nova = {
     } else {
       await this.apiPost(`/goals/monthly/${year}/${month}`, { ...data, year, month });
     }
-    
+
     this.showNotification('Goals saved!');
     this.loadDashboard();
   },
+
+  async deleteGoal(goalId) {
+    if (!confirm('Delete this goal? This cannot be undone.')) return;
+    try {
+      await fetch(`/api/goals/${goalId}`, { method: 'DELETE' });
+      this.loadGoals();
+      this.loadDashboard();
+    } catch (error) {
+      console.error('Failed to delete goal:', error);
+      alert('Failed to delete goal');
+    }
+  },
+
+  async completeGoal(goalId) {
+    if (!confirm('Mark this goal as complete?')) return;
+    try {
+      await this.apiPost(`/goals/${goalId}/complete`, {});
+      this.loadGoals();
+      this.loadDashboard();
+    } catch (error) {
+      console.error('Failed to complete goal:', error);
+      alert('Failed to complete goal');
+    }
+  },
   
   // Tasks
+  getPriorityColor(priority) {
+    const colors = {
+      'high': '#dc2626',
+      'medium': '#f59e0b',
+      'low': '#10b981'
+    };
+    return colors[priority] || colors.medium;
+  },
+
   async loadTasks() {
     const year = new Date().getFullYear();
     const week = this.getWeekNumber(new Date());
     const data = await this.apiGet(`/tasks/${year}/${week}`);
-    
+
     let tasks = data.tasks || [];
     if (this.taskFilter === 'pending') tasks = tasks.filter(t => !t.completed);
     if (this.taskFilter === 'completed') tasks = tasks.filter(t => t.completed);
-    
-    document.getElementById('tasksList').innerHTML = tasks.length
+
+    // Priority legend HTML
+    const priorityLegend = `
+      <div class="priority-legend" style="display: flex; align-items: center; gap: 20px; margin-bottom: 16px; padding: 12px; background: var(--bg-secondary); border-radius: 8px;">
+        <span style="font-weight: 500; color: var(--text-secondary);">Priority:</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="display: inline-block; width: 24px; height: 3px; background: ${this.getPriorityColor('high')};"></span>
+          <span style="font-size: 14px;">High</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="display: inline-block; width: 24px; height: 3px; background: ${this.getPriorityColor('medium')};"></span>
+          <span style="font-size: 14px;">Medium</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="display: inline-block; width: 24px; height: 3px; background: ${this.getPriorityColor('low')};"></span>
+          <span style="font-size: 14px;">Low</span>
+        </div>
+      </div>
+    `;
+
+    // Regular tasks HTML
+    const tasksHtml = tasks.length
       ? tasks.map(t => `
-        <div class="task-item" data-id="${t.id}">
-          <div class="task-priority ${t.priority || 'medium'}"></div>
+        <div class="task-item" data-id="${t.id}" style="border-left: 4px solid ${this.getPriorityColor(t.priority || 'medium')}; position: relative;">
           <div class="task-content">
             <div class="task-title ${t.completed ? 'completed' : ''}">${t.title}</div>
             <div class="task-meta">${t.project || 'No project'} • ${t.dueDate || 'No due date'}</div>
           </div>
-          <span class="task-project">${t.project || 'General'}</span>
-          <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="Nova.completeTask('${t.id}')">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="Nova.toggleTaskComplete('${t.id}')">
+            ${!t.completed ? `
+              <button class="btn-icon" title="Push to next week" onclick="event.stopPropagation(); Nova.pushTask('${t.id}')" style="padding: 4px 8px; font-size: 16px;">⏭️</button>
+              <button class="btn-icon" title="Archive task" onclick="event.stopPropagation(); Nova.archiveTask('${t.id}')" style="padding: 4px 8px; font-size: 16px;">📦</button>
+            ` : ''}
+            <button class="btn-icon btn-danger" title="Delete task" onclick="event.stopPropagation(); Nova.deleteTask('${t.id}')" style="padding: 4px 8px; font-size: 16px;">🗑️</button>
+          </div>
         </div>
       `).join('')
       : '<p style="color: var(--text-muted); padding: 20px;">No tasks for this view</p>';
+
+    document.getElementById('tasksList').innerHTML = priorityLegend + tasksHtml;
   },
   
-  async completeTask(taskId) {
+  async toggleTaskComplete(taskId) {
     await fetch(`/api/tasks/${taskId}/complete`, { method: 'PATCH' });
     this.loadTasks();
     this.loadDashboard();
+  },
+
+  async deleteTask(taskId) {
+    if (!confirm('Delete this task? This cannot be undone.')) return;
+    try {
+      await fetch(`/api/tasks/${taskId}`, { method: 'DELETE' });
+      this.loadTasks();
+      this.loadDashboard();
+    } catch (error) {
+      console.error('Failed to delete task:', error);
+      alert('Failed to delete task');
+    }
+  },
+
+  async pushTask(taskId) {
+    if (!confirm('Push this task to next week?')) return;
+    try {
+      const year = new Date().getFullYear();
+      const week = this.getWeekNumber(new Date());
+      const nextWeek = week < 52 ? week + 1 : 1;
+      const nextYear = week < 52 ? year : year + 1;
+
+      await this.apiPost(`/tasks/${taskId}/push`, {
+        toWeek: { year: nextYear, week: nextWeek }
+      });
+      this.loadTasks();
+      this.loadDashboard();
+    } catch (error) {
+      console.error('Failed to push task:', error);
+      alert('Failed to push task to next week');
+    }
+  },
+
+  async archiveTask(taskId) {
+    if (!confirm('Archive this task?')) return;
+    try {
+      await this.apiPost(`/tasks/${taskId}/archive`, {});
+      this.loadTasks();
+      this.loadDashboard();
+    } catch (error) {
+      console.error('Failed to archive task:', error);
+      alert('Failed to archive task');
+    }
+  },
+
+  async bringBackTask(taskId) {
+    if (!confirm('Bring this task back to the current week?')) return;
+    try {
+      const year = new Date().getFullYear();
+      const week = this.getWeekNumber(new Date());
+
+      await this.apiPost(`/tasks/${taskId}/bringback`, {
+        toWeek: { year, week }
+      });
+      this.loadTasks();
+      this.loadDashboard();
+    } catch (error) {
+      console.error('Failed to bring back task:', error);
+      alert('Failed to bring back task');
+    }
+  },
+
+  async restoreTask(taskId) {
+    if (!confirm('Restore this task from archive?')) return;
+    try {
+      await this.apiPost(`/tasks/${taskId}/restore`, {});
+      this.loadTasks();
+      this.loadDashboard();
+    } catch (error) {
+      console.error('Failed to restore task:', error);
+      alert('Failed to restore task');
+    }
+  },
+
+  togglePushedColumn() {
+    this.showPushedColumn = !this.showPushedColumn;
+    const btn = document.getElementById('togglePushedBtn');
+    if (btn) {
+      btn.classList.toggle('active', this.showPushedColumn);
+    }
+    this.loadTasks();
+  },
+
+  toggleArchivedColumn() {
+    this.showArchivedColumn = !this.showArchivedColumn;
+    const btn = document.getElementById('toggleArchivedBtn');
+    if (btn) {
+      btn.classList.toggle('active', this.showArchivedColumn);
+    }
+    this.loadTasks();
   },
   
   async rolloverTasks() {
