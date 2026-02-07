@@ -69,12 +69,13 @@ body {
 }
 
 .logo-text {
-  font-size: 22px;
-  font-weight: 600;
-  letter-spacing: 4px;
-  color: #64748b;
+  font-size: 28px;
+  font-weight: 300;
+  letter-spacing: 8px;
+  color: #1a1a1a;
   font-family: 'Helvetica Neue', 'Arial', sans-serif;
   text-transform: uppercase;
+  margin-left: 0;
 }
 
 .main-nav {
