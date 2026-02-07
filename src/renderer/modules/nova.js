@@ -393,12 +393,11 @@ const Nova = {
   },
 
   createGoalCard(goal) {
-    const priorityEmoji = goal.priority === 'high' ? '🔴' : goal.priority === 'medium' ? '🟡' : '🟢';
     const dueDateText = goal.dueDate ? `Due: ${new Date(goal.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : 'No due date';
+    const priorityColor = this.getPriorityColor(goal.priority);
 
     return `
-      <div class="goal-card" data-id="${goal.id}" draggable="true" onclick="Nova.openGoalDetail('${goal.id}')">
-        <div class="priority-badge ${goal.priority}">${priorityEmoji} ${goal.priority.toUpperCase()}</div>
+      <div class="goal-card" data-id="${goal.id}" draggable="true" onclick="Nova.openGoalDetail('${goal.id}')" style="border-left: 4px solid ${priorityColor}">
         <div class="goal-title">${goal.title}</div>
         <div class="goal-progress">
           <div class="goal-progress-bar">
@@ -433,7 +432,7 @@ const Nova = {
 
       body.innerHTML = `
         <div class="goal-detail-section">
-          <div class="priority-badge ${goal.priority}">${goal.priority === 'high' ? '🔴' : goal.priority === 'medium' ? '🟡' : '🟢'} ${goal.priority.toUpperCase()} PRIORITY</div>
+          <div class="priority-badge ${goal.priority}">${goal.priority.toUpperCase()} PRIORITY</div>
           <h1 class="goal-detail-title">${goal.title}</h1>
         </div>
 
@@ -1208,13 +1207,141 @@ const Nova = {
   },
 
   async viewPushedTasks() {
-    alert('View Pushed Tasks - Feature coming soon!');
-    // TODO: Implement modal showing pushed tasks
+    try {
+      const tasks = await this.apiGet('/tasks/pushed');
+
+      if (!tasks || tasks.length === 0) {
+        alert('No pushed tasks found');
+        return;
+      }
+
+      const modal = document.createElement('div');
+      modal.className = 'task-modal active';
+      modal.innerHTML = `
+        <div class="task-modal-content">
+          <button class="task-modal-close" onclick="this.closest('.task-modal').remove()">&times;</button>
+          <h2>⏭️ Pushed Tasks</h2>
+          <div class="task-modal-body">
+            <p style="color: var(--text-secondary); margin-bottom: 16px;">Tasks pushed to future weeks</p>
+            ${tasks.map(task => {
+              const priorityColor = this.getPriorityColor(task.priority);
+              return `
+                <div class="pushed-task-item" style="border-left: 4px solid ${priorityColor}; padding: 12px; background: var(--card-bg); margin-bottom: 8px; border-radius: 6px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                      <div style="font-weight: 500;">${task.title}</div>
+                      <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+                        Target: Week ${task.targetWeek} ${task.targetYear || ''}
+                      </div>
+                    </div>
+                    <button class="btn-primary btn-sm" onclick="Nova.bringBackTask('${task.id}')">
+                      Bring Back
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+          <div class="task-modal-footer">
+            <button class="btn-secondary" onclick="this.closest('.task-modal').remove()">Close</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    } catch (err) {
+      console.error('Failed to load pushed tasks:', err);
+      alert('Failed to load pushed tasks');
+    }
   },
 
   async viewArchivedTasks() {
-    alert('View Archived Tasks - Feature coming soon!');
-    // TODO: Implement modal showing archived tasks
+    try {
+      const tasks = await this.apiGet('/tasks/archived');
+
+      if (!tasks || tasks.length === 0) {
+        alert('No archived tasks found');
+        return;
+      }
+
+      const modal = document.createElement('div');
+      modal.className = 'task-modal active';
+      modal.innerHTML = `
+        <div class="task-modal-content">
+          <button class="task-modal-close" onclick="this.closest('.task-modal').remove()">&times;</button>
+          <h2>📦 Archived Tasks</h2>
+          <div class="task-modal-body">
+            <p style="color: var(--text-secondary); margin-bottom: 16px;">Completed or archived tasks</p>
+            ${tasks.map(task => {
+              const priorityColor = this.getPriorityColor(task.priority);
+              return `
+                <div class="archived-task-item" style="border-left: 4px solid ${priorityColor}; padding: 12px; background: var(--card-bg); margin-bottom: 8px; border-radius: 6px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                      <div style="font-weight: 500; ${task.completed ? 'text-decoration: line-through; opacity: 0.7;' : ''}">${task.title}</div>
+                      <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+                        Archived: ${task.archivedAt ? new Date(task.archivedAt).toLocaleDateString() : 'Recently'}
+                      </div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                      <button class="btn-secondary btn-sm" onclick="Nova.restoreTask('${task.id}')">
+                        Restore
+                      </button>
+                      <button class="btn-danger btn-sm" onclick="Nova.deleteTask('${task.id}')">
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+          <div class="task-modal-footer">
+            <button class="btn-secondary" onclick="this.closest('.task-modal').remove()">Close</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    } catch (err) {
+      console.error('Failed to load archived tasks:', err);
+      alert('Failed to load archived tasks');
+    }
+  },
+
+  async bringBackTask(taskId) {
+    if (!confirm('Bring this task back to the current week?')) return;
+
+    try {
+      await this.apiPut(`/tasks/${taskId}/bringback`, {
+        year: this.currentTaskYear,
+        week: this.currentTaskWeek
+      });
+      this.loadTasks();
+      this.showNotification('Task brought back to current week');
+      // Close the modal
+      document.querySelector('.task-modal')?.remove();
+    } catch (err) {
+      console.error('Failed to bring back task:', err);
+      alert('Failed to bring back task');
+    }
+  },
+
+  async restoreTask(taskId) {
+    if (!confirm('Restore this task from archive?')) return;
+
+    try {
+      await this.apiPut(`/tasks/${taskId}/restore`, {
+        year: this.currentTaskYear,
+        week: this.currentTaskWeek
+      });
+      this.loadTasks();
+      this.showNotification('Task restored');
+      // Refresh the archived tasks view
+      document.querySelector('.task-modal')?.remove();
+      this.viewArchivedTasks();
+    } catch (err) {
+      console.error('Failed to restore task:', err);
+      alert('Failed to restore task');
+    }
   },
 
   // Projects
