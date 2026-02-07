@@ -39,10 +39,10 @@ body {
 
 /* Header */
 .app-header {
-  background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border);
-  padding: 0 24px;
-  height: 64px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e5e5;
+  padding: 0 40px;
+  height: 70px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -80,30 +80,32 @@ body {
 
 .main-nav {
   display: flex;
-  gap: 8px;
+  gap: 32px;
 }
 
 .nav-btn {
-  background: var(--card-bg);
+  background: transparent;
   border: none;
-  color: var(--text-secondary);
-  padding: 8px 16px;
-  border-radius: 6px;
+  color: #999999;
+  padding: 8px 0;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-transform: uppercase;
   transition: all 0.3s ease;
   position: relative;
+  font-family: 'Helvetica Neue', 'Arial', sans-serif;
 }
 
 .nav-btn:hover {
-  color: var(--primary);
-  text-shadow: none;
+  color: #1a1a1a;
 }
 
 .nav-btn.active {
-  background: var(--bg);
-  color: var(--accent);
-  border-bottom: 2px solid var(--accent);
+  background: transparent;
+  color: #1a1a1a;
+  border-bottom: 1px solid #1a1a1a;
 }
 
 .header-actions {
