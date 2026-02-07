@@ -39,10 +39,10 @@ body {
 
 /* Header */
 .app-header {
-  background: #ffffff;
-  border-bottom: 1px solid #e5e5e5;
-  padding: 0 40px;
-  height: 70px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -69,43 +69,40 @@ body {
 }
 
 .logo-text {
-  font-size: 28px;
-  font-weight: 300;
-  letter-spacing: 8px;
-  color: #1a1a1a;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: #ffffff;
   font-family: 'Helvetica Neue', 'Arial', sans-serif;
   text-transform: uppercase;
-  margin-left: 0;
 }
 
 .main-nav {
   display: flex;
-  gap: 32px;
+  gap: 8px;
 }
 
 .nav-btn {
-  background: transparent;
+  background: var(--card-bg);
   border: none;
-  color: #999999;
-  padding: 8px 0;
+  color: var(--text-secondary);
+  padding: 8px 16px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 13px;
-  font-weight: 400;
-  letter-spacing: 2px;
-  text-transform: uppercase;
+  font-size: 14px;
   transition: all 0.3s ease;
   position: relative;
-  font-family: 'Helvetica Neue', 'Arial', sans-serif;
 }
 
 .nav-btn:hover {
-  color: #1a1a1a;
+  color: var(--primary);
+  text-shadow: none;
 }
 
 .nav-btn.active {
-  background: transparent;
-  color: #1a1a1a;
-  border-bottom: 1px solid #1a1a1a;
+  background: var(--bg);
+  color: var(--accent);
+  border-bottom: 2px solid var(--accent);
 }
 
 .header-actions {
@@ -162,18 +159,12 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 32px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #e5e5e5;
+  margin-bottom: 24px;
 }
 
 .tab-header h2 {
-  font-size: 24px;
-  font-weight: 300;
-  letter-spacing: 2px;
-  color: #1a1a1a;
-  text-transform: uppercase;
-  font-family: 'Helvetica Neue', 'Arial', sans-serif;
+  font-size: 28px;
+  font-weight: 600;
 }
 
 /* Buttons */
