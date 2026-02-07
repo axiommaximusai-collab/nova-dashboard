@@ -1828,9 +1828,16 @@ const Nova = {
       const project = await this.apiGet(`/projects/${projectId}`);
       this.currentProjectId = projectId;
 
-      // Get backlog tasks for this project
-      const tasksData = await this.apiGet('/tasks/');
-      const allTasks = tasksData.tasks || tasksData;
+      // Get all tasks for this project (using ?all=true to fetch from all weeks)
+      let allTasks = [];
+      try {
+        const tasksData = await this.apiGet('/tasks/?all=true');
+        allTasks = tasksData.tasks || tasksData || [];
+      } catch (err) {
+        console.error('Failed to fetch tasks:', err);
+        allTasks = [];
+      }
+
       const backlogTasks = allTasks.filter(t => t.projectId === projectId && !t.week && !t.day);
       const activeTasks = allTasks.filter(t => t.projectId === projectId && t.week && !t.completed);
       const completedTasks = allTasks.filter(t => t.projectId === projectId && t.completed);
