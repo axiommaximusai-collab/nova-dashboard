@@ -1394,6 +1394,11 @@ const Nova = {
           container.innerHTML = statusProjects.length
             ? statusProjects.map(p => this.createProjectCard(p)).join('')
             : '<div style="color: var(--text-muted); text-align: center; padding: 20px; font-size: 14px;">No projects</div>';
+
+          // Add drag and drop event listeners
+          container.ondragover = (e) => this.handleProjectDragOver(e);
+          container.ondrop = (e) => this.handleProjectDrop(e, status);
+          container.ondragleave = (e) => this.handleProjectDragLeave(e);
         }
 
         if (countElement) {
@@ -1425,7 +1430,12 @@ const Nova = {
     const goalLink = project.goalId ? `<div class="project-goal-link">→ ${project.goalName || 'Goal'}</div>` : '';
 
     return `
-      <div class="project-card" onclick="Nova.viewProjectDetail('${project.id}')" draggable="true">
+      <div class="project-card"
+           data-project-id="${project.id}"
+           draggable="true"
+           ondragstart="Nova.handleProjectDragStart(event, '${project.id}')"
+           ondragend="Nova.handleProjectDragEnd(event)"
+           onclick="Nova.viewProjectDetail('${project.id}')">
         <div class="project-card-header">
           <div class="project-card-title">${project.name}</div>
           <div class="project-card-category">${categoryEmoji} ${project.category}</div>
@@ -1949,6 +1959,62 @@ const Nova = {
     } catch (err) {
       console.error('Failed to delete project:', err);
       alert('Failed to delete project');
+    }
+  },
+
+  // Drag and Drop Handlers
+  draggedProjectId: null,
+
+  handleProjectDragStart(event, projectId) {
+    this.draggedProjectId = projectId;
+    event.target.style.opacity = '0.5';
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/html', event.target.innerHTML);
+  },
+
+  handleProjectDragEnd(event) {
+    event.target.style.opacity = '1';
+  },
+
+  handleProjectDragOver(event) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+
+    // Add visual feedback - highlight the drop zone
+    const dropZone = event.currentTarget;
+    if (dropZone && !dropZone.classList.contains('drag-over')) {
+      dropZone.classList.add('drag-over');
+    }
+  },
+
+  handleProjectDragLeave(event) {
+    // Only remove highlight if leaving the container itself, not child elements
+    if (event.currentTarget === event.target || !event.currentTarget.contains(event.relatedTarget)) {
+      event.currentTarget.classList.remove('drag-over');
+    }
+  },
+
+  async handleProjectDrop(event, targetStatus) {
+    event.preventDefault();
+
+    // Remove visual feedback
+    const dropZone = event.currentTarget;
+    if (dropZone) {
+      dropZone.classList.remove('drag-over');
+    }
+
+    if (!this.draggedProjectId) return;
+
+    try {
+      // Update project status
+      await this.apiPut(`/projects/${this.draggedProjectId}`, { status: targetStatus });
+      this.showNotification('Project moved');
+      this.loadProjects();
+    } catch (err) {
+      console.error('Failed to update project status:', err);
+      alert('Failed to move project');
+    } finally {
+      this.draggedProjectId = null;
     }
   },
 

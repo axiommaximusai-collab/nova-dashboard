@@ -792,6 +792,14 @@ body {
   flex-direction: column;
   gap: 12px;
   padding: 4px;
+  transition: all 0.2s;
+}
+
+.projects-list.drag-over {
+  background: rgba(99, 102, 241, 0.1);
+  border-radius: 8px;
+  outline: 2px dashed var(--primary);
+  outline-offset: -4px;
 }
 
 .project-card {
@@ -1089,6 +1097,8 @@ body {
   max-width: 600px;
   padding: 32px;
   position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .project-edit-close {
@@ -1172,6 +1182,8 @@ body {
   max-width: 500px;
   padding: 32px;
   position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .backlog-task-close {
