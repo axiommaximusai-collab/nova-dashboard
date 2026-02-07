@@ -69,10 +69,10 @@ body {
 }
 
 .logo-text {
-  font-size: 24px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  color: #ffffff;
+  font-size: 22px;
+  font-weight: 300;
+  letter-spacing: 6px;
+  color: #64748b;
   font-family: 'Helvetica Neue', 'Arial', sans-serif;
   text-transform: uppercase;
 }
@@ -83,26 +83,28 @@ body {
 }
 
 .nav-btn {
-  background: var(--card-bg);
+  background: transparent;
   border: none;
-  color: var(--text-secondary);
-  padding: 8px 16px;
-  border-radius: 6px;
+  color: #64748b;
+  padding: 8px 12px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 12px;
+  font-weight: 300;
+  letter-spacing: 2px;
+  text-transform: uppercase;
   transition: all 0.3s ease;
   position: relative;
+  font-family: 'Helvetica Neue', 'Arial', sans-serif;
 }
 
 .nav-btn:hover {
-  color: var(--primary);
-  text-shadow: none;
+  color: #94a3b8;
 }
 
 .nav-btn.active {
-  background: var(--bg);
-  color: var(--accent);
-  border-bottom: 2px solid var(--accent);
+  background: transparent;
+  color: #ffffff;
+  border-bottom: 1px solid #64748b;
 }
 
 .header-actions {
