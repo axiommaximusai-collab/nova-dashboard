@@ -29,14 +29,14 @@
     {
       "id": "task-003",
       "title": "Morning workout routine",
-      "day": "Monday",
+      "day": "Tuesday",
       "priority": "medium",
       "category": "health",
       "projectId": null,
       "goalId": "goal-003",
       "completed": false,
       "createdAt": "2026-02-03",
-      "updatedAt": "2026-02-03"
+      "updatedAt": "2026-02-07"
     },
     {
       "id": "task-004",
@@ -49,30 +49,6 @@
       "completed": false,
       "createdAt": "2026-02-05",
       "updatedAt": "2026-02-05"
-    },
-    {
-      "id": "task-005",
-      "title": "Review Q1 financials",
-      "day": "Tuesday",
-      "priority": "medium",
-      "category": "finance",
-      "projectId": null,
-      "goalId": null,
-      "completed": false,
-      "createdAt": "2026-02-04",
-      "updatedAt": "2026-02-04"
-    },
-    {
-      "id": "task-006",
-      "title": "Practice cold calling script",
-      "day": "Monday",
-      "priority": "low",
-      "category": "business",
-      "projectId": null,
-      "goalId": "goal-004",
-      "completed": false,
-      "createdAt": "2026-02-03",
-      "updatedAt": "2026-02-03"
     },
     {
       "id": "task-007",

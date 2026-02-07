@@ -6,35 +6,27 @@
       "description": "Complete MVP of Nova with all core features and working dashboard. Includes Goals, Tasks, Habits, Projects, and Network tabs fully functional.",
       "timeframe": "short",
       "priority": "high",
-      "progress": 40,
-      "status": "in-progress",
+      "progress": 100,
+      "status": "complete",
       "dueDate": "2026-03-31",
-      "tags": ["business", "tech"],
+      "tags": [
+        "business",
+        "tech"
+      ],
       "parentGoalId": "goal-005",
-      "childGoalIds": ["goal-010", "goal-011", "goal-012"],
-      "linkedHabits": ["habit-001", "habit-002"],
+      "childGoalIds": [
+        "goal-010",
+        "goal-011",
+        "goal-012"
+      ],
+      "linkedHabits": [
+        "habit-001",
+        "habit-002"
+      ],
       "createdAt": "2026-01-15",
-      "updatedAt": "2026-02-06",
-      "completedAt": null,
-      "archived": false
-    },
-    {
-      "id": "goal-002",
-      "title": "Call Francis about TX investment",
-      "description": "Discuss the Texas real estate investment opportunity. Need to make decision by end of month.",
-      "timeframe": "short",
-      "priority": "high",
-      "progress": 0,
-      "status": "not-started",
-      "dueDate": "2026-02-28",
-      "tags": ["business", "finance"],
-      "parentGoalId": null,
-      "childGoalIds": [],
-      "linkedHabits": [],
-      "createdAt": "2026-02-01",
-      "updatedAt": "2026-02-01",
-      "completedAt": null,
-      "archived": false
+      "updatedAt": "2026-02-07",
+      "completedAt": "2026-02-07",
+      "archived": true
     },
     {
       "id": "goal-003",
@@ -42,16 +34,22 @@
       "description": "Build consistent morning routine: wake at 6am, meditation, workout, healthy breakfast.",
       "timeframe": "short",
       "priority": "medium",
-      "progress": 60,
-      "status": "in-progress",
+      "progress": 100,
+      "status": "complete",
       "dueDate": "2026-03-15",
-      "tags": ["health", "personal"],
+      "tags": [
+        "health",
+        "personal"
+      ],
       "parentGoalId": null,
       "childGoalIds": [],
-      "linkedHabits": ["habit-003", "habit-004"],
+      "linkedHabits": [
+        "habit-003",
+        "habit-004"
+      ],
       "createdAt": "2026-01-20",
-      "updatedAt": "2026-02-05",
-      "completedAt": null,
+      "updatedAt": "2026-02-07",
+      "completedAt": "2026-02-07",
       "archived": false
     },
     {
@@ -63,10 +61,14 @@
       "progress": 35,
       "status": "in-progress",
       "dueDate": "2026-08-01",
-      "tags": ["business"],
+      "tags": [
+        "business"
+      ],
       "parentGoalId": null,
       "childGoalIds": [],
-      "linkedHabits": ["habit-005"],
+      "linkedHabits": [
+        "habit-005"
+      ],
       "createdAt": "2026-01-10",
       "updatedAt": "2026-02-06",
       "completedAt": null,
@@ -81,10 +83,18 @@
       "progress": 25,
       "status": "in-progress",
       "dueDate": "2026-12-31",
-      "tags": ["business", "tech"],
+      "tags": [
+        "business",
+        "tech"
+      ],
       "parentGoalId": "goal-020",
-      "childGoalIds": ["goal-001", "goal-015"],
-      "linkedHabits": ["habit-001"],
+      "childGoalIds": [
+        "goal-001",
+        "goal-015"
+      ],
+      "linkedHabits": [
+        "habit-001"
+      ],
       "createdAt": "2025-12-01",
       "updatedAt": "2026-02-06",
       "completedAt": null,
@@ -99,10 +109,15 @@
       "progress": 20,
       "status": "in-progress",
       "dueDate": "2026-09-30",
-      "tags": ["tech", "personal"],
+      "tags": [
+        "tech",
+        "personal"
+      ],
       "parentGoalId": null,
       "childGoalIds": [],
-      "linkedHabits": ["habit-006"],
+      "linkedHabits": [
+        "habit-006"
+      ],
       "createdAt": "2026-01-25",
       "updatedAt": "2026-02-03",
       "completedAt": null,
@@ -117,7 +132,10 @@
       "progress": 15,
       "status": "in-progress",
       "dueDate": "2026-11-30",
-      "tags": ["business", "finance"],
+      "tags": [
+        "business",
+        "finance"
+      ],
       "parentGoalId": null,
       "childGoalIds": [],
       "linkedHabits": [],
@@ -135,10 +153,19 @@
       "progress": 10,
       "status": "in-progress",
       "dueDate": "2030-12-31",
-      "tags": ["business", "tech", "personal"],
+      "tags": [
+        "business",
+        "tech",
+        "personal"
+      ],
       "parentGoalId": null,
-      "childGoalIds": ["goal-005"],
-      "linkedHabits": ["habit-001", "habit-006"],
+      "childGoalIds": [
+        "goal-005"
+      ],
+      "linkedHabits": [
+        "habit-001",
+        "habit-006"
+      ],
       "createdAt": "2025-11-01",
       "updatedAt": "2026-02-06",
       "completedAt": null,
@@ -153,7 +180,10 @@
       "progress": 8,
       "status": "in-progress",
       "dueDate": "2028-12-31",
-      "tags": ["finance", "personal"],
+      "tags": [
+        "finance",
+        "personal"
+      ],
       "parentGoalId": null,
       "childGoalIds": [],
       "linkedHabits": [],
@@ -171,10 +201,17 @@
       "progress": 30,
       "status": "in-progress",
       "dueDate": "2029-12-31",
-      "tags": ["health", "personal", "family"],
+      "tags": [
+        "health",
+        "personal",
+        "family"
+      ],
       "parentGoalId": null,
       "childGoalIds": [],
-      "linkedHabits": ["habit-003", "habit-004"],
+      "linkedHabits": [
+        "habit-003",
+        "habit-004"
+      ],
       "createdAt": "2025-09-01",
       "updatedAt": "2026-02-05",
       "completedAt": null,
@@ -189,10 +226,14 @@
       "progress": 75,
       "status": "in-progress",
       "dueDate": "2026-02-28",
-      "tags": ["tech"],
+      "tags": [
+        "tech"
+      ],
       "parentGoalId": "goal-001",
       "childGoalIds": [],
-      "linkedHabits": ["habit-001"],
+      "linkedHabits": [
+        "habit-001"
+      ],
       "createdAt": "2026-01-15",
       "updatedAt": "2026-02-06",
       "completedAt": null,
@@ -207,10 +248,14 @@
       "progress": 60,
       "status": "in-progress",
       "dueDate": "2026-03-15",
-      "tags": ["tech"],
+      "tags": [
+        "tech"
+      ],
       "parentGoalId": "goal-001",
       "childGoalIds": [],
-      "linkedHabits": ["habit-001"],
+      "linkedHabits": [
+        "habit-001"
+      ],
       "createdAt": "2026-01-15",
       "updatedAt": "2026-02-06",
       "completedAt": null,
@@ -225,7 +270,9 @@
       "progress": 10,
       "status": "not-started",
       "dueDate": "2026-03-25",
-      "tags": ["tech"],
+      "tags": [
+        "tech"
+      ],
       "parentGoalId": "goal-001",
       "childGoalIds": [],
       "linkedHabits": [],
@@ -243,7 +290,10 @@
       "progress": 5,
       "status": "not-started",
       "dueDate": "2026-10-31",
-      "tags": ["business", "tech"],
+      "tags": [
+        "business",
+        "tech"
+      ],
       "parentGoalId": "goal-005",
       "childGoalIds": [],
       "linkedHabits": [],

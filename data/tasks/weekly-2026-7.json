@@ -1,0 +1,21 @@
+{
+  "year": 2026,
+  "week": 7,
+  "tasks": [
+    {
+      "id": "task-006",
+      "title": "Practice cold calling script",
+      "day": "Monday",
+      "priority": "low",
+      "category": "business",
+      "projectId": null,
+      "goalId": "goal-004",
+      "completed": false,
+      "createdAt": "2026-02-03",
+      "updatedAt": "2026-02-07",
+      "week": 7,
+      "year": 2026,
+      "pushedFrom": "2026-6"
+    }
+  ]
+}
