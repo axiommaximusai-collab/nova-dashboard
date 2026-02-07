@@ -3,7 +3,9 @@ const Nova = {
   currentTab: 'dashboard',
   currentGoalView: 'daily',
   taskFilter: 'all',
-  
+  showPushedColumn: false,
+  showArchivedColumn: false,
+
   init() {
     this.setupNavigation();
     this.setupEventListeners();
@@ -259,7 +261,7 @@ const Nova = {
     document.getElementById('urgentCount').textContent = urgent.count || 0;
     document.getElementById('urgentList').innerHTML = urgent.items?.length
       ? urgent.items.map(item => `
-        <div class="urgent-item" onclick="nova.switchTab('${item.link.substring(1)}')">
+        <div class="urgent-item" onclick="Nova.switchTab('${item.link.substring(1)}')">
           <span class="urgent-type ${item.type}">${item.type === 'task' ? '📋' : item.type === 'network' ? '👤' : '⚖️'}</span>
           <span class="urgent-title">${item.title}</span>
         </div>
@@ -287,8 +289,8 @@ const Nova = {
           </div>
           <p class="suggestion-text">${sugg.text}</p>
           <div class="suggestion-actions">
-            <button class="suggestion-btn" onclick="nova.dismissSuggestion('${sugg.id}')">Dismiss</button>
-            <button class="suggestion-btn primary" onclick="nova.markSuggestionDone('${sugg.id}')">Done</button>
+            <button class="suggestion-btn" onclick="Nova.dismissSuggestion('${sugg.id}')">Dismiss</button>
+            <button class="suggestion-btn primary" onclick="Nova.markSuggestionDone('${sugg.id}')">Done</button>
           </div>
         </div>
       `).join('')
@@ -395,7 +397,7 @@ const Nova = {
     const dueDateText = goal.dueDate ? `Due: ${new Date(goal.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : 'No due date';
 
     return `
-      <div class="goal-card" data-id="${goal.id}" draggable="true" onclick="nova.openGoalDetail('${goal.id}')">
+      <div class="goal-card" data-id="${goal.id}" draggable="true" onclick="Nova.openGoalDetail('${goal.id}')">
         <div class="priority-badge ${goal.priority}">${priorityEmoji} ${goal.priority.toUpperCase()}</div>
         <div class="goal-title">${goal.title}</div>
         <div class="goal-progress">
@@ -413,9 +415,9 @@ const Nova = {
           </div>
         ` : ''}
         <div class="goal-actions" onclick="event.stopPropagation()">
-          <button class="goal-action-btn" onclick="nova.quickCompleteGoal('${goal.id}')">✓</button>
-          <button class="goal-action-btn" onclick="nova.openEditGoal('${goal.id}')">✎</button>
-          <button class="goal-action-btn delete" onclick="nova.deleteGoal('${goal.id}')">🗑️</button>
+          <button class="goal-action-btn" onclick="Nova.quickCompleteGoal('${goal.id}')">✓</button>
+          <button class="goal-action-btn" onclick="Nova.openEditGoal('${goal.id}')">✎</button>
+          <button class="goal-action-btn delete" onclick="Nova.deleteGoal('${goal.id}')">🗑️</button>
         </div>
       </div>
     `;
@@ -471,7 +473,7 @@ const Nova = {
             ${parentGoal ? `
               <div style="margin-bottom: 20px;">
                 <div class="info-label" style="margin-bottom: 8px;">SUPPORTS (Parent Goal):</div>
-                <div class="goal-hierarchy-item" onclick="nova.openGoalDetail('${parentGoal.id}')">
+                <div class="goal-hierarchy-item" onclick="Nova.openGoalDetail('${parentGoal.id}')">
                   <div class="hierarchy-title">→ ${parentGoal.title}</div>
                   <div class="hierarchy-progress">
                     <div class="hierarchy-progress-bar">
@@ -486,7 +488,7 @@ const Nova = {
               <div>
                 <div class="info-label" style="margin-bottom: 8px;">COMPRISED OF (Child Goals):</div>
                 ${childGoals.map(child => `
-                  <div class="goal-hierarchy-item" onclick="nova.openGoalDetail('${child.id}')">
+                  <div class="goal-hierarchy-item" onclick="Nova.openGoalDetail('${child.id}')">
                     <div class="hierarchy-title">• ${child.title}</div>
                     <div class="hierarchy-progress">
                       <div class="hierarchy-progress-bar">
@@ -502,9 +504,9 @@ const Nova = {
         ` : ''}
 
         <div class="goal-detail-actions">
-          <button class="btn-secondary" onclick="nova.closeGoalDetail()">Close</button>
-          <button class="btn-secondary" onclick="nova.openEditGoal('${goal.id}')">Edit</button>
-          <button class="btn-primary" onclick="nova.completeGoal('${goal.id}')">Mark Complete</button>
+          <button class="btn-secondary" onclick="Nova.closeGoalDetail()">Close</button>
+          <button class="btn-secondary" onclick="Nova.openEditGoal('${goal.id}')">Edit</button>
+          <button class="btn-primary" onclick="Nova.completeGoal('${goal.id}')">Mark Complete</button>
         </div>
       `;
 
@@ -900,8 +902,16 @@ const Nova = {
     container.innerHTML = tasks.map(task => this.createTaskCard(task)).join('');
   },
 
+  getPriorityColor(priority) {
+    const colors = {
+      'high': '#dc2626',
+      'medium': '#f59e0b',
+      'low': '#10b981'
+    };
+    return colors[priority] || colors.medium;
+  },
+
   createTaskCard(task) {
-    const priorityEmoji = task.priority === 'high' ? '🔴' : task.priority === 'medium' ? '🟡' : '🟢';
     const category = this.categories.find(c => c.id === task.category);
     const categoryDisplay = category ? `<span class="task-card-category" style="color: ${category.color}">${category.icon} ${category.name}</span>` : '';
 
@@ -912,18 +922,23 @@ const Nova = {
       linkDisplay = `<div class="task-card-link">→ Goal</div>`;
     }
 
+    const priorityColor = this.getPriorityColor(task.priority);
+
     return `
-      <div class="task-card ${task.completed ? 'completed' : ''} ${task.archived ? 'archived' : ''}" data-id="${task.id}" draggable="true" onclick="nova.openTaskEdit('${task.id}')">
-        <div class="task-priority ${task.priority}">${priorityEmoji} ${task.priority.toUpperCase()}</div>
+      <div class="task-card ${task.completed ? 'completed' : ''} ${task.archived ? 'archived' : ''}"
+           data-id="${task.id}"
+           draggable="true"
+           onclick="Nova.openTaskEdit('${task.id}')"
+           style="border-left: 4px solid ${priorityColor}">
         <div class="task-card-title">${task.title}</div>
         ${categoryDisplay}
         ${linkDisplay}
         <div class="task-card-actions" onclick="event.stopPropagation()">
-          <button class="task-action-btn" onclick="nova.toggleTaskComplete('${task.id}', ${!task.completed})" title="${task.completed ? 'Reopen' : 'Complete'}">${task.completed ? '↺' : '✓'}</button>
-          <button class="task-action-btn" onclick="nova.openTaskEdit('${task.id}')" title="Edit">✎</button>
-          <button class="task-action-btn" onclick="nova.pushTask('${task.id}')" title="Push to next week">→</button>
-          <button class="task-action-btn" onclick="nova.archiveTask('${task.id}')" title="Archive">📦</button>
-          <button class="task-action-btn delete" onclick="nova.deleteTask('${task.id}')" title="Delete">🗑️</button>
+          <button class="task-action-btn" onclick="Nova.toggleTaskComplete('${task.id}', ${!task.completed})" title="${task.completed ? 'Reopen' : 'Complete'}">${task.completed ? '↺' : '✓'}</button>
+          <button class="task-action-btn" onclick="Nova.openTaskEdit('${task.id}')" title="Edit">✎</button>
+          <button class="task-action-btn" onclick="Nova.pushTask('${task.id}')" title="Push to next week">→</button>
+          <button class="task-action-btn" onclick="Nova.archiveTask('${task.id}')" title="Archive">📦</button>
+          <button class="task-action-btn delete" onclick="Nova.deleteTask('${task.id}')" title="Delete">🗑️</button>
         </div>
       </div>
     `;
