@@ -238,6 +238,7 @@ router.put('/:id/push', async (req, res) => {
     const nextWeekData = await readTasks(nextYear, nextWeek);
     task.week = nextWeek;
     task.year = nextYear;
+    task.pushed = true;
     task.pushedFrom = `${year}-${week}`;
     task.updatedAt = new Date().toISOString().split('T')[0];
 

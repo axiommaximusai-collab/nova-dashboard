@@ -24,31 +24,9 @@
       "goalId": "goal-002",
       "completed": false,
       "createdAt": "2026-02-04",
-      "updatedAt": "2026-02-04"
-    },
-    {
-      "id": "task-004",
-      "title": "Code Goals API endpoints",
-      "day": "Wednesday",
-      "priority": "high",
-      "category": "tech",
-      "projectId": "proj-001",
-      "goalId": "goal-011",
-      "completed": false,
-      "createdAt": "2026-02-05",
-      "updatedAt": "2026-02-05"
-    },
-    {
-      "id": "task-007",
-      "title": "SQL tutorial - Chapter 5",
-      "day": "Thursday",
-      "priority": "medium",
-      "category": "learning",
-      "projectId": null,
-      "goalId": "goal-006",
-      "completed": false,
-      "createdAt": "2026-02-06",
-      "updatedAt": "2026-02-06"
+      "updatedAt": "2026-02-04",
+      "archived": true,
+      "archivedAt": "2026-02-07"
     }
   ]
 }
