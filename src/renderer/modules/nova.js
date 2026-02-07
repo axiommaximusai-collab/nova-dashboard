@@ -7,6 +7,8 @@ const Nova = {
   showArchivedColumn: false,
   showArchivedWorkflows: false,
   currentWorkflowId: null,
+  projectCategoryFilter: 'all',
+  currentProjectId: null,
 
   init() {
     this.setupNavigation();
@@ -145,7 +147,29 @@ const Nova = {
     document.getElementById('viewArchivedTasksBtn')?.addEventListener('click', () => this.viewArchivedTasks());
     document.getElementById('clearWeekBtn')?.addEventListener('click', () => this.clearWeek());
 
-    document.getElementById('newProjectBtn').addEventListener('click', () => this.showAddProjectModal());
+    document.getElementById('newProjectBtn').addEventListener('click', () => this.openCreateProject());
+
+    // Projects kanban
+    document.getElementById('projectCategoryFilter')?.addEventListener('change', (e) => {
+      this.projectCategoryFilter = e.target.value;
+      this.loadProjects();
+    });
+
+    document.querySelector('.project-detail-close')?.addEventListener('click', () => this.closeProjectDetail());
+    document.querySelector('.project-edit-close')?.addEventListener('click', () => this.closeProjectEdit());
+    document.getElementById('projectEditCancel')?.addEventListener('click', () => this.closeProjectEdit());
+    document.getElementById('projectEditSave')?.addEventListener('click', () => this.saveProject());
+
+    document.querySelector('.backlog-task-close')?.addEventListener('click', () => this.closeBacklogTaskModal());
+    document.getElementById('backlogTaskCancel')?.addEventListener('click', () => this.closeBacklogTaskModal());
+    document.getElementById('backlogTaskSave')?.addEventListener('click', () => this.saveBacklogTask());
+
+    document.querySelectorAll('.add-project-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const status = e.target.dataset.status;
+        this.openCreateProject(status);
+      });
+    });
     document.getElementById('newHabitBtn').addEventListener('click', () => this.showAddHabitModal());
     document.getElementById('quickAddMemory').addEventListener('click', () => this.showAddMemoryModal());
     document.getElementById('newWorkflowBtn').addEventListener('click', () => this.showAddWorkflowModal());
@@ -1349,31 +1373,81 @@ const Nova = {
 
   // Projects
   async loadProjects() {
-    const projects = await this.apiGet('/projects/');
-    document.getElementById('projectsGrid').innerHTML = projects.length
-      ? projects.map(p => `
-        <div class="project-card" onclick="Nova.viewProject('${p.id}')">
-          <div class="project-header">
-            <h4>${p.name}</h4>
-            <span class="project-status ${p.status}">${p.status}</span>
-          </div>
-          <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 12px;">
-            ${p.description?.substring(0, 80) || 'No description'}...
-          </p>
-          <div class="project-progress">
-            <div class="project-progress-bar">
-              <div class="project-progress-fill" style="width: ${p.progress || 0}%"></div>
-            </div>
-            <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted);">
-              <span>${p.progress || 0}% complete</span>
-              <span>${p.deadline || 'No deadline'}</span>
-            </div>
-          </div>
-        </div>
-      `).join('')
-      : '<p style="color: var(--text-muted);">No projects yet. Create one!</p>';
+    try {
+      const projectsData = await this.apiGet('/projects/');
+      const projects = projectsData.projects || projectsData;
+
+      // Filter by category
+      const filtered = this.projectCategoryFilter === 'all'
+        ? projects
+        : projects.filter(p => p.category === this.projectCategoryFilter);
+
+      // Populate each kanban column
+      const statuses = ['backlog', 'in-progress', 'review', 'done', 'archived'];
+
+      for (const status of statuses) {
+        const statusProjects = filtered.filter(p => p.status === status);
+        const container = document.getElementById(`projects-${status}`);
+        const countElement = document.getElementById(`count-${status}`);
+
+        if (container) {
+          container.innerHTML = statusProjects.length
+            ? statusProjects.map(p => this.createProjectCard(p)).join('')
+            : '<div style="color: var(--text-muted); text-align: center; padding: 20px; font-size: 14px;">No projects</div>';
+        }
+
+        if (countElement) {
+          countElement.textContent = statusProjects.length;
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load projects:', err);
+    }
   },
-  
+
+  createProjectCard(project) {
+    const categoryEmojis = {
+      'Business': '💼',
+      'Tech': '💻',
+      'Personal': '👤',
+      'Health': '❤️',
+      'Finance': '💰'
+    };
+
+    const categoryEmoji = categoryEmojis[project.category] || '📁';
+    const progress = project.progress || 0;
+    const deadline = project.deadline ? new Date(project.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'No deadline';
+
+    // Get backlog task count
+    const backlogCount = project.backlogCount || 0;
+
+    // Get linked goal name (simplified for now)
+    const goalLink = project.goalId ? `<div class="project-goal-link">→ ${project.goalName || 'Goal'}</div>` : '';
+
+    return `
+      <div class="project-card" onclick="Nova.viewProjectDetail('${project.id}')" draggable="true">
+        <div class="project-card-header">
+          <div class="project-card-title">${project.name}</div>
+          <div class="project-card-category">${categoryEmoji} ${project.category}</div>
+        </div>
+
+        <div class="project-card-progress">
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" style="width: ${progress}%"></div>
+          </div>
+          <span class="progress-text">${progress}%</span>
+        </div>
+
+        ${goalLink}
+
+        <div class="project-card-footer">
+          <span class="project-backlog-count">📋 ${backlogCount} backlog</span>
+          <span class="project-deadline">${deadline}</span>
+        </div>
+      </div>
+    `;
+  },
+
   // Workflows
   async loadWorkflows() {
     try {
@@ -1654,7 +1728,303 @@ const Nova = {
       alert('Failed to delete attachment');
     }
   },
-  
+
+  // Project Operations
+  openCreateProject(status = 'backlog') {
+    this.currentProjectId = null;
+    document.getElementById('projectEditTitle').textContent = 'Create Project';
+    document.getElementById('projectNameInput').value = '';
+    document.getElementById('projectDescriptionInput').value = '';
+    document.getElementById('projectCategoryInput').value = 'Business';
+    document.getElementById('projectDeadlineInput').value = '';
+    document.getElementById('projectGoalInput').value = '';
+
+    // Set status radio button
+    document.querySelectorAll('input[name="projectStatus"]').forEach(radio => {
+      radio.checked = radio.value === status;
+    });
+
+    // Load goals into dropdown
+    this.loadGoalsForProject();
+
+    document.getElementById('projectEditModal').classList.add('active');
+  },
+
+  async loadGoalsForProject() {
+    try {
+      const goals = await this.apiGet('/goals/');
+      const goalSelect = document.getElementById('projectGoalInput');
+      goalSelect.innerHTML = '<option value="">None</option>';
+
+      goals.forEach(goal => {
+        const option = document.createElement('option');
+        option.value = goal.id;
+        option.textContent = goal.title;
+        goalSelect.appendChild(option);
+      });
+    } catch (err) {
+      console.error('Failed to load goals:', err);
+    }
+  },
+
+  closeProjectEdit() {
+    document.getElementById('projectEditModal').classList.remove('active');
+    this.currentProjectId = null;
+  },
+
+  async saveProject() {
+    const name = document.getElementById('projectNameInput').value.trim();
+    const description = document.getElementById('projectDescriptionInput').value.trim();
+    const category = document.getElementById('projectCategoryInput').value;
+    const deadline = document.getElementById('projectDeadlineInput').value || null;
+    const goalId = document.getElementById('projectGoalInput').value || null;
+    const status = document.querySelector('input[name="projectStatus"]:checked')?.value || 'backlog';
+
+    if (!name) {
+      alert('Please enter a project name');
+      return;
+    }
+
+    const projectData = {
+      name,
+      description,
+      category,
+      deadline,
+      goalId,
+      status,
+      progress: 0,
+      backlogCount: 0
+    };
+
+    try {
+      if (this.currentProjectId) {
+        await this.apiPut(`/projects/${this.currentProjectId}`, projectData);
+        this.showNotification('Project updated');
+      } else {
+        await this.apiPost('/projects/', projectData);
+        this.showNotification('Project created');
+      }
+
+      this.closeProjectEdit();
+      this.loadProjects();
+    } catch (err) {
+      console.error('Failed to save project:', err);
+      alert('Failed to save project');
+    }
+  },
+
+  async viewProjectDetail(projectId) {
+    try {
+      const project = await this.apiGet(`/projects/${projectId}`);
+      this.currentProjectId = projectId;
+
+      // Get backlog tasks for this project
+      const tasksData = await this.apiGet('/tasks/');
+      const allTasks = tasksData.tasks || tasksData;
+      const backlogTasks = allTasks.filter(t => t.projectId === projectId && !t.week && !t.day);
+      const activeTasks = allTasks.filter(t => t.projectId === projectId && t.week && !t.completed);
+      const completedTasks = allTasks.filter(t => t.projectId === projectId && t.completed);
+
+      const modal = document.getElementById('projectDetailModal');
+      const body = document.getElementById('projectDetailBody');
+
+      const categoryEmojis = {
+        'Business': '💼',
+        'Tech': '💻',
+        'Personal': '👤',
+        'Health': '❤️',
+        'Finance': '💰'
+      };
+      const categoryEmoji = categoryEmojis[project.category] || '📁';
+
+      body.innerHTML = `
+        <div class="project-detail-header">
+          <h1>${project.name}</h1>
+          <div class="project-detail-meta">
+            <span class="project-badge">${categoryEmoji} ${project.category}</span>
+            <span class="progress-badge">${project.progress || 0}% Complete</span>
+          </div>
+        </div>
+
+        ${project.description ? `
+          <div class="project-detail-section">
+            <h3>Description</h3>
+            <p style="color: var(--text-secondary); line-height: 1.6;">${project.description}</p>
+          </div>
+        ` : ''}
+
+        <div class="project-detail-section">
+          <div class="section-header">
+            <h3>📋 Backlog Tasks</h3>
+            <button class="btn-sm btn-primary" onclick="Nova.openBacklogTaskModal('${projectId}')">+ Add Task</button>
+          </div>
+          ${backlogTasks.length > 0 ? `
+            <div class="backlog-tasks-list">
+              ${backlogTasks.map(task => `
+                <div class="backlog-task-item">
+                  <div class="backlog-task-title">${task.title}</div>
+                  <button class="btn-sm btn-secondary" onclick="Nova.scheduleTaskToWeek('${task.id}')">Add to Week</button>
+                </div>
+              `).join('')}
+            </div>
+          ` : '<p style="color: var(--text-muted); margin-top: 12px;">No backlog tasks</p>'}
+        </div>
+
+        ${activeTasks.length > 0 ? `
+          <div class="project-detail-section">
+            <h3>⚡ Active Tasks (This Week)</h3>
+            <div class="active-tasks-list">
+              ${activeTasks.map(task => `
+                <div class="active-task-item">
+                  <div>${task.title}</div>
+                  <span class="task-week-label">${task.day || 'Unscheduled'}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+
+        ${completedTasks.length > 0 ? `
+          <div class="project-detail-section">
+            <h3>✅ Completed Tasks</h3>
+            <div class="completed-tasks-list">
+              ${completedTasks.map(task => `
+                <div class="completed-task-item">${task.title}</div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+
+        <div class="project-detail-actions">
+          <button class="btn-secondary" onclick="Nova.editProject('${projectId}')">Edit Project</button>
+          <button class="btn-danger" onclick="Nova.deleteProject('${projectId}')">Delete Project</button>
+        </div>
+      `;
+
+      modal.classList.add('active');
+    } catch (err) {
+      console.error('Failed to load project detail:', err);
+      alert('Failed to load project details');
+    }
+  },
+
+  closeProjectDetail() {
+    document.getElementById('projectDetailModal').classList.remove('active');
+    this.currentProjectId = null;
+  },
+
+  async editProject(projectId) {
+    try {
+      const project = await this.apiGet(`/projects/${projectId}`);
+      this.currentProjectId = projectId;
+
+      document.getElementById('projectEditTitle').textContent = 'Edit Project';
+      document.getElementById('projectNameInput').value = project.name;
+      document.getElementById('projectDescriptionInput').value = project.description || '';
+      document.getElementById('projectCategoryInput').value = project.category;
+      document.getElementById('projectDeadlineInput').value = project.deadline || '';
+      document.getElementById('projectGoalInput').value = project.goalId || '';
+
+      document.querySelectorAll('input[name="projectStatus"]').forEach(radio => {
+        radio.checked = radio.value === project.status;
+      });
+
+      await this.loadGoalsForProject();
+      this.closeProjectDetail();
+      document.getElementById('projectEditModal').classList.add('active');
+    } catch (err) {
+      console.error('Failed to load project for editing:', err);
+      alert('Failed to load project');
+    }
+  },
+
+  async deleteProject(projectId) {
+    if (!confirm('Delete this project? This cannot be undone.')) return;
+
+    try {
+      await this.apiDelete(`/projects/${projectId}`);
+      this.showNotification('Project deleted');
+      this.closeProjectDetail();
+      this.loadProjects();
+    } catch (err) {
+      console.error('Failed to delete project:', err);
+      alert('Failed to delete project');
+    }
+  },
+
+  openBacklogTaskModal(projectId) {
+    this.currentProjectId = projectId;
+    document.getElementById('backlogTaskTitleInput').value = '';
+    this.apiGet(`/projects/${projectId}`).then(project => {
+      document.getElementById('backlogTaskProjectName').value = project.name;
+    });
+    document.getElementById('backlogTaskModal').classList.add('active');
+  },
+
+  closeBacklogTaskModal() {
+    document.getElementById('backlogTaskModal').classList.remove('active');
+  },
+
+  async saveBacklogTask() {
+    const title = document.getElementById('backlogTaskTitleInput').value.trim();
+
+    if (!title) {
+      alert('Please enter a task title');
+      return;
+    }
+
+    if (!this.currentProjectId) {
+      alert('No project selected');
+      return;
+    }
+
+    try {
+      const taskData = {
+        title,
+        projectId: this.currentProjectId,
+        status: 'backlog',
+        week: null,
+        day: null,
+        completed: false,
+        createdAt: new Date().toISOString()
+      };
+
+      await this.apiPost('/tasks/', taskData);
+      this.showNotification('Task added to backlog');
+      this.closeBacklogTaskModal();
+      this.viewProjectDetail(this.currentProjectId); // Reload project detail
+      this.loadProjects(); // Reload to update backlog count
+    } catch (err) {
+      console.error('Failed to create backlog task:', err);
+      alert('Failed to create task');
+    }
+  },
+
+  async scheduleTaskToWeek(taskId) {
+    try {
+      // Get current week number
+      const now = new Date();
+      const startOfYear = new Date(now.getFullYear(), 0, 1);
+      const weekNum = Math.ceil((((now - startOfYear) / 86400000) + startOfYear.getDay() + 1) / 7);
+      const currentWeek = `${now.getFullYear()}-${weekNum}`;
+
+      // Update task with week but no day yet (unscheduled in weekly view)
+      await this.apiPut(`/tasks/${taskId}`, {
+        week: currentWeek,
+        day: null,
+        status: 'todo'
+      });
+
+      this.showNotification('Task added to this week');
+      this.viewProjectDetail(this.currentProjectId);
+      this.loadTasks(); // Reload tasks tab
+      this.loadProjects(); // Update project
+    } catch (err) {
+      console.error('Failed to schedule task:', err);
+      alert('Failed to schedule task');
+    }
+  },
+
   // Habits
   async loadHabits() {
     const habits = await this.apiGet('/habits/');

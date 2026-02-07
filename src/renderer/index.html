@@ -521,10 +521,165 @@
       <section class="tab-panel" id="projects">
         <div class="tab-header">
           <h2>Projects</h2>
-          <button class="btn-primary" id="newProjectBtn">+ New Project</button>
+          <div style="display: flex; gap: 12px;">
+            <select id="projectCategoryFilter" class="filter-select">
+              <option value="all">Category: All</option>
+              <option value="Business">Business</option>
+              <option value="Tech">Tech</option>
+              <option value="Personal">Personal</option>
+              <option value="Health">Health</option>
+              <option value="Finance">Finance</option>
+            </select>
+            <button class="btn-primary" id="newProjectBtn">+ New Project</button>
+          </div>
         </div>
-        <div id="projectsGrid" class="projects-grid"></div>
+
+        <div class="projects-kanban">
+          <!-- Backlog Column -->
+          <div class="projects-column" data-status="backlog">
+            <div class="column-header">
+              <h3>Backlog</h3>
+              <span class="column-count" id="count-backlog">0</span>
+            </div>
+            <div class="projects-list" id="projects-backlog" data-status="backlog">
+              <div class="loading">Loading...</div>
+            </div>
+            <button class="add-project-btn" data-status="backlog">+ Add</button>
+          </div>
+
+          <!-- In Progress Column -->
+          <div class="projects-column" data-status="in-progress">
+            <div class="column-header">
+              <h3>In Progress</h3>
+              <span class="column-count" id="count-in-progress">0</span>
+            </div>
+            <div class="projects-list" id="projects-in-progress" data-status="in-progress">
+              <div class="loading">Loading...</div>
+            </div>
+            <button class="add-project-btn" data-status="in-progress">+ Add</button>
+          </div>
+
+          <!-- Review Column -->
+          <div class="projects-column" data-status="review">
+            <div class="column-header">
+              <h3>Review</h3>
+              <span class="column-count" id="count-review">0</span>
+            </div>
+            <div class="projects-list" id="projects-review" data-status="review">
+              <div class="loading">Loading...</div>
+            </div>
+            <button class="add-project-btn" data-status="review">+ Add</button>
+          </div>
+
+          <!-- Done Column -->
+          <div class="projects-column" data-status="done">
+            <div class="column-header">
+              <h3>Done</h3>
+              <span class="column-count" id="count-done">0</span>
+            </div>
+            <div class="projects-list" id="projects-done" data-status="done">
+              <div class="loading">Loading...</div>
+            </div>
+            <button class="add-project-btn" data-status="done">+ Add</button>
+          </div>
+
+          <!-- Archived Column -->
+          <div class="projects-column" data-status="archived">
+            <div class="column-header">
+              <h3>Archived</h3>
+              <span class="column-count" id="count-archived">0</span>
+            </div>
+            <div class="projects-list" id="projects-archived" data-status="archived">
+              <div class="loading">Loading...</div>
+            </div>
+            <button class="add-project-btn" data-status="archived">+ Add</button>
+          </div>
+        </div>
       </section>
+
+      <!-- PROJECT DETAIL MODAL -->
+      <div class="project-detail-modal" id="projectDetailModal">
+        <div class="project-detail-content">
+          <button class="project-detail-close">&times;</button>
+          <div id="projectDetailBody">
+            <!-- Dynamic content loaded here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- CREATE/EDIT PROJECT MODAL -->
+      <div class="project-edit-modal" id="projectEditModal">
+        <div class="project-edit-content">
+          <button class="project-edit-close">&times;</button>
+          <h2 id="projectEditTitle">Create Project</h2>
+          <div class="project-edit-body">
+            <div class="form-group">
+              <label>Project Name</label>
+              <input type="text" id="projectNameInput" placeholder="Enter project name..." class="form-input">
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea id="projectDescriptionInput" rows="3" placeholder="Brief description..." class="form-input"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Category</label>
+              <select id="projectCategoryInput" class="form-input">
+                <option value="Business">💼 Business</option>
+                <option value="Tech">💻 Tech</option>
+                <option value="Personal">👤 Personal</option>
+                <option value="Health">❤️ Health</option>
+                <option value="Finance">💰 Finance</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Deadline (optional)</label>
+              <input type="date" id="projectDeadlineInput" class="form-input">
+            </div>
+            <div class="form-group">
+              <label>Supports Goal (optional)</label>
+              <select id="projectGoalInput" class="form-input">
+                <option value="">None</option>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Status</label>
+              <div class="radio-group">
+                <label class="radio-option"><input type="radio" name="projectStatus" value="backlog" checked> Backlog</label>
+                <label class="radio-option"><input type="radio" name="projectStatus" value="in-progress"> In Progress</label>
+                <label class="radio-option"><input type="radio" name="projectStatus" value="review"> Review</label>
+                <label class="radio-option"><input type="radio" name="projectStatus" value="done"> Done</label>
+              </div>
+            </div>
+          </div>
+          <div class="project-edit-footer">
+            <button class="btn-secondary" id="projectEditCancel">Cancel</button>
+            <button class="btn-primary" id="projectEditSave">Save</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADD BACKLOG TASK MODAL -->
+      <div class="backlog-task-modal" id="backlogTaskModal">
+        <div class="backlog-task-content">
+          <button class="backlog-task-close">&times;</button>
+          <h2>Add Backlog Task</h2>
+          <div class="backlog-task-body">
+            <div class="form-group">
+              <label>Task</label>
+              <input type="text" id="backlogTaskTitleInput" placeholder="Enter task..." class="form-input">
+            </div>
+            <div class="form-group">
+              <label>Project</label>
+              <input type="text" id="backlogTaskProjectName" class="form-input" readonly>
+            </div>
+          </div>
+          <div class="backlog-task-footer">
+            <button class="btn-secondary" id="backlogTaskCancel">Cancel</button>
+            <button class="btn-primary" id="backlogTaskSave">Add to Backlog</button>
+          </div>
+        </div>
+      </div>
 
       <!-- WORKFLOWS TAB -->
       <section class="tab-panel" id="workflows">
